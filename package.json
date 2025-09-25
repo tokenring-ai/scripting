@@ -1,0 +1,21 @@
+{
+ "name": "@tokenring-ai/scripting",
+ "version": "0.1.0",
+ "description": "Scripting package for the TokenRing AI ecosystem.",
+ "type": "module",
+ "main": "index.ts",
+ "scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1"
+ },
+ "keywords": [
+  "tokenring",
+  "scripting",
+  "ai"
+ ],
+ "author": "TokenRing",
+ "license": "MIT",
+ "dependencies": {
+  "@tokenring-ai/agent": "^0.1.0",
+  "@tokenring-ai/utility": "^0.1.0"
+ }
+}

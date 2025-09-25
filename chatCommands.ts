@@ -1,0 +1,1 @@
+export * as script from "./chatCommands/script.ts";
