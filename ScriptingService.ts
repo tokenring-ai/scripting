@@ -1,6 +1,18 @@
 import {Agent} from "@tokenring-ai/agent";
 import {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
+import {z} from "zod";
+
+export const ScriptSchema = z.union([
+  z.array(z.string()),
+  z.function({
+    input: z.tuple([z.string()]),
+    output: z.promise(z.array(z.string()))
+  })
+]);
+
+export type Script = z.infer<typeof ScriptSchema>;
+
 
 export type ScriptResult = {
   ok: boolean;
@@ -8,8 +20,6 @@ export type ScriptResult = {
   error?: string;
   nextScriptResult?: ScriptResult;
 }
-
-export type Script = string[]|((input: string) => Promise<string[]>);
 
 export type ScriptingServiceOptions = Record<string, Script>;
 
