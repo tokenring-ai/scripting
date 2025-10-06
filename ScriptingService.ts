@@ -28,6 +28,10 @@ export type ScriptFunction = {
   type: 'static' | 'llm' | 'js';
   params: string[];
   body: string;
+} | {
+  type: 'native';
+  params: string[];
+  impl: (...args: string[]) => string | string[] | Promise<string | string[]>;
 };
 
 /**
@@ -66,7 +70,7 @@ export default class ScriptingService implements TokenRingService {
   /**
    * Execute a function with given arguments
    */
-  async executeFunction(funcName: string, args: string[], agent: Agent): Promise<string> {
+  async executeFunction(funcName: string, args: string[], agent: Agent): Promise<string | string[]> {
     const context = agent.getState(ScriptingContext);
     const func = this.resolveFunction(funcName, agent);
     
@@ -82,9 +86,18 @@ export default class ScriptingService implements TokenRingService {
     func.params.forEach((param, i) => context.variables.set(param, args[i]));
     
     try {
-      let result: string;
-      if (func.type === 'js') {
-        result = await this.executeJavaScript(func.body, func.params, args);
+      let result: string | string[];
+      if (func.type === 'native') {
+        result = await Promise.resolve(func.impl(...args));
+      } else if (func.type === 'js') {
+        const funcImpl = new Function(...func.params, func.body);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Function execution timeout')), 5000)
+        );
+        result = await Promise.race([
+          Promise.resolve(funcImpl(...args)),
+          timeoutPromise
+        ]);
       } else if (func.type === 'llm') {
         const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
         const [response] = await runChat({input: prompt}, agent);
@@ -94,29 +107,14 @@ export default class ScriptingService implements TokenRingService {
         result = context.interpolate(unquoted ? unquoted[1] : func.body);
       }
       return result;
+    } catch (error) {
+      throw new Error(`Function execution error: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       context.variables = tempVars;
     }
   }
 
-  /**
-   * Execute JavaScript code with timeout
-   */
-  private async executeJavaScript(code: string, params: string[], args: string[]): Promise<string> {
-    try {
-      const func = new Function(...params, code);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Function execution timeout')), 5000)
-      );
-      const result = await Promise.race([
-        Promise.resolve(func(...args)),
-        timeoutPromise
-      ]);
-      return String(result);
-    } catch (error) {
-      throw new Error(`JavaScript execution error: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
+
 
   /**
    * Run a script with the given input

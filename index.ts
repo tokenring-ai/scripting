@@ -14,11 +14,9 @@ export const packageInfo: TokenRingPackage = {
   description: packageJSON.description,
   install(agentTeam: AgentTeam) {
     const config = agentTeam.getConfigSlice('scripts', ScriptingConfigSchema);
-    if (config) {
-      agentTeam.addTools(packageInfo, tools)
-      agentTeam.addChatCommands(chatCommands);
-      agentTeam.addServices(new ScriptingService(config));
-    }
+    agentTeam.addTools(packageInfo, tools)
+    agentTeam.addChatCommands(chatCommands);
+    agentTeam.addServices(new ScriptingService(config ?? {}));
   }
 };
 

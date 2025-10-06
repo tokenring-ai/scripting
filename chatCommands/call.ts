@@ -28,7 +28,7 @@ export async function execute(remainder: string, agent: Agent) {
 
   try {
     const result = await scriptingService.executeFunction(funcName, args, agent);
-    agent.chatOutput(result);
+    agent.chatOutput(Array.isArray(result) ? result.join('\n') : result);
   } catch (error) {
     agent.errorLine(error instanceof Error ? error.message : String(error));
   }

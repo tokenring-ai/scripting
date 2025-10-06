@@ -73,14 +73,5 @@ export class ScriptingContext implements AgentStateSlice {
       }
       return;
     }
-    
-    // Fall back to IterableService
-    const {IterableService} = await import("@tokenring-ai/iterables");
-    const iterableService = agent.requireServiceByType(IterableService);
-    if (iterableService) {
-      yield* iterableService.generate(name, agent);
-    } else {
-      throw new Error(`List or iterable not found: @${name}`);
-    }
   }
 }

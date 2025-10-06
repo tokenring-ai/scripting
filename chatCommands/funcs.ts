@@ -25,7 +25,7 @@ export async function execute(remainder: string, agent: Agent) {
       const typePrefix = func.type === 'static' ? '' : func.type + ' ';
       const separator = func.type === 'js' ? ' {' : ' => ';
       const suffix = func.type === 'js' ? ' }' : '';
-      agent.infoLine(`${typePrefix}${trimmed}(${func.params.map(p => "$" + p).join(", ")})${separator}${func.body}${suffix}`);
+      agent.infoLine(`${typePrefix}${trimmed}(${func.params.map(p => "$" + p).join(", ")})${separator}${func.type === 'native' ? '...native function' : func.body}${suffix}`);
     }
     return;
   }

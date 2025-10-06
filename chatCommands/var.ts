@@ -57,7 +57,8 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
       return trimmed.match(/^["'](.*)["']$/) ? RegExp.$1 : context.interpolate(trimmed);
     });
 
-    return await scriptingService.executeFunction(funcName, args, agent);
+    const result = await scriptingService.executeFunction(funcName, args, agent);
+    return Array.isArray(result) ? result.join('\n') : result;
   }
 
   const unquoted = expr.match(/^["'](.*)["']$/s);
