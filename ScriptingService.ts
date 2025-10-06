@@ -1,7 +1,8 @@
-import {Agent} from "@tokenring-ai/agent";
-import {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
+import type {Agent} from "@tokenring-ai/agent";
+import type {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
 import {z} from "zod";
+import {ScriptingContext} from "./ScriptingContext.ts";
 
 export const ScriptSchema = z.union([
   z.array(z.string()),
@@ -13,7 +14,6 @@ export const ScriptSchema = z.union([
 
 export type Script = z.infer<typeof ScriptSchema>;
 
-
 export type ScriptResult = {
   ok: boolean;
   output?: string;
@@ -23,20 +23,43 @@ export type ScriptResult = {
 
 export type ScriptingServiceOptions = Record<string, Script>;
 
+export type ScriptFunction = {
+  type: 'static' | 'llm' | 'js';
+  params: string[];
+  body: string;
+};
+
 /**
- * Registry for chat command scripts
- * Stores and manages script functions that return arrays of chat commands to execute
+ * Registry for chat command scripts and global functions
  */
 export default class ScriptingService implements TokenRingService {
   name = "ScriptingService";
-  description = "Provides a registry of chat command scripts";
+  description = "Provides a registry of chat command scripts and global functions";
 
   scripts = new KeyedRegistry<Script>();
+  functions = new KeyedRegistry<ScriptFunction>();
+  
   getScriptByName = this.scripts.getItemByName;
   listScripts = this.scripts.getAllItemNames;
+  
+  registerFunction = this.functions.register;
+  getFunction = this.functions.getItemByName;
+  listFunctions = this.functions.getAllItemNames;
 
   constructor(scripts: ScriptingServiceOptions) {
     this.scripts.registerAll(scripts);
+  }
+
+  async attach(agent: Agent): Promise<void> {
+    agent.initializeState(ScriptingContext, {});
+  }
+
+  /**
+   * Get a function by name, checking local context first, then global registry
+   */
+  resolveFunction(name: string, agent: Agent): ScriptFunction | undefined {
+    const context = agent.getState(ScriptingContext);
+    return context.getFunction(name) || this.functions.getItemByName(name);
   }
 
   /**
@@ -59,7 +82,6 @@ export default class ScriptingService implements TokenRingService {
     }
 
     try {
-      // Execute the script function to get commands
       const commands = typeof script === 'function' ? await script(input) : script;
 
       if (!Array.isArray(commands)) {
@@ -68,7 +90,6 @@ export default class ScriptingService implements TokenRingService {
 
       agent.systemMessage(`Running script: ${scriptName} with ${commands.length} commands`);
 
-      // Execute each command
       for (const command of commands) {
         if (command.trim()) {
           agent.systemMessage(`Executing: ${command}`);

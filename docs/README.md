@@ -1,0 +1,207 @@
+# TokenRing Scripting Documentation
+
+## Overview
+
+Complete documentation for the TokenRing Scripting Language - a lightweight scripting system for interacting with AI agents and LLMs.
+
+## Documentation Structure
+
+### User Guides
+
+1. **[Getting Started](01-getting-started.md)**
+   - Overview and basic concepts
+   - Your first script
+   - Quick start guide
+
+2. **[Variables Guide](02-variables.md)**
+   - Defining and using variables
+   - Variable interpolation
+   - Scope and lifecycle
+   - Best practices
+
+3. **[Functions Guide](03-functions.md)**
+   - Static functions
+   - LLM functions
+   - JavaScript functions
+   - Calling and managing functions
+   - Global functions
+
+4. **[Commands Reference](04-commands.md)**
+   - Complete command documentation
+   - Syntax and examples
+   - Error handling
+   - Tips and tricks
+
+5. **[Examples](05-examples.md)**
+   - Content generation
+   - Research workflows
+   - Data processing
+   - Translation and localization
+   - Quality assurance
+
+6. **[Advanced Topics](06-advanced.md)**
+   - Complex workflows
+   - Advanced patterns
+   - Performance optimization
+   - Integration patterns
+   - Debugging techniques
+
+### Developer Guides
+
+7. **[Developer Guide](07-developer-guide.md)**
+   - Creating global functions
+   - Package integration
+   - Best practices
+   - Testing
+   - Security considerations
+
+## Quick Reference
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/var $name = value` | Assign variable |
+| `/vars` | List variables |
+| `/func name($p) => "text"` | Define static function |
+| `/func llm name($p) => "prompt"` | Define LLM function |
+| `/func js name($p) { code }` | Define JavaScript function |
+| `/funcs` | List functions |
+| `/call name("arg")` | Call function |
+| `/echo $var` | Display text/variable |
+| `/sleep seconds` | Pause execution |
+| `/script run name input` | Run script |
+
+### Function Types
+
+| Type | Syntax | Use Case |
+|------|--------|----------|
+| Static | `=> "text"` | Templates with interpolation |
+| LLM | `llm => "prompt"` | AI-powered analysis |
+| JavaScript | `js { code }` | Computation and data processing |
+
+### Variable Interpolation
+
+```bash
+/var $name = "Alice"
+/var $greeting = "Hello, $name!"  # Result: "Hello, Alice!"
+```
+
+### Common Patterns
+
+**LLM Chain:**
+```bash
+/var $data = llm("Generate data")
+/var $analysis = llm("Analyze: $data")
+```
+
+**Function Composition:**
+```bash
+/func js clean($text) { return $text.trim(); }
+/func llm analyze($text) => "Analyze: $text"
+/var $result = analyze(clean($input))
+```
+
+**Conditional Logic:**
+```bash
+/func js check($val) { return $val > 10 ? "yes" : "no"; }
+/var $decision = check("15")
+```
+
+## Features
+
+### Core Features
+
+- **Variables** - Store and reuse data with `$` prefix
+- **Functions** - Three types for different use cases
+- **LLM Integration** - Direct AI agent interaction
+- **Interpolation** - Automatic variable substitution
+- **Global Functions** - Package-provided utilities
+
+### Advanced Features
+
+- **Function composition** - Chain multiple operations
+- **Error handling** - Graceful error management
+- **Type flexibility** - Mix static, LLM, and JS functions
+- **Session persistence** - Variables persist during session
+- **Override capability** - Local functions override global
+
+## Use Cases
+
+### Content Creation
+
+- Article generation and expansion
+- Blog post creation with metadata
+- Multi-language translation
+- SEO optimization
+
+### Research & Analysis
+
+- Multi-source research synthesis
+- Comparative analysis
+- Question-answer workflows
+- Iterative refinement
+
+### Data Processing
+
+- Text analysis and statistics
+- CSV/JSON transformation
+- Data validation
+- Format conversion
+
+### Automation
+
+- Batch processing
+- Quality assurance pipelines
+- Template filling
+- Workflow automation
+
+## Getting Help
+
+### Documentation
+
+- Start with [Getting Started](01-getting-started.md)
+- Check [Commands Reference](04-commands.md) for syntax
+- Browse [Examples](05-examples.md) for patterns
+- Read [Advanced Topics](06-advanced.md) for complex use cases
+
+### Common Issues
+
+**Variable not found:**
+- Check spelling and `$` prefix
+- Use `/vars` to list all variables
+
+**Function not defined:**
+- Use `/funcs` to list available functions
+- Check for typos in function name
+
+**JavaScript timeout:**
+- Simplify complex operations
+- Break into smaller functions
+- Avoid infinite loops
+
+**LLM not responding:**
+- Check agent configuration
+- Verify prompt clarity
+- Review variable interpolation
+
+## Contributing
+
+Contributions are welcome! Areas for contribution:
+
+- Documentation improvements
+- Example workflows
+- Global function libraries
+- Best practices
+- Bug reports and fixes
+
+## License
+
+MIT License - See LICENSE file for details
+
+## Next Steps
+
+- **New users**: Start with [Getting Started](01-getting-started.md)
+- **Function developers**: Read [Developer Guide](07-developer-guide.md)
+- **Advanced users**: Explore [Advanced Topics](06-advanced.md)
+- **Quick reference**: Check [Commands Reference](04-commands.md)
