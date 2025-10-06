@@ -20,7 +20,7 @@ import {ScriptingService, ScriptFunction} from "@tokenring-ai/scripting";
 
 export class MyService {
   async attach(agent: Agent): Promise<void> {
-    const scriptingService = agent.tryServiceByType(ScriptingService);
+    const scriptingService = agent.requireServiceByType(ScriptingService);
     if (scriptingService) {
       scriptingService.registerFunction({
         name: "myFunction",
@@ -115,7 +115,7 @@ export class FileSystemService implements TokenRingService {
   description = "Provides file system operations";
 
   async attach(agent: Agent): Promise<void> {
-    const scriptingService = agent.tryServiceByType(ScriptingService);
+    const scriptingService = agent.requireServiceByType(ScriptingService);
     if (!scriptingService) return;
 
     // Register readFile function
@@ -538,7 +538,7 @@ import {utilityFunctions} from "./functions/utility.ts";
 
 export class MyService {
   async attach(agent: Agent): Promise<void> {
-    const scriptingService = agent.tryServiceByType(ScriptingService);
+    const scriptingService = agent.requireServiceByType(ScriptingService);
     if (!scriptingService) return;
 
     utilityFunctions.forEach(func => {

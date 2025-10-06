@@ -77,7 +77,7 @@ In your package's service `attach()` method:
 import {ScriptingService, ScriptFunction} from "@tokenring-ai/scripting";
 
 async attach(agent: Agent): Promise<void> {
-  const scriptingService = agent.tryServiceByType(ScriptingService);
+  const scriptingService = agent.requireServiceByType(ScriptingService);
   if (scriptingService) {
     // Register a JavaScript function
     scriptingService.registerFunction({
@@ -209,3 +209,7 @@ The `ScriptingService` stores scripts using a KeyedRegistry and provides operati
 - `get(name)` - Gets a script function by name
 - `list()` - Lists all registered scripts
 - `runScript({scriptName, input}, agent)` - Executes a script with the given input
+
+## Inspiration
+
+The creation of this package was inspired by the [mlld](https://github.com/mlld-lang/mlld) project, which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning, and reproducibility.
