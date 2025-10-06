@@ -1,6 +1,6 @@
-# Scripting Package
+# TokenRing Scripting Package
 
-The Scripting package provides functionality for running predefined sequences of chat commands by name, as well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate repetitive workflows and create dynamic, reusable command sequences.
+The TokenRing AI Scripting package provides functionality for running predefined sequences of chat commands by name, as well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate repetitive workflows and create dynamic, reusable command sequences.
 
 ## Features
 
@@ -25,14 +25,26 @@ The Scripting package provides functionality for running predefined sequences of
 #### Scripting Language
 
 - `/var $name = value` - Define variables with static values, LLM responses, or function calls
-- `/func name($param1, $param2) => "text"` - Define static functions
+- `/var delete $name` - Delete a variable
+- `/vars [$name]` - List all variables or show a specific variable
+- `/vars clear` - Clear all variables
+- `/func static name($param1, $param2) => "text"` - Define static functions
 - `/func llm name($param1, $param2) => "prompt"` - Define LLM functions
 - `/func js name($param1, $param2) { code }` - Define JavaScript functions
-- `/call functionName("arg1", "arg2")` - Call a function and display its output
-- `/vars [$name]` - List all variables or show a specific variable
+- `/func delete name` - Delete a function
 - `/funcs [name]` - List all functions or show a specific function
+- `/funcs clear` - Clear all local functions
+- `/call functionName("arg1", "arg2")` - Call a function and display its output
+- `/list @name = ["item1", "item2"]` - Define lists (use @ prefix)
+- `/lists [@name]` - List all lists or show a specific list
 - `/echo <text|$var>` - Display text or variable value without LLM processing
 - `/sleep <seconds|$var>` - Sleep for specified seconds
+- `/prompt $var "message"` - Prompt user for input
+- `/confirm $var "message"` - Prompt user for yes/no confirmation
+- `/if $condition { commands }` - Conditional execution
+- `/if $condition { commands } else { commands }` - If-else branching
+- `/for $item in @list { commands }` - Iterate over lists and iterables
+- `/while $condition { commands }` - Execute commands while condition is truthy
 
 See the [complete documentation](./docs/README.md) for detailed guides and examples.
 
@@ -56,9 +68,25 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 /var $analysis = llm("Analyze this summary: $summary")
 
 # Define and use functions
-/func search($query, $site) = llm("Search for $query on $site")
+/func static greet($name) => "Hello, $name!"
+/func llm search($query, $site) => "Search for $query on $site"
 /var $results = search("quantum computing", "Google Scholar")
 /call search("quantum computing", "Google Scholar")
+
+# Lists with @ prefix (static)
+/list @files = ["file1.txt", "file2.txt", "file3.txt"]
+/for $file in @files { /echo Processing $file }
+
+# Iterables with @ prefix (dynamic)
+/iterable define ts-files --type glob --pattern "src/**/*.ts"
+/for $f in @ts-files { /echo $basename at $path }
+
+# Interactive prompts
+/prompt $username "Enter your name:"
+/confirm $proceed "Continue with operation?"
+
+# Conditional execution
+/if $proceed { /echo Continuing... } else { /echo Stopped }
 
 # List variables and functions
 /vars
@@ -212,4 +240,4 @@ The `ScriptingService` stores scripts using a KeyedRegistry and provides operati
 
 ## Inspiration
 
-The creation of this package was inspired by the [mlld](https://github.com/mlld-lang/mlld) project, which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning, and reproducibility.
+The scripting operators used in this package were inspired by the [mlld](https://github.com/mlld-lang/mlld) project, which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning, and reproducibility.

@@ -7,9 +7,12 @@ The TokenRing Scripting Language is a lightweight scripting system designed for 
 ## Key Features
 
 - **Variables** - Store data and LLM responses with `$` prefix
+- **Lists** - Store arrays of items with `@` prefix
 - **Functions** - Three types: static text, LLM prompts, and JavaScript
 - **LLM Integration** - Direct integration with AI agents
 - **Variable Interpolation** - Automatic substitution in prompts and text
+- **Control Flow** - Conditionals (`/if`), loops (`/for`, `/while`)
+- **Interactive Prompts** - Get user input (`/prompt`, `/confirm`)
 - **Global Functions** - Packages can provide reusable functions
 
 ## Basic Concepts
@@ -28,7 +31,7 @@ Variables store values and are prefixed with `$`:
 Functions are reusable templates with parameters:
 
 ```bash
-/func greet($name) => "Hello, $name!"
+/func static greet($name) => "Hello, $name!"
 /func llm summarize($text) => "Summarize: $text"
 /func js wordCount($text) { return $text.split(/\s+/).length; }
 ```
@@ -55,6 +58,23 @@ Let's create a simple workflow:
 
 # Display the result
 /echo $overview
+
+# Work with lists
+/list @topics = ["AI", "ML", "DL"]
+/for $t in @topics {
+  /var $info = llm("Explain $t in one sentence")
+  /echo $t: $info
+}
+
+# Interactive workflow
+/prompt $name "What's your name?"
+/confirm $interested "Are you interested in $topic?"
+/if $interested {
+  /echo Great! Let me tell you more, $name
+  /echo $overview
+} else {
+  /echo No problem, $name. Maybe another time!
+}
 ```
 
 ## Next Steps

@@ -2,7 +2,8 @@ import type {Agent} from "@tokenring-ai/agent";
 import type {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
 import {z} from "zod";
-import {ScriptingContext} from "./ScriptingContext.ts";
+import {ScriptingContext} from "./state/ScriptingContext.ts";
+import runChat from "@tokenring-ai/ai-client/runChat";
 
 export const ScriptSchema = z.union([
   z.array(z.string()),
@@ -60,6 +61,61 @@ export default class ScriptingService implements TokenRingService {
   resolveFunction(name: string, agent: Agent): ScriptFunction | undefined {
     const context = agent.getState(ScriptingContext);
     return context.getFunction(name) || this.functions.getItemByName(name);
+  }
+
+  /**
+   * Execute a function with given arguments
+   */
+  async executeFunction(funcName: string, args: string[], agent: Agent): Promise<string> {
+    const context = agent.getState(ScriptingContext);
+    const func = this.resolveFunction(funcName, agent);
+    
+    if (!func) {
+      throw new Error(`Function ${funcName} not defined`);
+    }
+    
+    if (args.length !== func.params.length) {
+      throw new Error(`Function ${funcName} expects ${func.params.length} arguments, got ${args.length}`);
+    }
+
+    const tempVars = new Map(context.variables);
+    func.params.forEach((param, i) => context.variables.set(param, args[i]));
+    
+    try {
+      let result: string;
+      if (func.type === 'js') {
+        result = await this.executeJavaScript(func.body, func.params, args);
+      } else if (func.type === 'llm') {
+        const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
+        const [response] = await runChat({input: prompt}, agent);
+        result = response.trim();
+      } else {
+        const unquoted = func.body.match(/^["'](.*)["']$/s);
+        result = context.interpolate(unquoted ? unquoted[1] : func.body);
+      }
+      return result;
+    } finally {
+      context.variables = tempVars;
+    }
+  }
+
+  /**
+   * Execute JavaScript code with timeout
+   */
+  private async executeJavaScript(code: string, params: string[], args: string[]): Promise<string> {
+    try {
+      const func = new Function(...params, code);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Function execution timeout')), 5000)
+      );
+      const result = await Promise.race([
+        Promise.resolve(func(...args)),
+        timeoutPromise
+      ]);
+      return String(result);
+    } catch (error) {
+      throw new Error(`JavaScript execution error: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   /**

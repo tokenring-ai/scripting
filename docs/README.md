@@ -62,14 +62,25 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 | Command | Description |
 |---------|-------------|
 | `/var $name = value` | Assign variable |
+| `/var delete $name` | Delete variable |
 | `/vars` | List variables |
-| `/func name($p) => "text"` | Define static function |
+| `/vars clear` | Clear all variables |
+| `/func static name($p) => "text"` | Define static function |
 | `/func llm name($p) => "prompt"` | Define LLM function |
 | `/func js name($p) { code }` | Define JavaScript function |
+| `/func delete name` | Delete function |
 | `/funcs` | List functions |
+| `/funcs clear` | Clear local functions |
 | `/call name("arg")` | Call function |
+| `/list @name = ["item1", "item2"]` | Define list |
+| `/lists [@name]` | List all lists |
 | `/echo $var` | Display text/variable |
 | `/sleep seconds` | Pause execution |
+| `/prompt $var "msg"` | Prompt for input |
+| `/confirm $var "msg"` | Confirm yes/no |
+| `/if $cond { cmds }` | Conditional execution |
+| `/for $item in @list { cmds }` | Iterate over lists/iterables |
+| `/while $cond { cmds }` | Loop while truthy |
 | `/script run name input` | Run script |
 
 ### Function Types
@@ -80,11 +91,14 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 | LLM | `llm => "prompt"` | AI-powered analysis |
 | JavaScript | `js { code }` | Computation and data processing |
 
-### Variable Interpolation
+### Variable and List Interpolation
 
 ```bash
 /var $name = "Alice"
 /var $greeting = "Hello, $name!"  # Result: "Hello, Alice!"
+
+/list @colors = ["red", "green", "blue"]
+/echo Colors: @colors  # Result: "Colors: red, green, blue"
 ```
 
 ### Common Patterns
@@ -104,8 +118,29 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 
 **Conditional Logic:**
 ```bash
-/func js check($val) { return $val > 10 ? "yes" : "no"; }
-/var $decision = check("15")
+/var $count = "15"
+/if $count { /echo Count is set } else { /echo Count is empty }
+
+/confirm $proceed "Continue?"
+/if $proceed { /echo Proceeding... } else { /echo Cancelled }
+```
+
+**Loops:**
+```bash
+# Static lists
+/list @items = ["apple", "banana", "cherry"]
+/for $item in @items { /echo Processing $item }
+
+# Dynamic iterables
+/iterable define files --type glob --pattern "*.txt"
+/for $f in @files { /echo $basename }
+
+# While loops
+/var $counter = "3"
+/while $counter {
+  /echo Counter: $counter
+  /var $counter = "0"
+}
 ```
 
 ## Features
@@ -148,10 +183,11 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 - CSV/JSON transformation
 - Data validation
 - Format conversion
+- Batch file processing (with iterables)
 
 ### Automation
 
-- Batch processing
+- Batch processing over lists and iterables
 - Quality assurance pipelines
 - Template filling
 - Workflow automation

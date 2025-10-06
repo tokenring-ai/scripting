@@ -1,14 +1,25 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../ScriptingContext.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/func [llm|js] name($param1, $param2) => \"text\" - Define functions";
+export const description = "/func [static|llm|js] name($param1, $param2) => \"text\" - Define functions";
 
 export async function execute(remainder: string, agent: Agent) {
-  agent.initializeState(ScriptingContext, {});
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
     showHelp(agent);
+    return;
+  }
+
+  const deleteMatch = remainder.match(/^delete\s+(\w+)$/);
+  if (deleteMatch) {
+    const funcName = deleteMatch[1];
+    if (context.functions.has(funcName)) {
+      context.functions.delete(funcName);
+      agent.infoLine(`Function ${funcName} deleted`);
+    } else {
+      agent.errorLine(`Function ${funcName} not defined`);
+    }
     return;
   }
 
@@ -32,8 +43,8 @@ export async function execute(remainder: string, agent: Agent) {
     return;
   }
 
-  // Match: /func name($params) => "text"
-  const staticMatch = remainder.match(/^(\w+)\((.*?)\)\s*=>\s*(.+)$/s);
+  // Match: /func static name($params) => "text"
+  const staticMatch = remainder.match(/^static\s+(\w+)\((.*?)\)\s*=>\s*(.+)$/s);
   if (staticMatch) {
     const [, funcName, paramsStr, body] = staticMatch;
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
@@ -42,21 +53,24 @@ export async function execute(remainder: string, agent: Agent) {
     return;
   }
 
-  agent.errorLine("Invalid syntax. Use: /func name($param) => \"text\" or /func llm name($param) => \"prompt\" or /func js name($param) { return result; }");
+  agent.errorLine("Invalid syntax. Use: /func static name($param) => \"text\" or /func llm name($param) => \"prompt\" or /func js name($param) { return result; }");
 }
 
 function showHelp(agent: Agent) {
   agent.systemMessage("Function Command Usage:");
-  agent.systemMessage('  /func name($param) => "text" - Define static function');
+  agent.systemMessage('  /func static name($param) => "text" - Define static function');
   agent.systemMessage('  /func llm name($param) => "prompt" - Define LLM function');
   agent.systemMessage('  /func js name($param) { return result; } - Define JavaScript function');
+  agent.systemMessage('  /func delete name - Delete function');
 }
 
 export function help() {
   return [
-    "/func name($param1, $param2) => expression",
-    '  - Static: /func greet($name) => "Hello, $name"',
+    "/func static name($param1, $param2) => expression",
+    '  - Static: /func static greet($name) => "Hello, $name"',
     '  - LLM: /func llm analyze($text) => "Analyze: $text"',
     '  - JavaScript: /func js wordCount($text) { return $text.split(/\\s+/).length; }',
+    "/func delete name",
+    "  - Delete a function",
   ];
 }

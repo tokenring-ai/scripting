@@ -1,14 +1,18 @@
 import type {AgentStateSlice} from "@tokenring-ai/agent/Agent";
+import type Agent from "@tokenring-ai/agent/Agent";
 import {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
+import type {IterableItem} from "@tokenring-ai/iterables";
 
 export class ScriptingContext implements AgentStateSlice {
   name = "ScriptingContext";
   variables = new Map<string, string>();
+  lists = new Map<string, string[]>();
   functions = new Map<string, {type: 'static' | 'llm' | 'js', params: string[], body: string}>();
 
   reset(what: ResetWhat[]): void {
     if (what.includes("chat")) {
       this.variables.clear();
+      this.lists.clear();
       this.functions.clear();
     }
   }
@@ -16,12 +20,14 @@ export class ScriptingContext implements AgentStateSlice {
   serialize(): object {
     return {
       variables: Array.from(this.variables.entries()),
+      lists: Array.from(this.lists.entries()),
       functions: Array.from(this.functions.entries()),
     };
   }
 
   deserialize(data: any): void {
     this.variables = new Map(data.variables || []);
+    this.lists = new Map(data.lists || []);
     this.functions = new Map(data.functions || []);
   }
 
@@ -31,6 +37,14 @@ export class ScriptingContext implements AgentStateSlice {
 
   getVariable(name: string): string | undefined {
     return this.variables.get(name);
+  }
+
+  setList(name: string, value: string[]): void {
+    this.lists.set(name, value);
+  }
+
+  getList(name: string): string[] | undefined {
+    return this.lists.get(name);
   }
 
   defineFunction(name: string, type: 'static' | 'llm' | 'js', params: string[], body: string): void {
@@ -44,6 +58,29 @@ export class ScriptingContext implements AgentStateSlice {
   interpolate(text: string): string {
     return text.replace(/(?<!\\)\$(\w+)/g, (_, varName) => {
       return this.variables.get(varName) || "";
+    }).replace(/(?<!\\)@(\w+)/g, (_, listName) => {
+      const list = this.lists.get(listName);
+      return list ? list.join(", ") : "";
     });
+  }
+
+  async *getListGenerator(name: string, agent: Agent): AsyncGenerator<IterableItem> {
+    // Check local static lists first
+    const localList = this.lists.get(name);
+    if (localList) {
+      for (const item of localList) {
+        yield {value: item, variables: {item}};
+      }
+      return;
+    }
+    
+    // Fall back to IterableService
+    const {IterableService} = await import("@tokenring-ai/iterables");
+    const iterableService = agent.requireServiceByType(IterableService);
+    if (iterableService) {
+      yield* iterableService.generate(name, agent);
+    } else {
+      throw new Error(`List or iterable not found: @${name}`);
+    }
   }
 }

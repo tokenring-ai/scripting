@@ -281,12 +281,19 @@ ${$conclusion}`;
 ### Batch Processing
 
 ```bash
-# Process multiple items efficiently
-/func llm batchProcess($items) => "Process each of these items and return results:\n$items"
+# Process multiple items with lists
+/list @items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"]
+/for $item in @items {
+  /var $result = llm("Process $item")
+  /echo Result: $result
+}
 
-/var $items = "Item 1\nItem 2\nItem 3\nItem 4\nItem 5"
-/var $results = batchProcess($items)
-/echo $results
+# Process files with iterables (requires @tokenring-ai/iterables)
+/iterable define docs --type glob --pattern "docs/**/*.md"
+/for $doc in @docs {
+  /var $summary = llm("Summarize $content")
+  /echo $basename: $summary
+}
 ```
 
 ### Incremental Processing

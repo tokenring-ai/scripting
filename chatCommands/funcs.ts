@@ -1,25 +1,31 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../ScriptingContext.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 import ScriptingService from "../ScriptingService.ts";
 
 export const description = "/funcs [name] - List all functions or show specific function";
 
 export async function execute(remainder: string, agent: Agent) {
-  agent.initializeState(ScriptingContext, {});
+
   const context = agent.getState(ScriptingContext);
   const scriptingService = agent.requireServiceByType(ScriptingService);
 
-  const funcName = remainder?.trim();
+  const trimmed = remainder?.trim();
+  
+  if (trimmed === "clear") {
+    context.functions.clear();
+    agent.infoLine("All local functions cleared");
+    return;
+  }
 
-  if (funcName) {
-    const func = scriptingService?.resolveFunction(funcName, agent);
+  if (trimmed) {
+    const func = scriptingService?.resolveFunction(trimmed, agent);
     if (!func) {
-      agent.errorLine(`Function ${funcName} not defined`);
+      agent.errorLine(`Function ${trimmed} not defined`);
     } else {
       const typePrefix = func.type === 'static' ? '' : func.type + ' ';
       const separator = func.type === 'js' ? ' {' : ' => ';
       const suffix = func.type === 'js' ? ' }' : '';
-      agent.infoLine(`${typePrefix}${funcName}(${func.params.map(p => "$" + p).join(", ")})${separator}${func.body}${suffix}`);
+      agent.infoLine(`${typePrefix}${trimmed}(${func.params.map(p => "$" + p).join(", ")})${separator}${func.body}${suffix}`);
     }
     return;
   }
@@ -57,5 +63,7 @@ export function help() {
     "/funcs [name]",
     "  - List all functions (local and global)",
     "  - Show specific function definition",
+    "/funcs clear",
+    "  - Clear all local functions",
   ];
 }

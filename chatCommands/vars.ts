@@ -1,13 +1,21 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../ScriptingContext.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 export const description = "/vars [$name] - List all variables or show specific variable";
 
 export async function execute(remainder: string, agent: Agent) {
-  agent.initializeState(ScriptingContext, {});
+
   const context = agent.getState(ScriptingContext);
 
-  const varName = remainder?.trim().replace(/^\$/, "");
+  const trimmed = remainder?.trim();
+  
+  if (trimmed === "clear") {
+    context.variables.clear();
+    agent.infoLine("All variables cleared");
+    return;
+  }
+
+  const varName = trimmed?.replace(/^\$/, "");
 
   if (varName) {
     const value = context.getVariable(varName);
@@ -37,5 +45,7 @@ export function help() {
     "/vars [$name]",
     "  - List all variables",
     "  - Show specific variable value",
+    "/vars clear",
+    "  - Clear all variables",
   ];
 }

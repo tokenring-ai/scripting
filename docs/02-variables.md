@@ -103,6 +103,18 @@ Output:
 $name = Alice
 ```
 
+### Clear All Variables
+
+```bash
+/vars clear
+```
+
+### Delete Specific Variable
+
+```bash
+/var delete $name
+```
+
 ## Variable Scope
 
 - Variables are **session-scoped**

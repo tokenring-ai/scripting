@@ -12,14 +12,14 @@ Return text with variable interpolation.
 
 **Syntax:**
 ```bash
-/func functionName($param1, $param2) => "text with $param1 and $param2"
+/func static functionName($param1, $param2) => "text with $param1 and $param2"
 ```
 
 **Examples:**
 ```bash
-/func greet($name) => "Hello, $name! Welcome to TokenRing."
-/func formatEmail($to, $subject) => "To: $to\nSubject: $subject"
-/func template($title, $content) => "# $title\n\n$content"
+/func static greet($name) => "Hello, $name! Welcome to TokenRing."
+/func static formatEmail($to, $subject) => "To: $to\nSubject: $subject"
+/func static template($title, $content) => "# $title\n\n$content"
 ```
 
 **Usage:**
@@ -174,7 +174,7 @@ Execute and display output immediately:
 
 ```bash
 # Static function
-/func greet($name) => "Hello, $name!"
+/func static greet($name) => "Hello, $name!"
 /var $greeting = greet("Alice")
 /call greet("Bob")
 
@@ -301,6 +301,14 @@ Output:
 greet($name) => "Hello, $name!"
 ```
 
+### Clear All Local Functions
+
+```bash
+/funcs clear
+```
+
+Note: This only clears local functions defined with `/func`. Global functions registered by packages remain available.
+
 ## Global Functions
 
 Packages can register global functions that are available to all scripts.
@@ -340,7 +348,7 @@ Local functions take precedence:
 ```bash
 ✓ /func js wordCount($text) { return $text.split(/\s+/).length; }
 ✓ /func llm summarize($text) => "Summarize: $text"
-✓ /func greet($name) => "Hello, $name!"
+✓ /func static greet($name) => "Hello, $name!"
 
 ✗ /func llm wordCount($text) => "Count words in: $text"
 ```

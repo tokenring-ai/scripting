@@ -1,10 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../ScriptingContext.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 export const description = "/sleep <seconds|$var> - Sleep for specified seconds";
 
 export async function execute(remainder: string, agent: Agent) {
-  agent.initializeState(ScriptingContext, {});
+
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {

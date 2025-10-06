@@ -1,10 +1,9 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../ScriptingContext.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 export const description = "/echo <text|$var> - Display text or variable value";
 
 export async function execute(remainder: string, agent: Agent) {
-  agent.initializeState(ScriptingContext, {});
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
