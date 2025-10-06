@@ -1,7 +1,6 @@
 import type {AgentStateSlice} from "@tokenring-ai/agent/Agent";
 import type Agent from "@tokenring-ai/agent/Agent";
 import {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
-import type {IterableItem} from "@tokenring-ai/iterables";
 
 export class ScriptingContext implements AgentStateSlice {
   name = "ScriptingContext";
@@ -62,16 +61,5 @@ export class ScriptingContext implements AgentStateSlice {
       const list = this.lists.get(listName);
       return list ? list.join(", ") : "";
     });
-  }
-
-  async *getListGenerator(name: string, agent: Agent): AsyncGenerator<IterableItem> {
-    // Check local static lists first
-    const localList = this.lists.get(name);
-    if (localList) {
-      for (const item of localList) {
-        yield {value: item, variables: {item}};
-      }
-      return;
-    }
   }
 }

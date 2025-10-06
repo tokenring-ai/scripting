@@ -11,7 +11,7 @@ The TokenRing Scripting Language is a lightweight scripting system designed for 
 - **Functions** - Three types: static text, LLM prompts, and JavaScript
 - **LLM Integration** - Direct integration with AI agents
 - **Variable Interpolation** - Automatic substitution in prompts and text
-- **Control Flow** - Conditionals (`/if`), loops (`/for`, `/while`)
+- **Control Flow** - Conditionals (`/if`), loops (`/for`, `/while`) with semicolon or newline delimiters
 - **Interactive Prompts** - Get user input (`/prompt`, `/confirm`)
 - **Global Functions** - Packages can provide reusable functions
 
@@ -62,7 +62,7 @@ Let's create a simple workflow:
 # Work with lists
 /list @topics = ["AI", "ML", "DL"]
 /for $t in @topics {
-  /var $info = llm("Explain $t in one sentence")
+  /var $info = llm("Explain $t in one sentence");
   /echo $t: $info
 }
 
@@ -70,7 +70,7 @@ Let's create a simple workflow:
 /prompt $name "What's your name?"
 /confirm $interested "Are you interested in $topic?"
 /if $interested {
-  /echo Great! Let me tell you more, $name
+  /echo Great! Let me tell you more, $name;
   /echo $overview
 } else {
   /echo No problem, $name. Maybe another time!

@@ -1,5 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
+import {parseBlock, executeBlock} from "../utils/executeBlock.ts";
 
 export const description = "/if $condition { commands } [else { commands }] - Conditional execution";
 
@@ -29,15 +30,8 @@ export async function execute(remainder: string, agent: Agent) {
   
   if (!body) return;
 
-  const commands = body.trim().split('\n').map(c => c.trim()).filter(c => c);
-
-  for (const command of commands) {
-    if (command.startsWith('/')) {
-      await agent.runCommand(command);
-    } else {
-      agent.chatOutput(context.interpolate(command));
-    }
-  }
+  const commands = parseBlock(body);
+  await executeBlock(commands, agent);
 }
 
 export function help() {
@@ -47,6 +41,7 @@ export function help() {
     "/if $condition { commands } else { commands }",
     "  - Execute then or else block based on condition",
     "  - Condition is false if: empty, 'false', '0', or 'no'",
+    "  - Separate multiple commands with semicolons or newlines",
     "  - Example: /if $proceed { /echo Continuing... } else { /echo Stopped }",
   ];
 }

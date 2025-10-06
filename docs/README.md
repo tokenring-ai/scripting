@@ -79,7 +79,7 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 | `/prompt $var "msg"` | Prompt for input |
 | `/confirm $var "msg"` | Confirm yes/no |
 | `/if $cond { cmds }` | Conditional execution |
-| `/for $item in @list { cmds }` | Iterate over lists/iterables |
+| `/for $item in @list { cmds }` | Iterate over lists |
 | `/while $cond { cmds }` | Loop while truthy |
 | `/script run name input` | Run script |
 
@@ -131,16 +131,9 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 /list @items = ["apple", "banana", "cherry"]
 /for $item in @items { /echo Processing $item }
 
-# Dynamic iterables
-/iterable define files --type glob --pattern "*.txt"
-/for $f in @files { /echo $basename }
-
 # While loops
 /var $counter = "3"
-/while $counter {
-  /echo Counter: $counter
-  /var $counter = "0"
-}
+/while $counter { /echo Counter: $counter; /var $counter = "0" }
 ```
 
 ## Features
@@ -183,7 +176,7 @@ Complete documentation for the TokenRing Scripting Language - a lightweight scri
 - CSV/JSON transformation
 - Data validation
 - Format conversion
-- Batch file processing (with iterables)
+- Batch processing
 
 ### Automation
 

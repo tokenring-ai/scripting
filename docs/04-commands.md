@@ -363,28 +363,28 @@ Execute commands based on condition.
 **Examples:**
 ```bash
 /var $count = "5"
-/if $count {
-  /echo Count is set to $count
-}
+/if $count { /echo Count is set to $count }
 
 /confirm $proceed "Continue?"
-/if $proceed {
-  /echo Continuing...
-} else {
-  /echo Stopped
+/if $proceed { /echo Continuing... } else { /echo Stopped }
+
+# Multiple commands - use semicolons or newlines
+/if $count {
+  /echo Count is $count;
+  /var $doubled = "10"
 }
 ```
 
 **Notes:**
 - Condition is false if: empty, 'false', '0', or 'no'
-- Supports multi-line command blocks
+- Separate multiple commands with semicolons or newlines
 - Else block is optional
 
 ---
 
-### `/for` - Iterate Over Lists and Iterables
+### `/for` - Iterate Over Lists
 
-Iterate over static lists or dynamic iterables.
+Iterate over lists.
 
 **Syntax:**
 ```bash
@@ -393,25 +393,24 @@ Iterate over static lists or dynamic iterables.
 
 **Examples:**
 ```bash
-# Static list
+# Single command
 /list @files = ["file1.txt", "file2.txt", "file3.txt"]
-/for $file in @files {
-  /echo Processing $file
-}
+/for $file in @files { /echo Processing $file }
 
-# Dynamic iterable (requires @tokenring-ai/iterables)
-/iterable define ts-files --type glob --pattern "src/**/*.ts"
-/for $f in @ts-files {
-  /echo $basename at $path
-  /var $analysis = llm("Analyze $content")
+# Multiple commands with semicolons
+/for $file in @files { /echo Processing $file; /var $result = process($file) }
+
+# Multiple commands with newlines
+/for $file in @files {
+  /echo Processing $file;
+  /var $result = process($file)
 }
 ```
 
 **Notes:**
 - Loop variable uses `$` prefix
 - Collection uses `@` prefix
-- Supports multi-line command blocks
-- Item variables automatically available (e.g., $file, $path, $basename)
+- Separate multiple commands with semicolons or newlines
 - Variables are restored after iteration
 
 ---
@@ -428,14 +427,19 @@ Execute commands while condition is truthy.
 **Examples:**
 ```bash
 /var $counter = "3"
+/while $counter { /echo Counter: $counter; /var $counter = "0" }
+
+# Multiple commands with newlines
+/var $counter = "3"
 /while $counter {
-  /echo Counter: $counter
+  /echo Counter: $counter;
   /var $counter = "0"
 }
 ```
 
 **Notes:**
 - Condition is false if: empty, 'false', '0', or 'no'
+- Separate multiple commands with semicolons or newlines
 - Maximum 1000 iterations to prevent infinite loops
 - Update condition variable inside loop to exit
 
