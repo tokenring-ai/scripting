@@ -1,9 +1,9 @@
 import type {Agent} from "@tokenring-ai/agent";
 import type {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
+import runChat from "@tokenring-ai/ai-client/runChat";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
 import {z} from "zod";
 import {ScriptingContext} from "./state/ScriptingContext.ts";
-import runChat from "@tokenring-ai/ai-client/runChat";
 
 export const ScriptSchema = z.union([
   z.array(z.string()),
@@ -22,6 +22,10 @@ export type ScriptResult = {
   nextScriptResult?: ScriptResult;
 }
 
+export type ScriptingThis = {
+  agent: Agent;
+}
+
 export type ScriptingServiceOptions = Record<string, Script>;
 
 export type ScriptFunction = {
@@ -31,7 +35,7 @@ export type ScriptFunction = {
 } | {
   type: 'native';
   params: string[];
-  impl: (...args: string[]) => string | string[] | Promise<string | string[]>;
+  execute(...args: string[]): string | string[] | Promise<string | string[]>;
 };
 
 /**
@@ -88,16 +92,10 @@ export default class ScriptingService implements TokenRingService {
     try {
       let result: string | string[];
       if (func.type === 'native') {
-        result = await Promise.resolve(func.impl(...args));
+        result = await func.execute.call({agent}, ...args);
       } else if (func.type === 'js') {
         const funcImpl = new Function(...func.params, func.body);
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Function execution timeout')), 5000)
-        );
-        result = await Promise.race([
-          Promise.resolve(funcImpl(...args)),
-          timeoutPromise
-        ]);
+        result = await funcImpl.call({agent}, ...args);
       } else if (func.type === 'llm') {
         const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
         const [response] = await runChat({input: prompt}, agent);
