@@ -12,7 +12,7 @@ export async function execute(remainder: string, agent: Agent) {
   }
 
   const output = context.interpolate(remainder);
-  agent.chatOutput(output);
+  agent.infoLine(output);
 }
 
 export function help() {

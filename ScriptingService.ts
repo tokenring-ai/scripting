@@ -4,13 +4,11 @@ import runChat from "@tokenring-ai/ai-client/runChat";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
 import {z} from "zod";
 import {ScriptingContext} from "./state/ScriptingContext.ts";
+import {parseScript} from "./utils/parseScript.ts";
 
 export const ScriptSchema = z.union([
+  z.string(),
   z.array(z.string()),
-  z.function({
-    input: z.tuple([z.string()]),
-    output: z.promise(z.array(z.string()))
-  })
 ]);
 
 export type Script = z.infer<typeof ScriptSchema>;
@@ -45,7 +43,7 @@ export default class ScriptingService implements TokenRingService {
   name = "ScriptingService";
   description = "Provides a registry of chat command scripts and global functions";
 
-  scripts = new KeyedRegistry<Script>();
+  scripts = new KeyedRegistry<string[]>();
   functions = new KeyedRegistry<ScriptFunction>();
   
   getScriptByName = this.scripts.getItemByName;
@@ -56,7 +54,12 @@ export default class ScriptingService implements TokenRingService {
   listFunctions = this.functions.getAllItemNames;
 
   constructor(scripts: ScriptingServiceOptions) {
-    this.scripts.registerAll(scripts);
+    for (let [name, script] of Object.entries(scripts)) {
+      if (Array.isArray(script)) {
+        script = script.join(';\n');
+      }
+      this.scripts.register(name, parseScript(script));
+    }
   }
 
   async attach(agent: Agent): Promise<void> {
@@ -134,15 +137,9 @@ export default class ScriptingService implements TokenRingService {
     }
 
     try {
-      const commands = typeof script === 'function' ? await script(input) : script;
+      agent.systemMessage(`Running script: ${scriptName} with ${script.length} commands`);
 
-      if (!Array.isArray(commands)) {
-        throw new Error("Script must return an array of commands");
-      }
-
-      agent.systemMessage(`Running script: ${scriptName} with ${commands.length} commands`);
-
-      for (const command of commands) {
+      for (const command of script) {
         if (command.trim()) {
           agent.systemMessage(`Executing: ${command}`);
           await agent.runCommand(command);
