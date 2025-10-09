@@ -1,6 +1,7 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import ScriptingService from "../ScriptingService.ts";
+import {parseArguments} from "../utils/parseArguments.ts";
 
 export const description = "/call functionName(\"arg1\", \"arg2\") - Call a function and display output";
 
@@ -21,9 +22,14 @@ export async function execute(remainder: string, agent: Agent) {
   const [, funcName, argsStr] = match;
   const scriptingService = agent.requireServiceByType(ScriptingService);
 
-  const args = argsStr.split(",").map(a => {
-    const trimmed = a.trim();
-    return trimmed.match(/^["'](.*)["']$/) ? RegExp.$1 : context.interpolate(trimmed);
+  if (!scriptingService) {
+    agent.errorLine("ScriptingService not available");
+    return;
+  }
+
+  const args = parseArguments(argsStr).map(a => {
+    const unquoted = a.match(/^["'](.*)["']$/);
+    return unquoted ? unquoted[1] : context.interpolate(a);
   });
 
   try {

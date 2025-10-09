@@ -1,6 +1,7 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
-import {parseBlock, executeBlock} from "../utils/executeBlock.ts";
+import {extractBlock, parseBlock} from "../utils/blockParser.js";
+import {executeBlock} from "../utils/executeBlock.ts";
 
 export const description = "/while $condition { commands } - Execute commands while condition is truthy";
 
@@ -12,14 +13,21 @@ export async function execute(remainder: string, agent: Agent) {
     return;
   }
 
-  const match = remainder.match(/^\$(\w+)\s*\{(.+)\}$/s);
-  if (!match) {
+  const prefixMatch = remainder.match(/^\$(\w+)\s*/);
+  if (!prefixMatch) {
     agent.errorLine("Invalid syntax. Use: /while $condition { commands }");
     return;
   }
 
-  const [, conditionVar, body] = match;
-  const commands = parseBlock(body);
+  const [prefix, conditionVar] = prefixMatch;
+  const block = extractBlock(remainder, prefix.length);
+  
+  if (!block) {
+    agent.errorLine("Missing block { commands }");
+    return;
+  }
+
+  const commands = parseBlock(block.content);
   
   const maxIterations = 1000;
   let iterations = 0;
@@ -37,6 +45,8 @@ export async function execute(remainder: string, agent: Agent) {
 
   if (iterations >= maxIterations) {
     agent.errorLine(`While loop exceeded maximum iterations (${maxIterations})`);
+  } else if (iterations > 0) {
+    agent.infoLine(`While loop completed ${iterations} iteration${iterations === 1 ? '' : 's'}`);
   }
 }
 

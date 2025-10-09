@@ -1,6 +1,7 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import ScriptingService from "../ScriptingService.ts";
+import {parseArguments} from "../utils/parseArguments.ts";
 
 export const description = "/list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\") - Define or assign lists";
 
@@ -18,14 +19,21 @@ export async function execute(remainder: string, agent: Agent) {
     const [, listName, funcName, argsStr] = funcMatch;
     const scriptingService = agent.requireServiceByType(ScriptingService);
     
-    const args = argsStr.split(",").map(a => {
-      const trimmed = a.trim();
-      return trimmed.match(/^["'](.*)["']$/) ? RegExp.$1 : context.interpolate(trimmed);
+    const args = parseArguments(argsStr).map(a => {
+      const unquoted = a.match(/^["'](.*)["']$/);
+      return unquoted ? unquoted[1] : context.interpolate(a);
     });
 
     try {
       const result = await scriptingService.executeFunction(funcName, args, agent);
       const items = Array.isArray(result) ? result : [result];
+      
+      // Check for name conflict with variables
+      if (context.variables.has(listName)) {
+        agent.errorLine(`Name '${listName}' already exists as a variable ($${listName})`);
+        return;
+      }
+      
       context.setList(listName, items);
       agent.infoLine(`List @${listName} = [${items.length} items]`);
     } catch (error) {
@@ -43,11 +51,16 @@ export async function execute(remainder: string, agent: Agent) {
 
   const [, listName, itemsStr] = match;
   
-  const items = itemsStr.split(',').map(item => {
-    const trimmed = item.trim();
-    const unquoted = trimmed.match(/^["'](.*)["']$/);
-    return unquoted ? unquoted[1] : context.interpolate(trimmed);
-  }).filter(item => item);
+  // Check for name conflict with variables
+  if (context.variables.has(listName)) {
+    agent.errorLine(`Name '${listName}' already exists as a variable ($${listName})`);
+    return;
+  }
+  
+  const items = parseArguments(itemsStr).map(item => {
+    const unquoted = item.match(/^["'](.*)["']$/);
+    return unquoted ? unquoted[1] : context.interpolate(item);
+  });
 
   context.setList(listName, items);
   agent.infoLine(`List @${listName} = [${items.length} items]`);

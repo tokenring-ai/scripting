@@ -1,6 +1,5 @@
-import type {AgentStateSlice} from "@tokenring-ai/agent/Agent";
-import type Agent from "@tokenring-ai/agent/Agent";
 import {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
+import type {AgentStateSlice} from "@tokenring-ai/agent/types";
 
 export class ScriptingContext implements AgentStateSlice {
   name = "ScriptingContext";

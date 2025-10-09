@@ -2,6 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import runChat from "@tokenring-ai/ai-client/runChat";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import ScriptingService from "../ScriptingService.ts";
+import {parseArguments} from "../utils/parseArguments.ts";
 
 export const description = "/var $name = value|llm(\"prompt\") - Define or assign variables";
 
@@ -33,10 +34,20 @@ export async function execute(remainder: string, agent: Agent) {
   }
 
   const [, varName, expression] = match;
-  const value = await evaluateExpression(expression.trim(), context, agent);
   
-  context.setVariable(varName, value);
-  agent.infoLine(`Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`);
+  // Check for name conflict with lists
+  if (context.lists.has(varName)) {
+    agent.errorLine(`Name '${varName}' already exists as a list (@${varName})`);
+    return;
+  }
+  
+  try {
+    const value = await evaluateExpression(expression.trim(), context, agent);
+    context.setVariable(varName, value);
+    agent.infoLine(`Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`);
+  } catch (error) {
+    agent.errorLine(error instanceof Error ? error.message : String(error));
+  }
 }
 
 async function evaluateExpression(expr: string, context: ScriptingContext, agent: Agent): Promise<string> {
@@ -52,9 +63,9 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
     const [, funcName, argsStr] = funcMatch;
     const scriptingService = agent.requireServiceByType(ScriptingService);
     
-    const args = argsStr.split(",").map(a => {
-      const trimmed = a.trim();
-      return trimmed.match(/^["'](.*)["']$/) ? RegExp.$1 : context.interpolate(trimmed);
+    const args = parseArguments(argsStr).map(a => {
+      const unquoted = a.match(/^["'](.*)["']$/);
+      return unquoted ? unquoted[1] : context.interpolate(a);
     });
 
     const result = await scriptingService.executeFunction(funcName, args, agent);

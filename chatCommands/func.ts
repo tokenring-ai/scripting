@@ -3,6 +3,8 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 export const description = "/func [static|llm|js] name($param1, $param2) => \"text\" - Define functions";
 
+const RESERVED_NAMES = ['var', 'vars', 'func', 'funcs', 'call', 'echo', 'sleep', 'prompt', 'confirm', 'list', 'lists', 'if', 'for', 'while', 'script'];
+
 export async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
@@ -27,6 +29,10 @@ export async function execute(remainder: string, agent: Agent) {
   const jsMatch = remainder.match(/^js\s+(\w+)\((.*?)\)\s*\{(.+)\}$/s);
   if (jsMatch) {
     const [, funcName, paramsStr, body] = jsMatch;
+    if (RESERVED_NAMES.includes(funcName)) {
+      agent.errorLine(`Function name '${funcName}' is reserved`);
+      return;
+    }
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
     context.defineFunction(funcName, 'js', params, body.trim());
     agent.infoLine(`JavaScript function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`);
@@ -37,6 +43,10 @@ export async function execute(remainder: string, agent: Agent) {
   const llmMatch = remainder.match(/^llm\s+(\w+)\((.*?)\)\s*=>\s*(.+)$/s);
   if (llmMatch) {
     const [, funcName, paramsStr, body] = llmMatch;
+    if (RESERVED_NAMES.includes(funcName)) {
+      agent.errorLine(`Function name '${funcName}' is reserved`);
+      return;
+    }
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
     context.defineFunction(funcName, 'llm', params, body.trim());
     agent.infoLine(`LLM function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`);
@@ -47,6 +57,10 @@ export async function execute(remainder: string, agent: Agent) {
   const staticMatch = remainder.match(/^static\s+(\w+)\((.*?)\)\s*=>\s*(.+)$/s);
   if (staticMatch) {
     const [, funcName, paramsStr, body] = staticMatch;
+    if (RESERVED_NAMES.includes(funcName)) {
+      agent.errorLine(`Function name '${funcName}' is reserved`);
+      return;
+    }
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
     context.defineFunction(funcName, 'static', params, body.trim());
     agent.infoLine(`Static function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`);

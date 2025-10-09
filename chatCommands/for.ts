@@ -1,6 +1,7 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
-import {parseBlock, executeBlock} from "../utils/executeBlock.ts";
+import {extractBlock, parseBlock} from "../utils/blockParser.js";
+import {executeBlock} from "../utils/executeBlock.ts";
 
 export const description = "/for $item in @list { commands } - Iterate over lists";
 
@@ -12,19 +13,27 @@ export async function execute(remainder: string, agent: Agent) {
     return;
   }
 
-  const match = remainder.match(/^\$(\w+)\s+in\s+@(\w+)\s*\{(.+)\}$/s);
-  if (!match) {
+  const prefixMatch = remainder.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
+  if (!prefixMatch) {
     agent.errorLine("Invalid syntax. Use: /for $item in @list { commands }");
     return;
   }
 
-  const [, itemVar, listName, body] = match;
-  const commands = parseBlock(body);
+  const [prefix, itemVar, listName] = prefixMatch;
+  const block = extractBlock(remainder, prefix.length);
+  
+  if (!block) {
+    agent.errorLine("Missing block { commands }");
+    return;
+  }
+
+  const commands = parseBlock(block.content);
   const savedItem = context.variables.get(itemVar);
 
   const items = context.getList(listName);
   if (!items) {
-    throw new Error(`List @${listName} not found`);
+    agent.errorLine(`List @${listName} not found`);
+    return;
   }
 
   try {
@@ -35,8 +44,10 @@ export async function execute(remainder: string, agent: Agent) {
   } catch (error) {
     agent.errorLine(error instanceof Error ? error.message : String(error));
   } finally {
-    if (savedItem) {
+    if (savedItem !== undefined) {
       context.setVariable(itemVar, savedItem);
+    } else {
+      context.variables.delete(itemVar);
     }
   }
 }
