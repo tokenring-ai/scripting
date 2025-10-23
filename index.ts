@@ -9,13 +9,13 @@ import * as runAgent from "@tokenring-ai/agent/tools/runAgent"
 
 export const ScriptingConfigSchema = z.record(z.string(), ScriptSchema).optional();
 
-export const packageInfo: TokenRingPackage = {
+export default {
   name: packageJSON.name,
   version: packageJSON.version,
   description: packageJSON.description,
   install(agentTeam: AgentTeam) {
     const config = agentTeam.getConfigSlice('scripts', ScriptingConfigSchema);
-    agentTeam.addTools(packageInfo, tools)
+    agentTeam.addTools(packageJSON.name, tools)
     agentTeam.addChatCommands(chatCommands);
     const scriptingService = new ScriptingService(config ?? {});
     agentTeam.addServices(scriptingService);
@@ -39,7 +39,7 @@ export const packageInfo: TokenRingPackage = {
       }
     );
   }
-};
+} as TokenRingPackage;
 
 export {default as ScriptingService} from "./ScriptingService.ts";
 export type {ScriptFunction} from "./ScriptingService.ts";
