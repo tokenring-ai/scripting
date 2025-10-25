@@ -61,4 +61,15 @@ export class ScriptingContext implements AgentStateSlice {
       return list ? list.join(", ") : "";
     });
   }
+
+  show(): string[] {
+    return [
+      `Variables: ${this.variables.size}`,
+      ...Array.from(this.variables.entries()).map(([k, v]) => `  $${k} = ${v}`),
+      `Lists: ${this.lists.size}`,
+      ...Array.from(this.lists.entries()).map(([k, v]) => `  @${k} = [${v.join(", ")}]`),
+      `Functions: ${this.functions.size}`,
+      ...Array.from(this.functions.entries()).map(([k, v]) => `  ${k}(${v.params.join(", ")}) [${v.type}]`)
+    ];
+  }
 }

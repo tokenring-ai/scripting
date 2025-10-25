@@ -1,11 +1,12 @@
-import {AgentTeam, TokenRingPackage} from "@tokenring-ai/agent";
+import {AgentCommandService, AgentTeam, TokenRingPackage} from "@tokenring-ai/agent";
+import * as runAgent from "@tokenring-ai/agent/tools/runAgent"
+import {AIService} from "@tokenring-ai/ai-client";
 import {z} from "zod";
 
 import * as chatCommands from "./chatCommands.ts";
 import packageJSON from './package.json' with {type: 'json'};
 import ScriptingService, {ScriptingThis, ScriptSchema} from "./ScriptingService.js";
 import * as tools from "./tools.ts";
-import * as runAgent from "@tokenring-ai/agent/tools/runAgent"
 
 export const ScriptingConfigSchema = z.record(z.string(), ScriptSchema).optional();
 
@@ -15,8 +16,12 @@ export default {
   description: packageJSON.description,
   install(agentTeam: AgentTeam) {
     const config = agentTeam.getConfigSlice('scripts', ScriptingConfigSchema);
-    agentTeam.addTools(packageJSON.name, tools)
-    agentTeam.addChatCommands(chatCommands);
+    agentTeam.waitForService(AIService, aiService =>
+      aiService.addTools(packageJSON.name, tools)
+    );
+    agentTeam.waitForService(AgentCommandService, agentCommandService =>
+      agentCommandService.addAgentCommands(chatCommands)
+    );
     const scriptingService = new ScriptingService(config ?? {});
     agentTeam.addServices(scriptingService);
 

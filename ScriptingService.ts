@@ -1,5 +1,7 @@
 import type {Agent} from "@tokenring-ai/agent";
+import {AgentCommandService} from "@tokenring-ai/agent";
 import type {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
+import {AIService} from "@tokenring-ai/ai-client";
 import runChat from "@tokenring-ai/ai-client/runChat";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
 import {z} from "zod";
@@ -139,10 +141,11 @@ export default class ScriptingService implements TokenRingService {
     try {
       agent.systemMessage(`Running script: ${scriptName} with ${script.length} commands`);
 
+      const agentCommandService = agent.requireServiceByType(AgentCommandService);
       for (const command of script) {
         if (command.trim()) {
           agent.systemMessage(`Executing: ${command}`);
-          await agent.runCommand(command);
+          await agentCommandService.executeAgentCommand(agent, command);
         }
       }
 
@@ -163,7 +166,8 @@ export default class ScriptingService implements TokenRingService {
   }
 
   async* getContextItems(agent: Agent): AsyncGenerator<ContextItem> {
-    if (agent.tools.hasItemLike(/@tokenring-ai\/scripting/)) {
+    const aiService = agent.requireServiceByType(AIService);
+    if (aiService.getEnabledTools(agent).find(item => item.match(/@tokenring-ai\/scripting/))) {
       const scriptNames = this.listScripts();
       
       if (scriptNames.length > 0) {
