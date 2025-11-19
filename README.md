@@ -1,6 +1,8 @@
 # TokenRing Scripting Package
 
-The TokenRing AI Scripting package provides functionality for running predefined sequences of chat commands by name, as well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate repetitive workflows and create dynamic, reusable command sequences.
+The TokenRing AI Scripting package provides functionality for running predefined sequences of chat commands by name, as
+well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate
+repetitive workflows and create dynamic, reusable command sequences.
 
 ## Features
 
@@ -51,6 +53,7 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 ### Examples
 
 #### Predefined Scripts
+
 ```
 /script run setupProject "MyProject"
 /script run publishWorkflow "article.md"
@@ -58,6 +61,7 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 ```
 
 #### Scripting Language
+
 ```
 # Variables with static values
 /var $name = "Alice"
@@ -95,7 +99,8 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 
 ## Global Functions
 
-Packages can register global functions that are available to all scripting contexts. Global functions are resolved after local functions, allowing users to override them if needed.
+Packages can register global functions that are available to all scripting contexts. Global functions are resolved after
+local functions, allowing users to override them if needed.
 
 ### Registering Global Functions
 
@@ -168,7 +173,8 @@ This allows users to override global functions with their own implementations.
 
 ## Creating Scripts
 
-Scripts are JavaScript functions that accept an input string and return an array of chat commands to execute sequentially.
+Scripts are JavaScript functions that accept an input string and return an array of chat commands to execute
+sequentially.
 
 ### Script Structure
 
@@ -240,4 +246,6 @@ The `ScriptingService` stores scripts using a KeyedRegistry and provides operati
 
 ## Inspiration
 
-The scripting operators used in this package were inspired by the [mlld](https://github.com/mlld-lang/mlld) project, which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning, and reproducibility.
+The scripting operators used in this package were inspired by the [mlld](https://github.com/mlld-lang/mlld) project,
+which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning,
+and reproducibility.

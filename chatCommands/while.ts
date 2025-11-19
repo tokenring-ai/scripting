@@ -21,20 +21,20 @@ export async function execute(remainder: string, agent: Agent) {
 
   const [prefix, conditionVar] = prefixMatch;
   const block = extractBlock(remainder, prefix.length);
-  
+
   if (!block) {
     agent.errorLine("Missing block { commands }");
     return;
   }
 
   const commands = parseBlock(block.content);
-  
+
   const maxIterations = 1000;
   let iterations = 0;
 
   while (iterations < maxIterations) {
     const conditionValue = context.getVariable(conditionVar);
-    
+
     if (!conditionValue || conditionValue === 'false' || conditionValue === '0' || conditionValue === 'no') {
       break;
     }

@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { ScriptingContext } from '../state/ScriptingContext.ts';
+import {beforeEach, describe, expect, it} from 'vitest';
+import {ScriptingContext} from '../state/ScriptingContext.ts';
 
 describe('ScriptingContext', () => {
   let context: ScriptingContext;
@@ -99,9 +99,9 @@ describe('ScriptingContext', () => {
       context.setVariable('name', 'Alice');
       context.setList('items', ['a', 'b']);
       context.defineFunction('test', 'static', [], 'body');
-      
+
       context.reset(['chat']);
-      
+
       expect(context.variables.size).toBe(0);
       expect(context.lists.size).toBe(0);
       expect(context.functions.size).toBe(0);
@@ -119,11 +119,11 @@ describe('ScriptingContext', () => {
       context.setVariable('name', 'Alice');
       context.setList('items', ['a', 'b']);
       context.defineFunction('test', 'static', ['x'], 'body');
-      
+
       const serialized = context.serialize();
       const newContext = new ScriptingContext();
       newContext.deserialize(serialized);
-      
+
       expect(newContext.getVariable('name')).toBe('Alice');
       expect(newContext.getList('items')).toEqual(['a', 'b']);
       expect(newContext.getFunction('test')).toBeDefined();
@@ -133,7 +133,7 @@ describe('ScriptingContext', () => {
       const serialized = context.serialize();
       const newContext = new ScriptingContext();
       newContext.deserialize(serialized);
-      
+
       expect(newContext.variables.size).toBe(0);
       expect(newContext.lists.size).toBe(0);
       expect(newContext.functions.size).toBe(0);

@@ -21,7 +21,7 @@ export async function execute(remainder: string, agent: Agent) {
 
   const [prefix, itemVar, listName] = prefixMatch;
   const block = extractBlock(remainder, prefix.length);
-  
+
   if (!block) {
     agent.errorLine("Missing block { commands }");
     return;

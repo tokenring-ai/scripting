@@ -21,20 +21,20 @@ export async function execute(remainder: string, agent: Agent) {
 
   const [prefix, conditionVar] = prefixMatch;
   const thenBlock = extractBlock(remainder, prefix.length);
-  
+
   if (!thenBlock) {
     agent.errorLine("Missing then block { commands }");
     return;
   }
 
   const conditionValue = context.getVariable(conditionVar);
-  const isTruthy = conditionValue && 
-                   conditionValue !== 'false' && 
-                   conditionValue !== '0' && 
-                   conditionValue !== 'no';
+  const isTruthy = conditionValue &&
+    conditionValue !== 'false' &&
+    conditionValue !== '0' &&
+    conditionValue !== 'no';
 
   let body: string;
-  
+
   if (isTruthy) {
     body = thenBlock.content;
   } else {

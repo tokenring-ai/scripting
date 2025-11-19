@@ -1,6 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
 import ScriptingService from "../ScriptingService.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 export const description = "/funcs [name] - List all functions or show specific function";
 
@@ -10,7 +10,7 @@ export async function execute(remainder: string, agent: Agent) {
   const scriptingService = agent.requireServiceByType(ScriptingService);
 
   const trimmed = remainder?.trim();
-  
+
   if (trimmed === "clear") {
     context.functions.clear();
     agent.infoLine("All local functions cleared");
@@ -32,7 +32,7 @@ export async function execute(remainder: string, agent: Agent) {
 
   const localFuncs = Array.from(context.functions.entries());
   const globalFuncs = scriptingService?.listFunctions() || [];
-  
+
   if (localFuncs.length === 0 && globalFuncs.length === 0) {
     agent.infoLine("No functions defined");
     return;

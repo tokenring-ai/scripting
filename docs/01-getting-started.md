@@ -2,7 +2,8 @@
 
 ## Overview
 
-The TokenRing Scripting Language is a lightweight scripting system designed for interacting with AI agents and LLMs. It provides variables, functions, and seamless LLM integration for building dynamic workflows.
+The TokenRing Scripting Language is a lightweight scripting system designed for interacting with AI agents and LLMs. It
+provides variables, functions, and seamless LLM integration for building dynamic workflows.
 
 ## Key Features
 

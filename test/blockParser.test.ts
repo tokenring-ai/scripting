@@ -1,45 +1,45 @@
-import { describe, it, expect } from 'vitest';
-import { extractBlock, parseBlock } from '../utils/blockParser.ts';
+import {describe, expect, it} from 'vitest';
+import {extractBlock, parseBlock} from '../utils/blockParser.ts';
 
 describe('extractBlock', () => {
   it('extracts simple block', () => {
     const result = extractBlock('{ hello }');
-    expect(result).toEqual({ content: ' hello ', endPos: 9 });
+    expect(result).toEqual({content: ' hello ', endPos: 9});
   });
 
   it('extracts nested blocks', () => {
     const result = extractBlock('{ outer { inner } }');
-    expect(result).toEqual({ content: ' outer { inner } ', endPos: 19 });
+    expect(result).toEqual({content: ' outer { inner } ', endPos: 19});
   });
 
   it('extracts deeply nested blocks', () => {
     const result = extractBlock('{ a { b { c } } }');
-    expect(result).toEqual({ content: ' a { b { c } } ', endPos: 17 });
+    expect(result).toEqual({content: ' a { b { c } } ', endPos: 17});
   });
 
   it('handles blocks with prefix', () => {
     const result = extractBlock('prefix { content }', 7);
-    expect(result).toEqual({ content: ' content ', endPos: 18 });
+    expect(result).toEqual({content: ' content ', endPos: 18});
   });
 
   it('ignores braces in strings', () => {
     const result = extractBlock('{ "text { with } braces" }');
-    expect(result).toEqual({ content: ' "text { with } braces" ', endPos: 26 });
+    expect(result).toEqual({content: ' "text { with } braces" ', endPos: 26});
   });
 
   it('ignores braces in single quotes', () => {
     const result = extractBlock("{ 'text { with } braces' }");
-    expect(result).toEqual({ content: " 'text { with } braces' ", endPos: 26 });
+    expect(result).toEqual({content: " 'text { with } braces' ", endPos: 26});
   });
 
   it('handles escaped quotes', () => {
     const result = extractBlock('{ "escaped \\" quote" }');
-    expect(result).toEqual({ content: ' "escaped \\" quote" ', endPos: 22 });
+    expect(result).toEqual({content: ' "escaped \\" quote" ', endPos: 22});
   });
 
   it('handles mixed quotes', () => {
     const result = extractBlock('{ "outer" and \'inner\' }');
-    expect(result).toEqual({ content: ' "outer" and \'inner\' ', endPos: 23 });
+    expect(result).toEqual({content: ' "outer" and \'inner\' ', endPos: 23});
   });
 
   it('returns null when no opening brace', () => {
@@ -54,7 +54,7 @@ describe('extractBlock', () => {
   it('throws on extra closing brace', () => {
     expect(() => extractBlock('{ closed } }')).not.toThrow();
     const result = extractBlock('{ closed } }');
-    expect(result).toEqual({ content: ' closed ', endPos: 10 });
+    expect(result).toEqual({content: ' closed ', endPos: 10});
   });
 });
 
@@ -151,10 +151,10 @@ describe('integration tests', () => {
     const input = '$item in @list { /echo $item; /log $item }';
     const prefixMatch = input.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
     expect(prefixMatch).toBeTruthy();
-    
+
     const block = extractBlock(input, prefixMatch![0].length);
     expect(block).toBeTruthy();
-    
+
     const commands = parseBlock(block!.content);
     expect(commands).toEqual(['/echo $item', '/log $item']);
   });
@@ -162,23 +162,23 @@ describe('integration tests', () => {
   it('extracts and parses nested for/if', () => {
     const input = '$item in @list { /if $item { /echo $item } }';
     const prefixMatch = input.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
-    
+
     const block = extractBlock(input, prefixMatch![0].length);
     const commands = parseBlock(block!.content);
-    
+
     expect(commands).toEqual(['/if $item { /echo $item }']);
   });
 
   it('extracts and parses if/else', () => {
     const input = '$cond { /echo yes } else { /echo no }';
     const match = input.match(/^\$(\w+)\s*/);
-    
+
     const thenBlock = extractBlock(input, match![0].length);
     expect(thenBlock).toBeTruthy();
-    
+
     const elseBlock = extractBlock(input, thenBlock!.endPos);
     expect(elseBlock).toBeTruthy();
-    
+
     expect(parseBlock(thenBlock!.content)).toEqual(['/echo yes']);
     expect(parseBlock(elseBlock!.content)).toEqual(['/echo no']);
   });

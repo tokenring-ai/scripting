@@ -25,7 +25,7 @@ export async function execute(remainder: string, agent: Agent) {
     type: "ask",
     message
   });
-  
+
   context.setVariable(varName, input);
   agent.infoLine(`Variable $${varName} = ${input}`);
 }

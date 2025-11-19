@@ -1,6 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
 import ScriptingService from "../ScriptingService.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
 export const description = "/call functionName(\"arg1\", \"arg2\") - Call a function and display output";

@@ -8,7 +8,7 @@ export async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   const trimmed = remainder?.trim();
-  
+
   if (trimmed === "clear") {
     context.variables.clear();
     agent.infoLine("All variables cleared");

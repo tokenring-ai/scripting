@@ -25,9 +25,9 @@ export async function execute(remainder: string, agent: Agent) {
     type: "askForConfirmation",
     message
   });
-  
+
   const result = confirmed ? 'yes' : 'no';
-  
+
   context.setVariable(varName, result);
   agent.infoLine(`Variable $${varName} = ${result}`);
 }

@@ -53,6 +53,7 @@ Store function output in variables:
 ## Variable Interpolation
 
 Variables are automatically replaced in:
+
 - LLM prompts
 - Function arguments
 - Static text
@@ -85,6 +86,7 @@ Use `\$` to include a literal dollar sign:
 ```
 
 Output:
+
 ```
 Defined variables:
   $name = Alice
@@ -99,6 +101,7 @@ Defined variables:
 ```
 
 Output:
+
 ```
 $name = Alice
 ```

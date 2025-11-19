@@ -5,7 +5,7 @@ export class ScriptingContext implements AgentStateSlice {
   name = "ScriptingContext";
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();
-  functions = new Map<string, {type: 'static' | 'llm' | 'js', params: string[], body: string}>();
+  functions = new Map<string, { type: 'static' | 'llm' | 'js', params: string[], body: string }>();
 
   reset(what: ResetWhat[]): void {
     if (what.includes("chat")) {
@@ -49,7 +49,7 @@ export class ScriptingContext implements AgentStateSlice {
     this.functions.set(name, {type, params, body});
   }
 
-  getFunction(name: string): {type: 'static' | 'llm' | 'js', params: string[], body: string} | undefined {
+  getFunction(name: string): { type: 'static' | 'llm' | 'js', params: string[], body: string } | undefined {
     return this.functions.get(name);
   }
 

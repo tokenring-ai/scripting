@@ -2,7 +2,8 @@
 
 ## Overview
 
-Functions are reusable templates that accept parameters. There are three types: static text functions, LLM functions, and JavaScript functions.
+Functions are reusable templates that accept parameters. There are three types: static text functions, LLM functions,
+and JavaScript functions.
 
 ## Function Types
 
@@ -11,11 +12,13 @@ Functions are reusable templates that accept parameters. There are three types: 
 Return text with variable interpolation.
 
 **Syntax:**
+
 ```bash
 /func static functionName($param1, $param2) => "text with $param1 and $param2"
 ```
 
 **Examples:**
+
 ```bash
 /func static greet($name) => "Hello, $name! Welcome to TokenRing."
 /func static formatEmail($to, $subject) => "To: $to\nSubject: $subject"
@@ -23,6 +26,7 @@ Return text with variable interpolation.
 ```
 
 **Usage:**
+
 ```bash
 /var $message = greet("Alice")
 /call formatEmail("bob@example.com", "Meeting")
@@ -33,11 +37,13 @@ Return text with variable interpolation.
 Send prompts to the AI agent and return responses.
 
 **Syntax:**
+
 ```bash
 /func llm functionName($param1, $param2) => "prompt with $param1 and $param2"
 ```
 
 **Examples:**
+
 ```bash
 /func llm summarize($text) => "Summarize in one sentence: $text"
 /func llm translate($text, $lang) => "Translate to $lang: $text"
@@ -46,6 +52,7 @@ Send prompts to the AI agent and return responses.
 ```
 
 **Usage:**
+
 ```bash
 /var $article = "Long article text..."
 /var $summary = summarize($article)
@@ -53,6 +60,7 @@ Send prompts to the AI agent and return responses.
 ```
 
 **Features:**
+
 - Variable interpolation in prompts
 - Context-aware (uses current agent configuration)
 - Can be chained with other functions
@@ -63,6 +71,7 @@ Send prompts to the AI agent and return responses.
 Execute JavaScript code for computations and data processing.
 
 **Syntax:**
+
 ```bash
 /func js functionName($param1, $param2) {
   // JavaScript code
@@ -73,6 +82,7 @@ Execute JavaScript code for computations and data processing.
 **Examples:**
 
 String manipulation:
+
 ```bash
 /func js uppercase($text) {
   return $text.toUpperCase();
@@ -88,6 +98,7 @@ String manipulation:
 ```
 
 Math operations:
+
 ```bash
 /func js wordCount($text) {
   return $text.split(/\s+/).length;
@@ -99,6 +110,7 @@ Math operations:
 ```
 
 Date/time:
+
 ```bash
 /func js timestamp() {
   return new Date().toISOString();
@@ -110,6 +122,7 @@ Date/time:
 ```
 
 JSON processing:
+
 ```bash
 /func js parseJson($json) {
   const data = JSON.parse($json);
@@ -123,6 +136,7 @@ JSON processing:
 ```
 
 Array operations:
+
 ```bash
 /func js joinList($items, $separator) {
   return $items.split(',').map(s => s.trim()).join($separator);
@@ -134,6 +148,7 @@ Array operations:
 ```
 
 Text processing:
+
 ```bash
 /func js extractUrls($text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -146,6 +161,7 @@ Text processing:
 ```
 
 **Limitations:**
+
 - No async/await (must be synchronous)
 - No Node.js/Bun APIs (fs, http, etc.)
 - No external libraries
@@ -279,6 +295,7 @@ Combine literals and variables:
 ```
 
 Output:
+
 ```
 Local functions:
   greet($name)
@@ -297,6 +314,7 @@ Global functions:
 ```
 
 Output:
+
 ```
 greet($name) => "Hello, $name!"
 ```

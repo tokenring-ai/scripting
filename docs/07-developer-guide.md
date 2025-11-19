@@ -6,7 +6,8 @@ Guide for package developers who want to provide global functions for the script
 
 ## Global Functions
 
-Packages can register global functions that are available to all scripting contexts. Global functions are resolved after local functions, allowing users to override them if needed.
+Packages can register global functions that are available to all scripting contexts. Global functions are resolved after
+local functions, allowing users to override them if needed.
 
 ## Registering Global Functions
 
@@ -53,6 +54,7 @@ scriptingService.registerFunction({
 ```
 
 Usage:
+
 ```bash
 /var $msg = greeting("Alice")
 # Result: "Hello, Alice! Welcome to the system."
@@ -74,6 +76,7 @@ scriptingService.registerFunction({
 ```
 
 Usage:
+
 ```bash
 /var $summary = summarizeFile("article.md")
 # Result: [LLM response]
@@ -95,6 +98,7 @@ scriptingService.registerFunction({
 ```
 
 Usage:
+
 ```bash
 /var $now = timestamp()
 # Result: "2024-01-15T10:30:00.000Z"
@@ -184,6 +188,7 @@ export class FileSystemService implements TokenRingService {
 ```
 
 Usage:
+
 ```bash
 # Read file
 /var $content = readFile("article.md")
@@ -463,6 +468,7 @@ scriptingService.registerFunction({
 ### 1. Sandboxing
 
 JavaScript functions run in a sandboxed environment:
+
 - No file system access (unless explicitly provided)
 - No network access
 - No process/system access

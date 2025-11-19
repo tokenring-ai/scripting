@@ -11,6 +11,7 @@ Complete reference for all scripting commands.
 Assign values to variables.
 
 **Syntax:**
+
 ```bash
 /var $name = value
 /var $name = llm("prompt")
@@ -19,6 +20,7 @@ Assign values to variables.
 ```
 
 **Examples:**
+
 ```bash
 # Static value
 /var $name = "Alice"
@@ -35,6 +37,7 @@ Assign values to variables.
 ```
 
 **Notes:**
+
 - Variable names must start with `$`
 - Values can be quoted or unquoted
 - Variables persist for the session
@@ -47,6 +50,7 @@ Assign values to variables.
 Display all variables or a specific variable.
 
 **Syntax:**
+
 ```bash
 /vars              # List all variables
 /vars $name        # Show specific variable
@@ -54,6 +58,7 @@ Display all variables or a specific variable.
 ```
 
 **Examples:**
+
 ```bash
 /vars
 # Output:
@@ -79,6 +84,7 @@ Display all variables or a specific variable.
 Define static, LLM, or JavaScript functions.
 
 **Syntax:**
+
 ```bash
 # Static function
 /func static name($param1, $param2) => "text with $param1"
@@ -97,6 +103,7 @@ Define static, LLM, or JavaScript functions.
 ```
 
 **Examples:**
+
 ```bash
 # Static
 /func static greet($name) => "Hello, $name!"
@@ -114,6 +121,7 @@ Define static, LLM, or JavaScript functions.
 ```
 
 **Notes:**
+
 - Function names must be valid identifiers
 - Parameters are prefixed with `$`
 - Local functions override global functions
@@ -126,6 +134,7 @@ Define static, LLM, or JavaScript functions.
 Display all functions or a specific function.
 
 **Syntax:**
+
 ```bash
 /funcs             # List all functions
 /funcs name        # Show specific function
@@ -133,6 +142,7 @@ Display all functions or a specific function.
 ```
 
 **Examples:**
+
 ```bash
 /funcs
 # Output:
@@ -152,6 +162,7 @@ Display all functions or a specific function.
 ```
 
 **Notes:**
+
 - `clear` only removes local functions
 - Global functions remain available
 
@@ -162,11 +173,13 @@ Display all functions or a specific function.
 Execute a function and display its output.
 
 **Syntax:**
+
 ```bash
 /call functionName("arg1", "arg2")
 ```
 
 **Examples:**
+
 ```bash
 /call greet("Alice")
 # Output: Hello, Alice!
@@ -179,6 +192,7 @@ Execute a function and display its output.
 ```
 
 **Notes:**
+
 - Use quotes for string literals
 - Use variable names without quotes
 - Output is displayed immediately
@@ -192,6 +206,7 @@ Execute a function and display its output.
 Display text or variable values without LLM processing.
 
 **Syntax:**
+
 ```bash
 /echo text
 /echo $variableName
@@ -199,6 +214,7 @@ Display text or variable values without LLM processing.
 ```
 
 **Examples:**
+
 ```bash
 /echo Hello World
 # Output: Hello World
@@ -212,6 +228,7 @@ Display text or variable values without LLM processing.
 ```
 
 **Notes:**
+
 - Variables are interpolated
 - No LLM processing occurs
 - Useful for debugging
@@ -223,12 +240,14 @@ Display text or variable values without LLM processing.
 Pause execution for a specified number of seconds.
 
 **Syntax:**
+
 ```bash
 /sleep seconds
 /sleep $variable
 ```
 
 **Examples:**
+
 ```bash
 /sleep 5
 # Pauses for 5 seconds
@@ -239,6 +258,7 @@ Pause execution for a specified number of seconds.
 ```
 
 **Notes:**
+
 - Accepts numbers or variables
 - Useful in scripts and workflows
 - Duration in seconds
@@ -252,12 +272,14 @@ Pause execution for a specified number of seconds.
 Define lists with `@` prefix.
 
 **Syntax:**
+
 ```bash
 /list @name = ["item1", "item2", "item3"]
 /list @name = [$var1, $var2]
 ```
 
 **Examples:**
+
 ```bash
 /list @files = ["file1.txt", "file2.txt", "file3.txt"]
 /list @colors = ["red", "green", "blue"]
@@ -268,6 +290,7 @@ Define lists with `@` prefix.
 ```
 
 **Notes:**
+
 - Lists use `@` prefix (variables use `$`)
 - Items can be quoted strings or variables
 - Lists can be used with `/for` loops
@@ -279,12 +302,14 @@ Define lists with `@` prefix.
 Display all lists or a specific list.
 
 **Syntax:**
+
 ```bash
 /lists             # List all lists
 /lists @name       # Show specific list
 ```
 
 **Examples:**
+
 ```bash
 /lists
 # Output:
@@ -306,11 +331,13 @@ Display all lists or a specific list.
 Prompt user for input and store in variable.
 
 **Syntax:**
+
 ```bash
 /prompt $var "message"
 ```
 
 **Examples:**
+
 ```bash
 /prompt $name "Enter your name:"
 /prompt $email "Enter your email address:"
@@ -318,6 +345,7 @@ Prompt user for input and store in variable.
 ```
 
 **Notes:**
+
 - Message supports variable interpolation
 - User input is stored as a string
 
@@ -328,11 +356,13 @@ Prompt user for input and store in variable.
 Prompt user for yes/no confirmation.
 
 **Syntax:**
+
 ```bash
 /confirm $var "message"
 ```
 
 **Examples:**
+
 ```bash
 /confirm $proceed "Continue with operation?"
 /if $proceed {
@@ -343,6 +373,7 @@ Prompt user for yes/no confirmation.
 ```
 
 **Notes:**
+
 - Stores 'yes' or 'no' in variable
 - Message supports variable interpolation
 
@@ -355,12 +386,14 @@ Prompt user for yes/no confirmation.
 Execute commands based on condition.
 
 **Syntax:**
+
 ```bash
 /if $condition { commands }
 /if $condition { commands } else { commands }
 ```
 
 **Examples:**
+
 ```bash
 /var $count = "5"
 /if $count { /echo Count is set to $count }
@@ -376,6 +409,7 @@ Execute commands based on condition.
 ```
 
 **Notes:**
+
 - Condition is false if: empty, 'false', '0', or 'no'
 - Separate multiple commands with semicolons or newlines
 - Else block is optional
@@ -387,11 +421,13 @@ Execute commands based on condition.
 Iterate over lists.
 
 **Syntax:**
+
 ```bash
 /for $item in @list { commands }
 ```
 
 **Examples:**
+
 ```bash
 # Single command
 /list @files = ["file1.txt", "file2.txt", "file3.txt"]
@@ -408,6 +444,7 @@ Iterate over lists.
 ```
 
 **Notes:**
+
 - Loop variable uses `$` prefix
 - Collection uses `@` prefix
 - Separate multiple commands with semicolons or newlines
@@ -420,11 +457,13 @@ Iterate over lists.
 Execute commands while condition is truthy.
 
 **Syntax:**
+
 ```bash
 /while $condition { commands }
 ```
 
 **Examples:**
+
 ```bash
 /var $counter = "3"
 /while $counter { /echo Counter: $counter; /var $counter = "0" }
@@ -438,6 +477,7 @@ Execute commands while condition is truthy.
 ```
 
 **Notes:**
+
 - Condition is false if: empty, 'false', '0', or 'no'
 - Separate multiple commands with semicolons or newlines
 - Maximum 1000 iterations to prevent infinite loops
@@ -452,6 +492,7 @@ Execute commands while condition is truthy.
 Execute predefined command sequences.
 
 **Syntax:**
+
 ```bash
 /script list                    # List available scripts
 /script run <name> <input>      # Run a script
@@ -459,6 +500,7 @@ Execute predefined command sequences.
 ```
 
 **Examples:**
+
 ```bash
 /script list
 # Output: Available scripts: setupProject, publishWorkflow
@@ -471,6 +513,7 @@ Execute predefined command sequences.
 ```
 
 **Notes:**
+
 - Scripts are defined in configuration
 - Scripts execute multiple commands
 - Input is passed to the script function

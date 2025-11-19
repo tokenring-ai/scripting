@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
-import { ScriptingContext } from '../state/ScriptingContext.ts';
+import {vi} from 'vitest';
 import ScriptingService from '../ScriptingService.ts';
+import {ScriptingContext} from '../state/ScriptingContext.ts';
 
 export function createMockAgent() {
   const context = new ScriptingContext();
@@ -8,7 +8,7 @@ export function createMockAgent() {
   const errors: string[] = [];
   const infos: string[] = [];
   const humanResponses: any[] = [];
-  
+
   const agent = {
     getState: vi.fn(() => context),
     requireServiceByType: vi.fn((type) => {

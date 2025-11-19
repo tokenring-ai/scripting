@@ -1,8 +1,8 @@
 import type {Agent} from "@tokenring-ai/agent";
 import {AgentCommandService} from "@tokenring-ai/agent";
 import type {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
-import {AIService} from "@tokenring-ai/ai-client";
-import runChat from "@tokenring-ai/ai-client/runChat";
+import {ChatService} from "@tokenring-ai/chat";
+import runChat from "@tokenring-ai/chat/runChat";
 import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
 import {z} from "zod";
 import {ScriptingContext} from "./state/ScriptingContext.ts";
@@ -47,10 +47,10 @@ export default class ScriptingService implements TokenRingService {
 
   scripts = new KeyedRegistry<string[]>();
   functions = new KeyedRegistry<ScriptFunction>();
-  
+
   getScriptByName = this.scripts.getItemByName;
   listScripts = this.scripts.getAllItemNames;
-  
+
   registerFunction = this.functions.register;
   getFunction = this.functions.getItemByName;
   listFunctions = this.functions.getAllItemNames;
@@ -82,18 +82,18 @@ export default class ScriptingService implements TokenRingService {
   async executeFunction(funcName: string, args: string[], agent: Agent): Promise<string | string[]> {
     const context = agent.getState(ScriptingContext);
     const func = this.resolveFunction(funcName, agent);
-    
+
     if (!func) {
       throw new Error(`Function ${funcName} not defined`);
     }
-    
+
     if (args.length !== func.params.length) {
       throw new Error(`Function ${funcName} expects ${func.params.length} arguments, got ${args.length}`);
     }
 
     const tempVars = new Map(context.variables);
     func.params.forEach((param, i) => context.variables.set(param, args[i]));
-    
+
     try {
       let result: string | string[];
       if (func.type === 'native') {
@@ -118,13 +118,12 @@ export default class ScriptingService implements TokenRingService {
   }
 
 
-
   /**
    * Run a script with the given input
    */
   async runScript(
     {scriptName, input}:
-    { scriptName: string; input: string;},
+    { scriptName: string; input: string; },
     agent: Agent,
   ): Promise<ScriptResult> {
 
@@ -157,7 +156,7 @@ export default class ScriptingService implements TokenRingService {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       agent.systemMessage(`Script ${scriptName} failed: ${errorMessage}`);
-      
+
       return {
         ok: false,
         error: errorMessage
@@ -166,10 +165,10 @@ export default class ScriptingService implements TokenRingService {
   }
 
   async* getContextItems(agent: Agent): AsyncGenerator<ContextItem> {
-    const aiService = agent.requireServiceByType(AIService);
-    if (aiService.getEnabledTools(agent).find(item => item.match(/@tokenring-ai\/scripting/))) {
+    const chatService = agent.requireServiceByType(ChatService);
+    if (chatService.getEnabledTools(agent).find(item => item.match(/@tokenring-ai\/scripting/))) {
       const scriptNames = this.listScripts();
-      
+
       if (scriptNames.length > 0) {
         yield {
           position: "afterSystemMessage",

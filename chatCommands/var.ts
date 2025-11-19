@@ -1,7 +1,7 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import runChat from "@tokenring-ai/ai-client/runChat";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
+import runChat from "@tokenring-ai/chat/runChat";
 import ScriptingService from "../ScriptingService.ts";
+import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
 export const description = "/var $name = value|llm(\"prompt\") - Define or assign variables";
@@ -34,13 +34,13 @@ export async function execute(remainder: string, agent: Agent) {
   }
 
   const [, varName, expression] = match;
-  
+
   // Check for name conflict with lists
   if (context.lists.has(varName)) {
     agent.errorLine(`Name '${varName}' already exists as a list (@${varName})`);
     return;
   }
-  
+
   try {
     const value = await evaluateExpression(expression.trim(), context, agent);
     context.setVariable(varName, value);
@@ -62,7 +62,7 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
   if (funcMatch) {
     const [, funcName, argsStr] = funcMatch;
     const scriptingService = agent.requireServiceByType(ScriptingService);
-    
+
     const args = parseArguments(argsStr).map(a => {
       const unquoted = a.match(/^["'](.*)["']$/);
       return unquoted ? unquoted[1] : context.interpolate(a);
