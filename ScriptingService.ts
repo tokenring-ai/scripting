@@ -3,7 +3,7 @@ import {AgentCommandService} from "@tokenring-ai/agent";
 import type {ContextItem, TokenRingService} from "@tokenring-ai/agent/types";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
-import KeyedRegistry from "@tokenring-ai/utility/KeyedRegistry";
+import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
 import {z} from "zod";
 import {ScriptingContext} from "./state/ScriptingContext.ts";
 import {parseScript} from "./utils/parseScript.ts";
