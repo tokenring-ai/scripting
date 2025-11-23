@@ -1,9 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/confirm $var \"message\" - Prompt user for yes/no confirmation";
+const description = "/confirm $var \"message\" - Prompt user for yes/no confirmation";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -40,3 +41,8 @@ export function help() {
     "  - Example: /confirm $proceed \"Continue with operation?\"",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

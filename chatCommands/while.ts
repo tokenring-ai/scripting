@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-export const description = "/while $condition { commands } - Execute commands while condition is truthy";
+const description = "/while $condition { commands } - Execute commands while condition is truthy";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -60,3 +61,8 @@ export function help() {
     "  - Maximum 1000 iterations to prevent infinite loops",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

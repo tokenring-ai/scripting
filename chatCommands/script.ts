@@ -1,9 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../ScriptingService.ts";
 
-export const description = "/script - Run predefined chat command scripts";
+const description = "/script - Run predefined chat command scripts";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
 
   const args = remainder?.trim().split(/\s+/);
@@ -95,3 +96,9 @@ export function help() {
     "  - Shows information about a specific script",
   ];
 }
+
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

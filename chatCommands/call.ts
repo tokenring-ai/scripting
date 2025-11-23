@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-export const description = "/call functionName(\"arg1\", \"arg2\") - Call a function and display output";
+const description = "/call functionName(\"arg1\", \"arg2\") - Call a function and display output";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -47,3 +48,8 @@ export function help() {
     '  - Example: /call search("AI trends", "Google")',
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

@@ -1,9 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/vars [$name] - List all variables or show specific variable";
+const description = "/vars [$name] - List all variables or show specific variable";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
 
   const context = agent.getState(ScriptingContext);
 
@@ -49,3 +50,8 @@ export function help() {
     "  - Clear all variables",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

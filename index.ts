@@ -1,6 +1,8 @@
-import {AgentCommandService, AgentTeam, TokenRingPackage} from "@tokenring-ai/agent";
-import * as runAgent from "@tokenring-ai/agent/tools/runAgent"
+import TokenRingApp from "@tokenring-ai/app"; 
+import {AgentCommandService} from "@tokenring-ai/agent";
+import {execute as runAgent} from "@tokenring-ai/agent/tools/runAgent"
 import {ChatService} from "@tokenring-ai/chat";
+import {TokenRingPlugin} from "@tokenring-ai/app";
 import {z} from "zod";
 
 import * as chatCommands from "./chatCommands.ts";
@@ -14,22 +16,22 @@ export default {
   name: packageJSON.name,
   version: packageJSON.version,
   description: packageJSON.description,
-  install(agentTeam: AgentTeam) {
-    const config = agentTeam.getConfigSlice('scripts', ScriptingConfigSchema);
-    agentTeam.waitForService(ChatService, chatService =>
+  install(app: TokenRingApp) {
+    const config = app.getConfigSlice('scripts', ScriptingConfigSchema);
+    app.waitForService(ChatService, chatService =>
       chatService.addTools(packageJSON.name, tools)
     );
-    agentTeam.waitForService(AgentCommandService, agentCommandService =>
+    app.waitForService(AgentCommandService, agentCommandService =>
       agentCommandService.addAgentCommands(chatCommands)
     );
     const scriptingService = new ScriptingService(config ?? {});
-    agentTeam.addServices(scriptingService);
+    app.addServices(scriptingService);
 
     scriptingService.registerFunction("runAgent", {
         type: 'native',
         params: ['agentType', 'message', 'context'],
         async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
-          const res = await runAgent.execute({
+          const res = await runAgent({
             agentType,
             message,
             context,
@@ -44,7 +46,7 @@ export default {
       }
     );
   }
-} as TokenRingPackage;
+} as TokenRingPlugin;
 
 export {default as ScriptingService} from "./ScriptingService.ts";
 export type {ScriptFunction} from "./ScriptingService.ts";

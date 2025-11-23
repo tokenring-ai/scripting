@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/func [static|llm|js] name($param1, $param2) => \"text\" - Define functions";
+const description = "/func [static|llm|js] name($param1, $param2) => \"text\" - Define functions";
 
 const RESERVED_NAMES = ['var', 'vars', 'func', 'funcs', 'call', 'echo', 'sleep', 'prompt', 'confirm', 'list', 'lists', 'if', 'for', 'while', 'script'];
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -88,3 +89,9 @@ export function help() {
     "  - Delete a function",
   ];
 }
+
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

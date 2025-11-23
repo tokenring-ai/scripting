@@ -1,9 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/sleep <seconds|$var> - Sleep for specified seconds";
+const description = "/sleep <seconds|$var> - Sleep for specified seconds";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
 
   const context = agent.getState(ScriptingContext);
 
@@ -33,3 +34,8 @@ export function help() {
     "  - Example: /sleep $delay",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

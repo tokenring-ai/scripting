@@ -1,10 +1,11 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/funcs [name] - List all functions or show specific function";
+const description = "/funcs [name] - List all functions or show specific function";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
 
   const context = agent.getState(ScriptingContext);
   const scriptingService = agent.requireServiceByType(ScriptingService);
@@ -67,3 +68,8 @@ export function help() {
     "  - Clear all local functions",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

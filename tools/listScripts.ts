@@ -1,10 +1,11 @@
 import {Agent} from "@tokenring-ai/agent";
+import {TokenRingToolDefinition} from "@tokenring-ai/chat/types";
 import {z} from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
-export const name = "script/list";
+const name = "script/list";
 
-export async function execute({}, agent: Agent): Promise<{
+async function execute({}, agent: Agent): Promise<{
   ok: boolean;
   scripts: string[];
   error?: string;
@@ -19,7 +20,11 @@ export async function execute({}, agent: Agent): Promise<{
   };
 }
 
-export const description =
+const description =
   "Lists all available scripts. Returns an array of script names that can be used with the runScript tool.";
 
-export const inputSchema = z.object({});
+const inputSchema = z.object({});
+
+export default {
+  name, description, inputSchema, execute,
+} as TokenRingToolDefinition<typeof inputSchema>;

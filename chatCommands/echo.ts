@@ -1,9 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/echo <text|$var> - Display text or variable value";
+const description = "/echo <text|$var> - Display text or variable value";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -23,3 +24,8 @@ export function help() {
     '  - Example: /echo Hello, $name!',
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

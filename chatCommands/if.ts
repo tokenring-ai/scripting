@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-export const description = "/if $condition { commands } [else { commands }] - Conditional execution";
+const description = "/if $condition { commands } [else { commands }] - Conditional execution";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -67,3 +68,8 @@ export function help() {
     "  - Example: /if $proceed { /echo Continuing... } else { /echo Stopped }",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

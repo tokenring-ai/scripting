@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-export const description = "/for $item in @list { commands } - Iterate over lists";
+const description = "/for $item in @list { commands } - Iterate over lists";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -61,3 +62,9 @@ export function help() {
     "  - Example: /for $x in @items { /echo $x; /var $y = process($x) }",
   ];
 }
+
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

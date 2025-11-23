@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-export const description = "/list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\") - Define or assign lists";
+const description = "/list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\") - Define or assign lists";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
@@ -82,3 +83,8 @@ export function help() {
     '  - Example: /list @files = globFiles("**/*.ts")',
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

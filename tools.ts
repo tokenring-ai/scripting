@@ -1,2 +1,2 @@
-export * as runScript from "./tools/runScript.ts";
-export * as listScripts from "./tools/listScripts.ts";
+export {default as runScript} from "./tools/runScript.ts";
+export {default as listScripts} from "./tools/listScripts.ts";

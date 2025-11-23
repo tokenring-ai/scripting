@@ -1,12 +1,13 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import runChat from "@tokenring-ai/chat/runChat";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-export const description = "/var $name = value|llm(\"prompt\") - Define or assign variables";
+const description = "/var $name = value|llm(\"prompt\") - Define or assign variables";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
 
   const context = agent.getState(ScriptingContext);
 
@@ -93,3 +94,8 @@ export function help() {
     "  - Delete a variable",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand

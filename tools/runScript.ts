@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingToolDefinition} from "@tokenring-ai/chat/types";
 import {z} from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
-export const name = "script/run";
+const name = "script/run";
 
-export async function execute(
-  {scriptName, input}: { scriptName?: string; input?: string },
+async function execute(
+  {scriptName, input}: z.infer<typeof inputSchema>,
   agent: Agent,
 ): Promise<{
   ok: boolean;
@@ -25,10 +26,14 @@ export async function execute(
   return await scriptingService.runScript({scriptName, input}, agent);
 }
 
-export const description =
+const description =
   "Run a script with the given input. Scripts are predefined sequences of chat commands.";
 
-export const inputSchema = z.object({
+const inputSchema = z.object({
   scriptName: z.string().describe("The name of the script to run."),
   input: z.string().describe("The input to pass to the script."),
 });
+
+export default {
+  name, description, inputSchema, execute,
+} as TokenRingToolDefinition<typeof inputSchema>;

@@ -1,9 +1,10 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-export const description = "/lists [@name] - List all lists or show specific list";
+const description = "/lists [@name] - List all lists or show specific list";
 
-export async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   const listName = remainder?.trim().replace(/^@/, "");
@@ -37,3 +38,8 @@ export function help() {
     "  - Show specific list contents",
   ];
 }
+export default {
+  description,
+  execute,
+  help,
+} as TokenRingAgentCommand
