@@ -84,7 +84,7 @@ function showHelp(agent: Agent) {
   agent.systemMessage('  /var $name = functionName("arg1", "arg2") - Call function');
 }
 
-export function help() {
+function help() {
   return [
     "/var $name = value",
     '  - Assign static value: /var $name = "text"',

@@ -26,7 +26,7 @@ async function execute(remainder: string, agent: Agent) {
   agent.infoLine("Sleep complete");
 }
 
-export function help() {
+function help() {
   return [
     "/sleep <seconds|$var>",
     "  - Sleep for specified number of seconds",

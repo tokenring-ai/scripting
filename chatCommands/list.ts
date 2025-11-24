@@ -74,7 +74,7 @@ function showHelp(agent: Agent) {
   agent.systemMessage('  /list @name = functionName("arg") - List from function call');
 }
 
-export function help() {
+function help() {
   return [
     "/list @name = [\"item1\", \"item2\"]",
     "  - Define a list with items",

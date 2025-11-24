@@ -53,7 +53,7 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-export function help() {
+function help() {
   return [
     "/for $item in @list { commands }",
     "  - Iterate over lists",

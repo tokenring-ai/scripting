@@ -57,7 +57,7 @@ async function execute(remainder: string, agent: Agent) {
   await executeBlock(commands, agent);
 }
 
-export function help() {
+function help() {
   return [
     "/if $condition { commands }",
     "  - Execute commands if condition is truthy",

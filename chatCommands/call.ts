@@ -41,7 +41,7 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-export function help() {
+function help() {
   return [
     "/call functionName(\"arg1\", \"arg2\")",
     "  - Call a function and display its output",

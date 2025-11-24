@@ -33,7 +33,7 @@ async function execute(remainder: string, agent: Agent) {
   agent.infoLine(`Variable $${varName} = ${result}`);
 }
 
-export function help() {
+function help() {
   return [
     "/confirm $var \"message\"",
     "  - Prompt user for yes/no confirmation",

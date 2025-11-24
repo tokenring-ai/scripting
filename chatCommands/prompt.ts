@@ -31,7 +31,7 @@ async function execute(remainder: string, agent: Agent) {
   agent.infoLine(`Variable $${varName} = ${input}`);
 }
 
-export function help() {
+function help() {
   return [
     "/prompt $var \"message\"",
     "  - Prompt user for input and store in variable",

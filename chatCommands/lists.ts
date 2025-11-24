@@ -31,7 +31,7 @@ async function execute(remainder: string, agent: Agent) {
   });
 }
 
-export function help() {
+function help() {
   return [
     "/lists [@name]",
     "  - List all lists",

@@ -41,7 +41,7 @@ async function execute(remainder: string, agent: Agent) {
   });
 }
 
-export function help() {
+function help() {
   return [
     "/vars [$name]",
     "  - List all variables",

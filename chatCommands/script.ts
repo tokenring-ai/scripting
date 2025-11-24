@@ -86,7 +86,7 @@ async function runScript(
   await scriptingService.runScript({scriptName, input: input || ""}, agent);
 }
 
-export function help() {
+function help() {
   return [
     "/script list",
     "  - Lists all available scripts",

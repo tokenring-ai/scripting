@@ -79,7 +79,7 @@ function showHelp(agent: Agent) {
   agent.systemMessage('  /func delete name - Delete function');
 }
 
-export function help() {
+function help() {
   return [
     "/func static name($param1, $param2) => expression",
     '  - Static: /func static greet($name) => "Hello, $name"',

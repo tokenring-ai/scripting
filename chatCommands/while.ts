@@ -51,7 +51,7 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-export function help() {
+function help() {
   return [
     "/while $condition { commands }",
     "  - Execute commands while condition variable is truthy",

@@ -16,7 +16,7 @@ async function execute(remainder: string, agent: Agent) {
   agent.infoLine(output);
 }
 
-export function help() {
+function help() {
   return [
     "/echo <text|$var>",
     "  - Display text or variable value without LLM processing",

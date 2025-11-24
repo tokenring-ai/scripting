@@ -59,7 +59,7 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-export function help() {
+function help() {
   return [
     "/funcs [name]",
     "  - List all functions (local and global)",
