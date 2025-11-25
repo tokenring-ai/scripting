@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import * as funcCmd from '../chatCommands/func.ts';
-import * as funcsCmd from '../chatCommands/funcs.ts';
+import * as funcCmd from '../commands/func.ts';
+import * as funcsCmd from '../commands/funcs.ts';
 import {createMockAgent} from './testHelpers.ts';
 
 describe('func command', () => {

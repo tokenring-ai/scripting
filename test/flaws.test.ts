@@ -1,9 +1,9 @@
 import {describe, expect, it} from 'vitest';
-import * as callCmd from '../chatCommands/call.ts';
-import * as forCmd from '../chatCommands/for.ts';
-import * as funcCmd from '../chatCommands/func.ts';
-import * as listCmd from '../chatCommands/list.ts';
-import * as whileCmd from '../chatCommands/while.ts';
+import * as callCmd from '../commands/call.ts';
+import * as forCmd from '../commands/for.ts';
+import * as funcCmd from '../commands/func.ts';
+import * as listCmd from '../commands/list.ts';
+import * as whileCmd from '../commands/while.ts';
 import ScriptingService from '../ScriptingService.ts';
 import {createMockAgent} from './testHelpers.ts';
 
@@ -194,7 +194,7 @@ describe('FLAW: Func command parameter parsing with commas', () => {
 describe('FLAW: Variable name validation', () => {
   it('allows variable names that shadow command names', async () => {
     const {agent, context} = createMockAgent();
-    const varCmd = await import('../chatCommands/var.ts');
+    const varCmd = await import('../commands/var.ts');
 
     // The regex /^\$(\w+)\s*=/ only checks \w+ which is fine
     // But there's no validation against reserved words
@@ -214,7 +214,7 @@ describe('FLAW: Variable name validation', () => {
 describe('FLAW: Echo command no escape for variables', () => {
   it('cannot display literal dollar signs without interpolation', async () => {
     const {agent, context, infos} = createMockAgent();
-    const echoCmd = await import('../chatCommands/echo.ts');
+    const echoCmd = await import('../commands/echo.ts');
 
     context.setVariable('name', 'Alice');
 
@@ -257,7 +257,7 @@ describe('FLAW: Func command JS body extraction with nested braces', () => {
 describe('FLAW: Prompt and confirm message parsing with greedy regex', () => {
   it('prompt command should handle quotes inside messages', async () => {
     const {agent, context, humanResponses} = createMockAgent();
-    const promptCmd = await import('../chatCommands/prompt.ts');
+    const promptCmd = await import('../commands/prompt.ts');
 
     humanResponses.push('test');
 
@@ -272,7 +272,7 @@ describe('FLAW: Prompt and confirm message parsing with greedy regex', () => {
 
   it('confirm command should handle quotes inside messages', async () => {
     const {agent, context, humanResponses} = createMockAgent();
-    const confirmCmd = await import('../chatCommands/confirm.ts');
+    const confirmCmd = await import('../commands/confirm.ts');
 
     humanResponses.push(true);
 
@@ -288,8 +288,8 @@ describe('FLAW: Prompt and confirm message parsing with greedy regex', () => {
 describe('FLAW: No validation for list/variable name conflicts', () => {
   it('should warn when creating list with same name as variable', async () => {
     const {agent, context, errors} = createMockAgent();
-    const varCmd = await import('../chatCommands/var.ts');
-    const listCmd = await import('../chatCommands/list.ts');
+    const varCmd = await import('../commands/var.ts');
+    const listCmd = await import('../commands/list.ts');
 
     // Create variable $data
     await varCmd.execute('$data = "variable"', agent as any);
@@ -305,8 +305,8 @@ describe('FLAW: No validation for list/variable name conflicts', () => {
 
   it('should warn when creating variable with same name as list', async () => {
     const {agent, context, errors} = createMockAgent();
-    const varCmd = await import('../chatCommands/var.ts');
-    const listCmd = await import('../chatCommands/list.ts');
+    const varCmd = await import('../commands/var.ts');
+    const listCmd = await import('../commands/list.ts');
 
     // Create list @name
     await listCmd.execute('@name = ["Bob", "Charlie"]', agent as any);

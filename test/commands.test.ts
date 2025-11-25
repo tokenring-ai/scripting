@@ -1,15 +1,15 @@
 import {describe, expect, it} from 'vitest';
-import * as confirmCmd from '../chatCommands/confirm.ts';
-import * as echoCmd from '../chatCommands/echo.ts';
-import * as forCmd from '../chatCommands/for.ts';
-import * as ifCmd from '../chatCommands/if.ts';
-import * as listCmd from '../chatCommands/list.ts';
-import * as listsCmd from '../chatCommands/lists.ts';
-import * as promptCmd from '../chatCommands/prompt.ts';
-import * as sleepCmd from '../chatCommands/sleep.ts';
-import * as varCmd from '../chatCommands/var.ts';
-import * as varsCmd from '../chatCommands/vars.ts';
-import * as whileCmd from '../chatCommands/while.ts';
+import * as confirmCmd from '../commands/confirm.ts';
+import * as echoCmd from '../commands/echo.ts';
+import * as forCmd from '../commands/for.ts';
+import * as ifCmd from '../commands/if.ts';
+import * as listCmd from '../commands/list.ts';
+import * as listsCmd from '../commands/lists.ts';
+import * as promptCmd from '../commands/prompt.ts';
+import * as sleepCmd from '../commands/sleep.ts';
+import * as varCmd from '../commands/var.ts';
+import * as varsCmd from '../commands/vars.ts';
+import * as whileCmd from '../commands/while.ts';
 import {createMockAgent} from './testHelpers.ts';
 
 describe('echo command', () => {
