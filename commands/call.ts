@@ -4,7 +4,7 @@ import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-const description = "/call functionName(\"arg1\", \"arg2\") - Call a function and display output";
+const description = "/call - Call a function and display output";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -41,13 +41,15 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-function help() {
-  return [
-    "/call functionName(\"arg1\", \"arg2\")",
-    "  - Call a function and display its output",
-    '  - Example: /call search("AI trends", "Google")',
-  ];
-}
+const help: string = `# /call functionName("arg1", "arg2")
+
+Call a function and display its output
+
+## Example
+
+/call search("AI trends", "Google")
+`;
+
 export default {
   description,
   execute,

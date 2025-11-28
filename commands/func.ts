@@ -2,7 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/func [static|llm|js] name($param1, $param2) => \"text\" - Define functions";
+const description = "/func - Define functions";
 
 const RESERVED_NAMES = ['var', 'vars', 'func', 'funcs', 'call', 'echo', 'sleep', 'prompt', 'confirm', 'list', 'lists', 'if', 'for', 'while', 'script'];
 
@@ -79,17 +79,39 @@ function showHelp(agent: Agent) {
   agent.systemMessage('  /func delete name - Delete function');
 }
 
-function help() {
-  return [
-    "/func static name($param1, $param2) => expression",
-    '  - Static: /func static greet($name) => "Hello, $name"',
-    '  - LLM: /func llm analyze($text) => "Analyze: $text"',
-    '  - JavaScript: /func js wordCount($text) { return $text.split(/\\s+/).length; }',
-    "/func delete name",
-    "  - Delete a function",
-  ];
-}
+const help: string = `# /func [static|llm|js] name($param1, $param2) => expression
 
+Define reusable functions with different execution types
+
+## Function Types
+
+- **static**: Returns static text with variable interpolation
+- **llm**: Sends prompt to LLM and returns response
+- **js**: Executes JavaScript code with access to variables
+
+## Syntax
+
+/func static name($param) => "text"        - Static function
+/func llm name($param) => "prompt"         - LLM function
+/func js name($param) { return result; }   - JavaScript function
+/func delete name                          - Delete function
+
+## Examples
+
+/func static greet($name) => "Hello, $name!"
+/func llm analyze($text) => "Analyze: $text"
+/func js wordCount($text) { return $text.split(/\\s+/).length; }
+/func delete greet
+
+## Notes
+
+- Function names cannot be reserved words (var, if, for, etc.)
+- Parameters are automatically prefixed with $ when called
+- Static functions support variable interpolation in return text
+- LLM functions send interpolated prompts to the language model
+- JavaScript functions have full access to context variables
+- Use /funcs to view all defined functions
+- Local functions are specific to current context`;
 export default {
   description,
   execute,

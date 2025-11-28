@@ -3,7 +3,7 @@ import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/funcs [name] - List all functions or show specific function";
+const description = "/funcs - List all functions or show specific function";
 
 async function execute(remainder: string, agent: Agent) {
 
@@ -59,15 +59,36 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-function help() {
-  return [
-    "/funcs [name]",
-    "  - List all functions (local and global)",
-    "  - Show specific function definition",
-    "/funcs clear",
-    "  - Clear all local functions",
-  ];
-}
+const help: string = `# /funcs [name]
+
+List all functions (local and global) or show specific function definition
+
+## Syntax
+
+/funcs                    - List all functions
+/funcs name               - Show specific function definition
+/funcs clear              - Clear all local functions
+
+## Function Types
+
+- **static**: Returns static text with variable interpolation
+- **llm**: Sends prompt to LLM and returns response
+- **js**: Executes JavaScript code with access to variables
+- **native**: Built-in functions with special behavior
+
+## Examples
+
+/funcs                    - Display all available functions
+/funcs greet              - Show greet function definition
+/funcs clear              - Remove all local functions
+
+## Notes
+
+- Local functions are specific to current context
+- Global functions are available across all contexts
+- Use /func to create new functions
+- Function definitions show parameter lists and return types
+- Native functions show '...native function' as body`;
 export default {
   description,
   execute,

@@ -86,17 +86,28 @@ async function runScript(
   await scriptingService.runScript({scriptName, input: input || ""}, agent);
 }
 
-function help() {
-  return [
-    "/script list",
-    "  - Lists all available scripts",
-    "/script run <scriptName> [input]",
-    "  - Runs the specified script with optional input",
-    "/script info <scriptName>",
-    "  - Shows information about a specific script",
-  ];
-}
+const help: string = `# /script - Manage and run predefined chat command scripts
 
+## Subcommands
+
+- **/script list** - List all available scripts
+- **/script run <name> [input]** - Run a script with optional input
+- **/script info <name>** - Show information about a script
+
+## Examples
+
+/script list              - Display all available scripts
+/script run myScript      - Execute myScript without input
+/script run myScript data - Execute myScript with 'data' as input
+/script info myScript     - Show myScript details
+
+## Notes
+
+- Scripts are predefined sequences of commands
+- Scripts can accept optional input for processing
+- Scripts are defined in the scripting configuration
+- Use /script list to see what's available
+- Scripts run in the current context with existing variables`;
 export default {
   description,
   execute,

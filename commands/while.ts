@@ -4,7 +4,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-const description = "/while $condition { commands } - Execute commands while condition is truthy";
+const description = "/while - Execute commands while condition is truthy";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -51,16 +51,36 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-function help() {
-  return [
-    "/while $condition { commands }",
-    "  - Execute commands while condition variable is truthy",
-    "  - Condition is false if: empty, 'false', '0', or 'no'",
-    "  - Separate multiple commands with semicolons or newlines",
-    "  - Example: /while $continue { /echo Running...; /var $continue = no }",
-    "  - Maximum 1000 iterations to prevent infinite loops",
-  ];
+const help: string = `# /while $condition { commands }
+
+Execute commands repeatedly while a condition variable remains truthy
+
+## Syntax
+
+/while $condition { command1; command2 }
+/while $condition {
+  /echo Looping...
+  /var $counter = $counter + 1
 }
+
+## Condition Evaluation
+
+- Condition is false if: empty, 'false', '0', or 'no'
+- Any other value is considered truthy
+
+## Examples
+
+/while $continue { /echo Running...; /var $continue = no }
+/while $count < 10 {
+  /echo Count: $count
+  /var $count = $count + 1
+}
+
+## Notes
+
+- Separate multiple commands with semicolons or newlines
+- Maximum 1000 iterations to prevent infinite loops
+- Use /var $condition = no to break the loop`;
 export default {
   description,
   execute,

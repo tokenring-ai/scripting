@@ -4,7 +4,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-const description = "/for $item in @list { commands } - Iterate over lists";
+const description = "/for - Iterate over lists";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -53,15 +53,16 @@ async function execute(remainder: string, agent: Agent) {
   }
 }
 
-function help() {
-  return [
-    "/for $item in @list { commands }",
-    "  - Iterate over lists",
-    "  - Example: /for $file in @files { /echo Processing $file }",
-    "  - Separate multiple commands with semicolons or newlines",
-    "  - Example: /for $x in @items { /echo $x; /var $y = process($x) }",
-  ];
-}
+const help: string = `# /for $item in @list { commands }
+
+Iterate over lists
+
+## Examples
+
+/for $file in @files { /echo Processing $file }
+/for $x in @items { /echo $x; /var $y = process($x) }
+
+**Note:** Separate multiple commands with semicolons or newlines`;
 
 export default {
   description,

@@ -5,7 +5,7 @@ import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-const description = "/var $name = value|llm(\"prompt\") - Define or assign variables";
+const description = "/var - Define or assign variables";
 
 async function execute(remainder: string, agent: Agent) {
 
@@ -84,16 +84,31 @@ function showHelp(agent: Agent) {
   agent.systemMessage('  /var $name = functionName("arg1", "arg2") - Call function');
 }
 
-function help() {
-  return [
-    "/var $name = value",
-    '  - Assign static value: /var $name = "text"',
-    '  - Assign LLM response: /var $name = llm("prompt with $otherVar")',
-    '  - Call function: /var $name = myFunc("arg1", $var2)',
-    "/var delete $name",
-    "  - Delete a variable",
-  ];
-}
+const help: string = `# /var $name = value
+
+Define or assign variables with various value types
+
+## Syntax
+
+/var $name = "static text"        - Assign static text value
+/var $name = llm("prompt")       - Assign LLM response
+/var $name = functionName("arg") - Call function and assign result
+/var delete $name                - Delete a variable
+
+## Examples
+
+/var $name = "Hello, World!"     - Simple text assignment
+/var $greeting = llm("Say hello") - LLM response assignment
+/var $count = addNumbers(5, 3)   - Function result assignment
+/var $result = process($input)   - Variable interpolation in function call
+
+## Notes
+
+- Variables can contain any text including interpolated variables
+- LLM prompts support variable interpolation: llm("Process: $text")
+- Function calls can mix quoted strings and variables
+- Names cannot conflict with existing lists (prefixed with @)
+- Use /vars to view all variables`;
 export default {
   description,
   execute,

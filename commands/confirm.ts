@@ -2,7 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/confirm $var \"message\" - Prompt user for yes/no confirmation";
+const description = "/confirm - Prompt user for yes/no confirmation";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -33,14 +33,17 @@ async function execute(remainder: string, agent: Agent) {
   agent.infoLine(`Variable $${varName} = ${result}`);
 }
 
-function help() {
-  return [
-    "/confirm $var \"message\"",
-    "  - Prompt user for yes/no confirmation",
-    "  - Stores 'yes' or 'no' in variable",
-    "  - Example: /confirm $proceed \"Continue with operation?\"",
-  ];
-}
+const help: string = `# /confirm $var "message"
+
+Prompt user for yes/no confirmation
+
+- Stores 'yes' or 'no' in variable
+
+## Example
+
+/confirm $proceed "Continue with operation?"
+`;
+
 export default {
   description,
   execute,

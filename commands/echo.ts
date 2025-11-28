@@ -2,7 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/echo <text|$var> - Display text or variable value";
+const description = "/echo - Display text or variable value";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -16,14 +16,16 @@ async function execute(remainder: string, agent: Agent) {
   agent.infoLine(output);
 }
 
-function help() {
-  return [
-    "/echo <text|$var>",
-    "  - Display text or variable value without LLM processing",
-    '  - Example: /echo $summary',
-    '  - Example: /echo Hello, $name!',
-  ];
-}
+const help: string = `# /echo <text|$var>
+
+Display text or variable value without LLM processing
+
+## Examples
+
+/echo $summary
+/echo Hello, $name!
+`;
+
 export default {
   description,
   execute,

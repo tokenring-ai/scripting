@@ -2,7 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/lists [@name] - List all lists or show specific list";
+const description = "/lists - List all lists or show specific list";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -31,13 +31,28 @@ async function execute(remainder: string, agent: Agent) {
   });
 }
 
-function help() {
-  return [
-    "/lists [@name]",
-    "  - List all lists",
-    "  - Show specific list contents",
-  ];
-}
+const help: string = `# /lists [@name]
+
+List all lists or show specific list contents
+
+## Syntax
+
+/lists                    - List all defined lists
+/lists @name              - Show contents of specific list
+
+## Examples
+
+/lists                    - Display all lists with item counts
+/lists @files             - Show all items in @files list
+/lists @names             - Display all names in @names list
+
+## Notes
+
+- Lists are arrays of strings that can be iterated over
+- Use /list to create new lists
+- Lists are prefixed with @ to distinguish from variables
+- List contents are displayed as JSON-like arrays
+- Lists persist across script executions`;
 export default {
   description,
   execute,

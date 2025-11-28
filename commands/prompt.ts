@@ -2,7 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/prompt $var \"message\" - Prompt user for input";
+const description = "/prompt - Prompt user for input";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -23,21 +23,39 @@ async function execute(remainder: string, agent: Agent) {
   const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
 
   const input = await agent.askHuman({
-    type: "ask",
+    type: "askForText",
     message
   });
 
-  context.setVariable(varName, input);
-  agent.infoLine(`Variable $${varName} = ${input}`);
+  if (input) {
+    context.setVariable(varName, input);
+    agent.infoLine(`Variable $${varName} = ${input}`);
+  } else {
+    agent.warningLine("User cancelled input");
+  }
 }
 
-function help() {
-  return [
-    "/prompt $var \"message\"",
-    "  - Prompt user for input and store in variable",
-    "  - Example: /prompt $name \"Enter your name:\"",
-  ];
-}
+const help: string = `# /prompt $var "message"
+
+Prompt the user for input and store the response in a variable
+
+## Syntax
+
+/prompt $variable "message"   - Prompt user and store response
+
+## Examples
+
+/prompt $name "Enter your name:"
+/prompt $age "How old are you?"
+/prompt $continue "Process next item? (y/n)"
+
+## Notes
+
+- The message supports variable interpolation
+- User input is stored as-is (no processing)
+- Useful for interactive scripts and workflows
+- Script pauses until user provides input
+- Input can be any text including special characters`;
 export default {
   description,
   execute,

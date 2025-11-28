@@ -4,7 +4,7 @@ import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-const description = "/list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\") - Define or assign lists";
+const description = "/list - Define or assign lists";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -74,15 +74,31 @@ function showHelp(agent: Agent) {
   agent.systemMessage('  /list @name = functionName("arg") - List from function call');
 }
 
-function help() {
-  return [
-    "/list @name = [\"item1\", \"item2\"]",
-    "  - Define a list with items",
-    '  - Example: /list @files = ["file1.txt", "file2.txt"]',
-    "  - Example: /list @names = [$name1, $name2]",
-    '  - Example: /list @files = globFiles("**/*.ts")',
-  ];
-}
+const help: string = `# /list @name = ["item1", "item2"]
+
+Define or assign lists with various content sources
+
+## Syntax
+
+/list @name = ["item1", "item2"]     - Create list with literal items
+/list @name = [$var1, $var2]         - Create list from variables
+/list @name = functionName("arg")    - Create list from function result
+
+## Examples
+
+/list @files = ["file1.txt", "file2.txt"] - Static file list
+/list @names = [$name1, $name2]           - List from variables
+/list @results = searchResults("query")   - List from function
+/list @items = ["$item1", "$item2"]     - Mixed quotes and variables
+
+## Notes
+
+- Lists are arrays of strings that can be iterated with /for
+- Names cannot conflict with existing variables (prefixed with $)
+- Function results are automatically converted to arrays
+- Use /lists to view all defined lists
+- Lists persist across script executions
+- Items can be quoted strings or interpolated variables`;
 export default {
   description,
   execute,

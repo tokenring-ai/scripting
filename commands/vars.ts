@@ -2,7 +2,7 @@ import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/vars [$name] - List all variables or show specific variable";
+const description = "/vars - List all variables or show specific variable";
 
 async function execute(remainder: string, agent: Agent) {
 
@@ -41,15 +41,27 @@ async function execute(remainder: string, agent: Agent) {
   });
 }
 
-function help() {
-  return [
-    "/vars [$name]",
-    "  - List all variables",
-    "  - Show specific variable value",
-    "/vars clear",
-    "  - Clear all variables",
-  ];
-}
+const help: string = `# /vars [$name]
+
+List all variables or show specific variable value
+
+## Syntax
+
+/vars                    - List all variables
+/vars $name              - Show specific variable value
+/vars clear              - Clear all variables
+
+## Examples
+
+/vars                    - Display all defined variables
+/vars $name              - Show value of $name variable
+/vars clear              - Remove all variables
+
+## Notes
+
+- Variables are displayed with truncated values (60 chars max)
+- Use /var to create or modify variables
+- Variables persist across script executions`;
 export default {
   description,
   execute,

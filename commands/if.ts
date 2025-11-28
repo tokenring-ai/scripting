@@ -4,7 +4,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-const description = "/if $condition { commands } [else { commands }] - Conditional execution";
+const description = "/if - Conditional execution";
 
 async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
@@ -57,17 +57,39 @@ async function execute(remainder: string, agent: Agent) {
   await executeBlock(commands, agent);
 }
 
-function help() {
-  return [
-    "/if $condition { commands }",
-    "  - Execute commands if condition is truthy",
-    "/if $condition { commands } else { commands }",
-    "  - Execute then or else block based on condition",
-    "  - Condition is false if: empty, 'false', '0', or 'no'",
-    "  - Separate multiple commands with semicolons or newlines",
-    "  - Example: /if $proceed { /echo Continuing... } else { /echo Stopped }",
-  ];
+const help: string = `# /if $condition { commands } [else { commands }]
+
+Execute commands conditionally based on variable truthiness
+
+## Syntax
+
+/if $condition { commands }                    - Basic if statement
+/if $condition { commands } else { commands }  - If-else statement
+
+## Condition Evaluation
+
+- Condition is false if: empty, 'false', '0', or 'no'
+- Any other value is considered truthy
+
+## Examples
+
+/if $proceed { /echo Continuing... }
+/if $proceed { /echo Yes } else { /echo No }
+/if $count > 0 {
+  /echo Positive count: $count
+  /var $result = "positive"
+} else {
+  /echo Zero or negative
+  /var $result = "non-positive"
 }
+
+## Notes
+
+- Separate multiple commands with semicolons or newlines
+- Blocks can contain any valid scripting commands
+- Nested if statements are supported
+- Use /var to set condition variables before if statements
+- Else blocks are optional`;
 export default {
   description,
   execute,
