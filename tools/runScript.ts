@@ -34,6 +34,8 @@ const inputSchema = z.object({
   input: z.string().describe("The input to pass to the script."),
 });
 
+const requiredContextHandlers = ["available-scripts"];
+
 export default {
-  name, description, inputSchema, execute,
+  name, description, inputSchema, execute, requiredContextHandlers
 } as TokenRingToolDefinition<typeof inputSchema>;
