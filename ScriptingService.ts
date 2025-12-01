@@ -104,7 +104,9 @@ export default class ScriptingService implements TokenRingService {
         result = await funcImpl.call({agent}, ...args);
       } else if (func.type === 'llm') {
         const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
-        const [response] = await runChat({input: prompt}, agent);
+        const chatService = agent.requireServiceByType(ChatService);
+        const chatConfig = chatService.getChatConfig(agent);
+        const [response] = await runChat(prompt, chatConfig, agent);
         result = response.trim();
       } else {
         const unquoted = func.body.match(/^["'](.*)["']$/s);
@@ -165,19 +167,4 @@ export default class ScriptingService implements TokenRingService {
     }
   }
 
-  async* getContextItems(agent: Agent): AsyncGenerator<ContextItem> {
-    const chatService = agent.requireServiceByType(ChatService);
-    if (chatService.getEnabledTools(agent).find(item => item.match(/@tokenring-ai\/scripting/))) {
-      const scriptNames = this.listScripts();
-
-      if (scriptNames.length > 0) {
-        yield {
-          position: "afterSystemMessage",
-          role: "user",
-          content: `/* The following scripts are available for use with the script tool */\n` +
-            scriptNames.map(name => `- ${name}`).join("\n")
-        };
-      }
-    }
-  }
 }

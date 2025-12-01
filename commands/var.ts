@@ -1,5 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
@@ -55,7 +56,10 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
   const llmMatch = expr.match(/^llm\(["'](.+)["']\)$/s);
   if (llmMatch) {
     const prompt = context.interpolate(llmMatch[1]);
-    const [response] = await runChat({input: prompt}, agent);
+    const chatService = agent.requireServiceByType(ChatService);
+    const chatConfig = chatService.getChatConfig(agent);
+
+    const [response] = await runChat(prompt, chatConfig, agent);
     return response.trim();
   }
 

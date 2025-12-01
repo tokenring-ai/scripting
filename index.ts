@@ -6,6 +6,7 @@ import {TokenRingPlugin} from "@tokenring-ai/app";
 import {z} from "zod";
 
 import chatCommands from "./chatCommands.ts";
+import contextHandlers from "./contextHandlers.ts";
 import packageJSON from './package.json' with {type: 'json'};
 import ScriptingService, {ScriptingThis, ScriptSchema} from "./ScriptingService.js";
 import tools from "./tools.ts";
@@ -18,9 +19,10 @@ export default {
   description: packageJSON.description,
   install(app: TokenRingApp) {
     const config = app.getConfigSlice('scripts', ScriptingConfigSchema);
-    app.waitForService(ChatService, chatService =>
-      chatService.addTools(packageJSON.name, tools)
-    );
+    app.waitForService(ChatService, chatService => {
+      chatService.addTools(packageJSON.name, tools);
+      chatService.registerContextHandlers(contextHandlers);
+    });
     app.waitForService(AgentCommandService, agentCommandService =>
       agentCommandService.addAgentCommands(chatCommands)
     );
