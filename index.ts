@@ -39,10 +39,10 @@ export default {
             context,
           }, this.agent);
 
-          if (res.ok) {
-            return res.response ?? "Agent completed successfully";
+          if (res.status === 'success') {
+            return res.response;
           } else {
-            throw new Error(res.error ?? "Agent failed");
+            throw new Error(res.response);
           }
         }
       }

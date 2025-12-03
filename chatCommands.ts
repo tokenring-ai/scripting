@@ -1,18 +1,18 @@
-import {default as script} from "./commands/script.ts";
-import {default as varCommand} from "./commands/var.ts";
-import {default as func} from "./commands/func.ts";
-import {default as vars} from "./commands/vars.ts";
-import {default as funcs} from "./commands/funcs.ts";
-import {default as call} from "./commands/call.ts";
-import {default as echo} from "./commands/echo.ts";
-import {default as sleep} from "./commands/sleep.ts";
-import {default as prompt} from "./commands/prompt.ts";
-import {default as confirm} from "./commands/confirm.ts";
-import {default as list} from "./commands/list.ts";
-import {default as lists} from "./commands/lists.ts";
-import {default as ifCommand} from "./commands/if.ts";
-import {default as forCommand} from "./commands/for.ts";
-import {default as whileCommand} from "./commands/while.ts";
+import script from "./commands/script.ts";
+import varCommand from "./commands/var.ts";
+import func from "./commands/func.ts";
+import vars from "./commands/vars.ts";
+import funcs from "./commands/funcs.ts";
+import call from "./commands/call.ts";
+import echo from "./commands/echo.ts";
+import sleep from "./commands/sleep.ts";
+import prompt from "./commands/prompt.ts";
+import confirm from "./commands/confirm.ts";
+import list from "./commands/list.ts";
+import lists from "./commands/lists.ts";
+import ifCommand from "./commands/if.ts";
+import forCommand from "./commands/for.ts";
+import whileCommand from "./commands/while.ts";
 
 export default {
   script,

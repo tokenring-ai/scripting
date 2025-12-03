@@ -1,3 +1,3 @@
-import {default as runScript} from "./tools/runScript.ts";
+import runScript from "./tools/runScript.ts";
 
 export default {runScript};
