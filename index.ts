@@ -1,4 +1,5 @@
-import TokenRingApp from "@tokenring-ai/app"; 
+import {runSubAgent} from "@tokenring-ai/agent/runSubAgent";
+import TokenRingApp from "@tokenring-ai/app";
 import {AgentCommandService} from "@tokenring-ai/agent";
 import {execute as runAgent} from "@tokenring-ai/agent/tools/runAgent"
 import {ChatService} from "@tokenring-ai/chat";
@@ -33,11 +34,14 @@ export default {
         type: 'native',
         params: ['agentType', 'message', 'context'],
         async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
-          const res = await runAgent({
+          const res = await runSubAgent({
             agentType,
             message,
             context,
-          }, this.agent);
+            forwardChatOutput: true,
+            forwardSystemOutput: true,
+            forwardHumanRequests: true,
+          }, this.agent, true);
 
           if (res.status === 'success') {
             return res.response;
