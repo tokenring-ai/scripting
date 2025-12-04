@@ -35,7 +35,8 @@ export default {
         params: ['agentType', 'message', 'context'],
         async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
           const res = await runSubAgent({
-            agentType,
+            agentType: agentType,
+            headless: this.agent.headless,
             message,
             context,
             forwardChatOutput: true,
