@@ -37,8 +37,7 @@ export default {
           const res = await runSubAgent({
             agentType: agentType,
             headless: this.agent.headless,
-            message,
-            context,
+            command: `/work ${message}\n\nImportant Context:\n${context}`,
             forwardChatOutput: true,
             forwardSystemOutput: true,
             forwardHumanRequests: true,
