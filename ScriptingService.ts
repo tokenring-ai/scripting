@@ -1,6 +1,5 @@
 import type {Agent} from "@tokenring-ai/agent";
 import {AgentCommandService} from "@tokenring-ai/agent";
-import type {ContextItem} from "@tokenring-ai/agent/types";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import {TokenRingService} from "@tokenring-ai/app/types";

@@ -14,33 +14,33 @@ agents and LLMs.
  - Your first script
  - Quick start guide
 
-2. **[Variables Guide](02-variables.md)**
+1. **[Variables Guide](02-variables.md)**
  - Defining and using variables
  - Variable interpolation
  - Scope and lifecycle
  - Best practices
 
-3. **[Functions Guide](03-functions.md)**
+1. **[Functions Guide](03-functions.md)**
  - Static functions
  - LLM functions
  - JavaScript functions
  - Calling and managing functions
  - Global functions
 
-4. **[Commands Reference](04-commands.md)**
+1. **[Commands Reference](04-commands.md)**
  - Complete command documentation
  - Syntax and examples
  - Error handling
  - Tips and tricks
 
-5. **[Examples](05-examples.md)**
+1. **[Examples](05-examples.md)**
  - Content generation
  - Research workflows
  - Data processing
  - Translation and localization
  - Quality assurance
 
-6. **[Advanced Topics](06-advanced.md)**
+1. **[Advanced Topics](06-advanced.md)**
  - Complex workflows
  - Advanced patterns
  - Performance optimization
@@ -49,7 +49,7 @@ agents and LLMs.
 
 ### Developer Guides
 
-7. **[Developer Guide](07-developer-guide.md)**
+1. **[Developer Guide](07-developer-guide.md)**
  - Creating global functions
  - Package integration
  - Best practices
