@@ -38,4 +38,4 @@ const requiredContextHandlers = ["available-scripts"];
 
 export default {
   name, description, inputSchema, execute, requiredContextHandlers
-} as TokenRingToolDefinition<typeof inputSchema>;
+} satisfies TokenRingToolDefinition<typeof inputSchema>;
