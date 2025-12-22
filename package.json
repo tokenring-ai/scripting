@@ -6,7 +6,9 @@
   "main": "index.ts",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "tsc --noEmit",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "tokenring",
@@ -21,5 +23,13 @@
     "zod": "catalog:",
     "@tokenring-ai/agent": "0.2.0",
     "@tokenring-ai/utility": "0.2.0"
+  },
+  "devDependencies": {
+    "vitest": "catalog:",
+    "typescript": "catalog:"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
   }
 }
