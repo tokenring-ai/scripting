@@ -3,7 +3,7 @@ import {TokenRingToolDefinition} from "@tokenring-ai/chat/types";
 import {z} from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
-const name = "script/run";
+const name = "script_run";
 
 async function execute(
   {scriptName, input}: z.infer<typeof inputSchema>,
