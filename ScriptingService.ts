@@ -99,8 +99,23 @@ export default class ScriptingService implements TokenRingService {
       if (func.type === 'native') {
         result = await func.execute.call({agent}, ...args);
       } else if (func.type === 'js') {
-        const funcImpl = new Function(...func.params, func.body);
+        // TODO: This is the pattern recommended by the Mozilla docs, but seems odd
+        const AsyncFunction = async function () {}.constructor;
+
+        const funcImpl = new AsyncFunction(...func.params, func.body);
         result = await funcImpl.call({agent}, ...args);
+        if (Array.isArray(result)) {
+          for (const item of result) {
+            if (typeof item !== 'string') {
+              throw new Error(`Function ${funcName} returned an array with non-string item`);
+            }
+          }
+          return result;
+        }
+        if (typeof result !== 'string') {
+          throw new Error(`Function ${funcName} did not return a string`);
+        }
+        return result;
       } else if (func.type === 'llm') {
         const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
         const chatService = agent.requireServiceByType(ChatService);
