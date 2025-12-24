@@ -1,4 +1,5 @@
 import {vi} from 'vitest';
+import {AgentCommandService} from '@tokenring-ai/agent';
 import ScriptingService from '../ScriptingService.ts';
 import {ScriptingContext} from '../state/ScriptingContext.ts';
 
@@ -9,11 +10,35 @@ export function createMockAgent() {
   const infos: string[] = [];
   const humanResponses: any[] = [];
 
+  const mockAgentCommandService = {
+    executeAgentCommand: vi.fn(async (agent: any, command: string) => {
+      // Extract command name and args from command string (e.g., "/echo hello" -> "echo", "hello")
+      const parts = command.trim().split(/\s+/);
+      const cmdName = parts[0].replace(/^\//, '');
+      const args = parts.slice(1).join(' ');
+      
+      // Handle common commands in tests
+      if (cmdName === 'echo') {
+        outputs.push(args || '');
+      } else {
+        outputs.push(`[command: ${command}]`);
+      }
+    })
+  };
+
   const agent = {
-    getState: vi.fn(() => context),
-    requireServiceByType: vi.fn((type) => {
-      if (type === ScriptingService) {
+    getState: vi.fn((StateClass) => {
+      if (StateClass === ScriptingContext) {
+        return context;
+      }
+      return context;
+    }),
+    requireServiceByType: vi.fn((ServiceClass) => {
+      if (ServiceClass === ScriptingService) {
         return new ScriptingService({});
+      }
+      if (ServiceClass === AgentCommandService) {
+        return mockAgentCommandService;
       }
       return null;
     }),
@@ -37,5 +62,6 @@ export function createMockAgent() {
     errors,
     infos,
     humanResponses,
+    mockAgentCommandService,
   };
 }

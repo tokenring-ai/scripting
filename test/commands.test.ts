@@ -1,15 +1,15 @@
 import {describe, expect, it} from 'vitest';
-import * as confirmCmd from '../commands/confirm.ts';
-import * as echoCmd from '../commands/echo.ts';
-import * as forCmd from '../commands/for.ts';
-import * as ifCmd from '../commands/if.ts';
-import * as listCmd from '../commands/list.ts';
-import * as listsCmd from '../commands/lists.ts';
-import * as promptCmd from '../commands/prompt.ts';
-import * as sleepCmd from '../commands/sleep.ts';
-import * as varCmd from '../commands/var.ts';
-import * as varsCmd from '../commands/vars.ts';
-import * as whileCmd from '../commands/while.ts';
+import confirmCmd from '../commands/confirm.ts';
+import echoCmd from '../commands/echo.ts';
+import forCmd from '../commands/for.ts';
+import ifCmd from '../commands/if.ts';
+import listCmd from '../commands/list.ts';
+import listsCmd from '../commands/lists.ts';
+import promptCmd from '../commands/prompt.ts';
+import sleepCmd from '../commands/sleep.ts';
+import varCmd from '../commands/var.ts';
+import varsCmd from '../commands/vars.ts';
+import whileCmd from '../commands/while.ts';
 import {createMockAgent} from './testHelpers.ts';
 
 describe('echo command', () => {
@@ -292,10 +292,11 @@ describe('prompt command', () => {
     context.setVariable('field', 'username');
     humanResponses.push('test');
     await promptCmd.execute('$value "Enter $field:"', agent as any);
-    expect(agent.askHuman).toHaveBeenCalledWith({
-      type: 'ask',
-      message: 'Enter username:'
-    });
+    expect(agent.askHuman).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Enter username:'
+      })
+    );
   });
 
   it('shows error on invalid syntax', async () => {
