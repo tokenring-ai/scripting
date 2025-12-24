@@ -102,6 +102,7 @@ export default class ScriptingService implements TokenRingService {
         // TODO: This is the pattern recommended by the Mozilla docs, but seems odd
         const AsyncFunction = async function () {}.constructor;
 
+        // @ts-ignore
         const funcImpl = new AsyncFunction(...func.params, func.body);
         result = await funcImpl.call({agent}, ...args);
         if (Array.isArray(result)) {

@@ -13,6 +13,7 @@ import lists from "./commands/lists.ts";
 import ifCommand from "./commands/if.ts";
 import forCommand from "./commands/for.ts";
 import whileCommand from "./commands/while.ts";
+import evalCommand from "./commands/eval.ts";
 
 export default {
   script,
@@ -30,4 +31,5 @@ export default {
   if: ifCommand,
   for: forCommand,
   while: whileCommand,
+  eval: evalCommand,
 };

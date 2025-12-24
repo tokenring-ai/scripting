@@ -9,7 +9,7 @@ export async function executeBlock(commands: string[], agent: Agent): Promise<vo
     if (command.startsWith('/')) {
       await agentCommandService.executeAgentCommand(agent, command);
     } else {
-      agent.chatOutput(context.interpolate(command));
+      await agentCommandService.executeAgentCommand(agent, context.interpolate(command));
     }
   }
 }
