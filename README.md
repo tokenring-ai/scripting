@@ -1,8 +1,6 @@
 # TokenRing Scripting Package
 
-The TokenRing AI Scripting package provides functionality for running predefined sequences of chat commands by name, as
-well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate
-repetitive workflows and create dynamic, reusable command sequences.
+The TokenRing AI Scripting package provides functionality for running predefined sequences of chat commands by name, as well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate repetitive workflows and create dynamic, reusable command sequences.
 
 ## Features
 
@@ -13,6 +11,14 @@ repetitive workflows and create dynamic, reusable command sequences.
 - **Scripting language** with variables (`/var`), functions (`/func`), and LLM integration
 - Variable interpolation in prompts and expressions
 - Dynamic function calls with parameters
+- List processing with `/list` and `/for`
+- Conditional execution with `/if`
+- Looping with `/while`
+- Interactive prompts with `/prompt`
+- User confirmation with `/confirm`
+- Sleep/delay with `/sleep`
+- Command evaluation with `/eval`
+- Comprehensive help system
 
 ## Usage
 
@@ -24,28 +30,41 @@ repetitive workflows and create dynamic, reusable command sequences.
 - `/script run <scriptName> <input>` - Runs the specified script with the given input
 - `/script info <scriptName>` - Shows information about a specific script
 
-#### Scripting Language
+#### Variable Management
 
-- `/var $name = value` - Define variables with static values, LLM responses, or function calls
+- `/var $name = "value"` - Define variables with static values, LLM responses, or function calls
 - `/var delete $name` - Delete a variable
-- `/vars [$name]` - List all variables or show a specific variable
+- `/vars` - List all variables
+- `/vars $name` - Show specific variable value
 - `/vars clear` - Clear all variables
+
+#### Function Management
+
 - `/func static name($param1, $param2) => "text"` - Define static functions
 - `/func llm name($param1, $param2) => "prompt"` - Define LLM functions
 - `/func js name($param1, $param2) { code }` - Define JavaScript functions
 - `/func delete name` - Delete a function
-- `/funcs [name]` - List all functions or show a specific function
+- `/funcs` - List all functions
+- `/funcs name` - Show specific function definition
 - `/funcs clear` - Clear all local functions
 - `/call functionName("arg1", "arg2")` - Call a function and display its output
-- `/list @name = ["item1", "item2"]` - Define lists (use @ prefix)
-- `/lists [@name]` - List all lists or show a specific list
+
+#### List Management
+
+- `/list @name = ["item1", "item2"]` - Define static lists
+- `/list @name = functionName("arg")` - Define lists from function results
+- `/lists` - List all lists
+- `/lists @name` - Show contents of specific list
+
+#### Core Commands
+
 - `/echo <text|$var>` - Display text or variable value without LLM processing
 - `/sleep <seconds|$var>` - Sleep for specified seconds
 - `/prompt $var "message"` - Prompt user for input
 - `/confirm $var "message"` - Prompt user for yes/no confirmation
-- `/if $condition { commands }` - Conditional execution
-- `/if $condition { commands } else { commands }` - If-else branching
-- `/for $item in @list { commands }` - Iterate over lists and iterables
+- `/eval <command>` - Interpolate variables and execute command
+- `/if $condition { commands } [else { commands }]` - Conditional execution
+- `/for $item in @list { commands }` - Iterate over lists
 - `/while $condition { commands }` - Execute commands while condition is truthy
 
 See the [complete documentation](./docs/README.md) for detailed guides and examples.
@@ -54,15 +73,15 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 
 #### Predefined Scripts
 
-```
+```bash
 /script run setupProject "MyProject"
 /script run publishWorkflow "article.md"
 /script info setupProject
 ```
 
-#### Scripting Language
+#### Variable Usage
 
-```
+```bash
 # Variables with static values
 /var $name = "Alice"
 /var $topic = "AI safety"
@@ -81,9 +100,8 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 /list @files = ["file1.txt", "file2.txt", "file3.txt"]
 /for $file in @files { /echo Processing $file }
 
-# Iterables with @ prefix (dynamic)
-/iterable define ts-files --type glob --pattern "src/**/*.ts"
-/for $f in @ts-files { /echo $basename at $path }
+# Lists with function results
+/list @results = processResults($input)
 
 # Interactive prompts
 /prompt $username "Enter your name:"
@@ -99,8 +117,7 @@ See the [complete documentation](./docs/README.md) for detailed guides and examp
 
 ## Global Functions
 
-Packages can register global functions that are available to all scripting contexts. Global functions are resolved after
-local functions, allowing users to override them if needed.
+Packages can register global functions that are available to all scripting contexts. Global functions are resolved after local functions, allowing users to override them if needed.
 
 ### Registering Global Functions
 
@@ -173,8 +190,7 @@ This allows users to override global functions with their own implementations.
 
 ## Creating Scripts
 
-Scripts are JavaScript functions that accept an input string and return an array of chat commands to execute
-sequentially.
+Scripts are JavaScript functions that accept an input string and return an array of chat commands to execute sequentially.
 
 ### Script Structure
 
@@ -234,7 +250,12 @@ The Scripting package consists of:
 
 - `ScriptingService` - Manages and executes scripts
 - `/script` chat command - Interface for users to interact with scripts
-- Example scripts - Ready-to-use script functions
+- Comprehensive command system with 15+ commands
+- Variable and function management system
+- List processing capabilities
+- Context preservation and state management
+- Error handling and user feedback
+- Integration with TokenRing agent system
 
 The `ScriptingService` stores scripts using a KeyedRegistry and provides operations:
 
@@ -246,6 +267,4 @@ The `ScriptingService` stores scripts using a KeyedRegistry and provides operati
 
 ## Inspiration
 
-The scripting operators used in this package were inspired by the [mlld](https://github.com/mlld-lang/mlld) project,
-which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning,
-and reproducibility.
+The scripting operators used in this package were inspired by the [mlld](https://github.com/mlld-lang/mlld) project, which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning, and reproducibility.
