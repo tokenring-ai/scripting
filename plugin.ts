@@ -21,7 +21,6 @@ export default {
   version: packageJSON.version,
   description: packageJSON.description,
   install(app, config) {
-    // const config = app.getConfigSlice('scripts', ScriptingConfigSchema);
     app.waitForService(ChatService, chatService => {
       chatService.addTools(packageJSON.name, tools);
       chatService.registerContextHandlers(contextHandlers);
