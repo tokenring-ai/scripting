@@ -235,11 +235,4 @@ Contributions are welcome! Areas for contribution:
 
 ## License
 
-MIT License - See LICENSE file for details
-
-## Next Steps
-
-- **New users**: Start with [Getting Started](01-getting-started.md)
-- **Function developers**: Read [Developer Guide](07-developer-guide.md)
-- **Advanced users**: Explore [Advanced Topics](06-advanced.md)
-- **Quick reference**: Check [Commands Reference](04-commands.md)
+MIT License - see [LICENSE](./LICENSE) file for details.

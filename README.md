@@ -1,270 +1,278 @@
-# TokenRing Scripting Package
+# @tokenring-ai/scripting
 
-The TokenRing AI Scripting package provides functionality for running predefined sequences of chat commands by name, as well as a lightweight scripting language with variables, functions, and LLM integration. This allows users to automate repetitive workflows and create dynamic, reusable command sequences.
+## Overview
+
+The TokenRing AI Scripting package provides a lightweight scripting language for automating workflows with variables, functions, lists, and LLM integration. It enables users to create dynamic, reusable command sequences with conditional execution, loops, and interactive prompts.
 
 ## Features
 
-- Run predefined scripts consisting of chat command sequences
-- List available scripts
-- View script information
-- Error handling for script execution
-- **Scripting language** with variables (`/var`), functions (`/func`), and LLM integration
-- Variable interpolation in prompts and expressions
-- Dynamic function calls with parameters
-- List processing with `/list` and `/for`
-- Conditional execution with `/if`
-- Looping with `/while`
-- Interactive prompts with `/prompt`
-- User confirmation with `/confirm`
-- Sleep/delay with `/sleep`
-- Command evaluation with `/eval`
-- Comprehensive help system
+- **Scripting Language**: Define and run predefined scripts consisting of chat command sequences
+- **Variables**: Create and manage variables with static values, LLM responses, or function results
+- **Functions**: Define static, LLM, or JavaScript functions with parameters
+- **Lists**: Work with arrays of strings for iteration and processing
+- **Control Flow**: Conditional execution with `/if`, iteration with `/for`, and loops with `/while`
+- **Interactive Prompts**: Collect user input with `/prompt` and `/confirm`
+- **Execution Control**: Pause execution with `/sleep` and evaluate expressions with `/eval`
+- **Native Integration**: Built-in `runAgent` function for running sub-agents
+- **Tool Integration**: Use the `script_run` tool with AI agents
 
-## Usage
+## Installation
 
-### Chat Commands
+```bash
+npm install @tokenring-ai/scripting
+```
 
-#### Script Management
+or with yarn:
 
-- `/script list` - Lists all available scripts
-- `/script run <scriptName> <input>` - Runs the specified script with the given input
-- `/script info <scriptName>` - Shows information about a specific script
+```bash
+yarn add @tokenring-ai/scripting
+```
 
-#### Variable Management
+## Core Components
 
-- `/var $name = "value"` - Define variables with static values, LLM responses, or function calls
+### ScriptingService
+
+The `ScriptingService` manages scripts and functions, providing operations for registration and execution:
+
+```typescript
+// Register a script
+scriptingService.scripts.register(name, parsedCommands);
+
+// List all scripts
+scriptingService.listScripts(); // Returns string[]
+
+// Get a script by name
+scriptingService.getScriptByName(name); // Returns string[]
+
+// Run a script with input
+await scriptingService.runScript({scriptName, input}, agent);
+```
+
+### ScriptingContext
+
+The `ScriptingContext` manages state within an agent session:
+
+```typescript
+// Variables (prefixed with $)
+context.setVariable('name', 'value');
+context.getVariable('name');
+
+// Lists (prefixed with @)
+context.setList('items', ['a', 'b', 'c']);
+context.getList('items');
+
+// Functions (local and global)
+context.defineFunction('greet', 'static', ['name'], '"Hello, $name!"');
+context.getFunction('name');
+
+// Variable interpolation
+context.interpolate('Hello, $name'); // Returns interpolated string
+```
+
+## Chat Commands
+
+### Script Management
+
+- `/script list` - List all available scripts
+- `/script run <name> [input]` - Run a script with optional input
+- `/script info <name>` - Show information about a script
+
+### Variable Management
+
+- `/var $name = "value"` - Define variable with static value
+- `/var $name = llm("prompt")` - Define variable with LLM response
+- `/var $name = functionName("arg")` - Define variable with function result
 - `/var delete $name` - Delete a variable
 - `/vars` - List all variables
 - `/vars $name` - Show specific variable value
 - `/vars clear` - Clear all variables
 
-#### Function Management
+### Function Management
 
-- `/func static name($param1, $param2) => "text"` - Define static functions
-- `/func llm name($param1, $param2) => "prompt"` - Define LLM functions
-- `/func js name($param1, $param2) { code }` - Define JavaScript functions
+- `/func static name($param) => "text"` - Define static function
+- `/func llm name($param) => "prompt"` - Define LLM function
+- `/func js name($param) { return result; }` - Define JavaScript function
 - `/func delete name` - Delete a function
 - `/funcs` - List all functions
 - `/funcs name` - Show specific function definition
 - `/funcs clear` - Clear all local functions
-- `/call functionName("arg1", "arg2")` - Call a function and display its output
 
-#### List Management
+### List Management
 
-- `/list @name = ["item1", "item2"]` - Define static lists
-- `/list @name = functionName("arg")` - Define lists from function results
+- `/list @name = ["item1", "item2"]` - Define static list
+- `/list @name = functionName("arg")` - Define list from function results
 - `/lists` - List all lists
-- `/lists @name` - Show contents of specific list
+- `/lists @name` - Show specific list contents
 
-#### Core Commands
+### Control Flow
 
-- `/echo <text|$var>` - Display text or variable value without LLM processing
-- `/sleep <seconds|$var>` - Sleep for specified seconds
+- `/echo <text|$var>` - Display text without LLM processing
+- `/sleep <seconds|$var>` - Pause execution for specified time
 - `/prompt $var "message"` - Prompt user for input
-- `/confirm $var "message"` - Prompt user for yes/no confirmation
+- `/confirm $var "message"` - Prompt for yes/no confirmation
 - `/eval <command>` - Interpolate variables and execute command
 - `/if $condition { commands } [else { commands }]` - Conditional execution
-- `/for $item in @list { commands }` - Iterate over lists
-- `/while $condition { commands }` - Execute commands while condition is truthy
+- `/for $item in @list { commands }` - Iterate over list items
+- `/while $condition { commands }` - Execute while condition is truthy
+- `/call functionName("arg1", "arg2")` - Call function and display output
 
-See the [complete documentation](./docs/README.md) for detailed guides and examples.
+## Usage Examples
 
-### Examples
-
-#### Predefined Scripts
+### Basic Variables
 
 ```bash
+/var $name = "Alice"
+/var $topic = "AI safety"
+/var $summary = llm("Summarize key points about $topic")
+```
+
+### Functions
+
+```bash
+/func static greet($name) => "Hello, $name!"
+/func llm analyze($text) => "Analyze this: $text"
+/func js wordCount($text) { return $text.split(/\s+/).length; }
+```
+
+### Lists and Iteration
+
+```bash
+/list @files = ["file1.txt", "file2.txt", "file3.txt"]
+/for $file in @files {
+  /echo Processing $file
+}
+```
+
+### Conditionals and Loops
+
+```bash
+/confirm $proceed "Continue?"
+/if $proceed {
+  /echo Continuing with operation...
+} else {
+  /echo Operation cancelled
+}
+
+/var $count = 1
+/while $count <= 5 {
+  /echo Count: $count
+  /var $count = $count + 1
+}
+```
+
+### Running Scripts
+
+```bash
+/script list
 /script run setupProject "MyProject"
-/script run publishWorkflow "article.md"
 /script info setupProject
 ```
 
-#### Variable Usage
+## Tools
 
-```bash
-# Variables with static values
-/var $name = "Alice"
-/var $topic = "AI safety"
+### script_run
 
-# Variables with LLM responses
-/var $summary = llm("Summarize the key points about $topic")
-/var $analysis = llm("Analyze this summary: $summary")
-
-# Define and use functions
-/func static greet($name) => "Hello, $name!"
-/func llm search($query, $site) => "Search for $query on $site"
-/var $results = search("quantum computing", "Google Scholar")
-/call search("quantum computing", "Google Scholar")
-
-# Lists with @ prefix (static)
-/list @files = ["file1.txt", "file2.txt", "file3.txt"]
-/for $file in @files { /echo Processing $file }
-
-# Lists with function results
-/list @results = processResults($input)
-
-# Interactive prompts
-/prompt $username "Enter your name:"
-/confirm $proceed "Continue with operation?"
-
-# Conditional execution
-/if $proceed { /echo Continuing... } else { /echo Stopped }
-
-# List variables and functions
-/vars
-/funcs
-```
-
-## Global Functions
-
-Packages can register global functions that are available to all scripting contexts. Global functions are resolved after local functions, allowing users to override them if needed.
-
-### Registering Global Functions
-
-In your package's service `attach()` method:
+Run a script with the given input. Scripts are predefined sequences of chat commands.
 
 ```typescript
-import {ScriptingService, ScriptFunction} from "@tokenring-ai/scripting";
-
-async attach(agent: Agent): Promise<void> {
-  const scriptingService = agent.requireServiceByType(ScriptingService);
-  if (scriptingService) {
-    // Register a JavaScript function
-    scriptingService.registerFunction({
-      name: "readFile",
-      item: {
-        type: 'js',
-        params: ['path'],
-        body: `
-          const fs = require('fs');
-          return fs.readFileSync(path, 'utf-8');
-        `
-      }
-    });
-
-    // Register an LLM function
-    scriptingService.registerFunction({
-      name: "summarizeFile",
-      item: {
-        type: 'llm',
-        params: ['path'],
-        body: '"Read and summarize the file at $path"'
-      }
-    });
-
-    // Register a static function
-    scriptingService.registerFunction({
-      name: "greeting",
-      item: {
-        type: 'static',
-        params: ['name'],
-        body: '"Hello, $name! Welcome to the system."'
-      }
-    });
-  }
-}
+const result = await agent.useTool("script_run", {
+  scriptName: "setupProject",
+  input: "MyProject"
+});
 ```
 
-### Function Resolution Order
+**Parameters:**
+- `scriptName` (string): The name of the script to run
+- `input` (string): The input to pass to the script
 
-1. **Local functions** - Defined in the current session with `/func`
-2. **Global functions** - Registered by packages via ScriptingService
+**Returns:**
+- `ok` (boolean): Whether the script completed successfully
+- `output` (string, optional): Script output on success
+- `error` (string, optional): Error message on failure
 
-This allows users to override global functions with their own implementations.
+## Plugin Configuration
 
-### Example Usage
+Configure scripts in your application:
 
-```bash
-# Use a global function
-/var $content = readFile("article.md")
-/var $summary = summarizeFile("article.md")
+```typescript
+import type {ScriptingConfigSchema} from "@tokenring-ai/scripting";
 
-# Override a global function locally
-/func js readFile($path) {
-  return "Custom implementation for " + $path;
-}
-
-# Now uses the local override
-/var $content = readFile("article.md")
-```
-
-## Creating Scripts
-
-Scripts are JavaScript functions that accept an input string and return an array of chat commands to execute sequentially.
-
-### Script Structure
-
-```javascript
-export async function myScript(input) {
-  return [
-    "/agent switch writer",
-    `/template run createOutline ${input}`,
-    "/agent switch editor",
-    "/tools enable editing"
-  ];
-}
-```
-
-### Example Scripts
-
-```javascript
-export async function setupProject(projectName) {
-  return [
-    `/agent switch writer`,
-    `/template run projectSetup ${projectName}`,
-    `/tools enable filesystem`,
-    `/agent switch publisher`
-  ];
-}
-
-export async function publishWorkflow(filename) {
-  return [
-    `/agent switch editor`,
-    `/tools enable editing`,
-    `/template run review ${filename}`,
-    `/agent switch publisher`,
-    `/tools enable publishing`
-  ];
-}
-```
-
-## Configuration
-
-To use scripts in your application, add them to your configuration file:
-
-```javascript
-// writer-config.js
 export default {
- // ... other configuration
- scripts: {
-  setupProject: (await import("../../scripts/setupProject.js")).setupProject,
-  publishWorkflow: (await import("../../scripts/publishWorkflow.js")).publishWorkflow,
-  // Add your custom scripts here
- }
-};
+  // Scripting configuration
+  scripting: {
+    setupProject: [
+      "/agent switch writer",
+      "/template run createOutline ${input}",
+      "/agent switch editor",
+      "/tools enable editing"
+    ],
+    publishWorkflow: {
+      "/agent switch editor",
+      "/template run review filename",
+      "/agent switch publisher"
+    }
+  }
+} satisfies typeof ScriptingConfigSchema;
 ```
 
-## Technical Details
+Scripts can be defined as:
+- Arrays of command strings
+- Single strings with commands separated by newlines or semicolons
+- Functions returning command arrays
 
-The Scripting package consists of:
+## Native Functions
 
-- `ScriptingService` - Manages and executes scripts
-- `/script` chat command - Interface for users to interact with scripts
-- Comprehensive command system with 15+ commands
-- Variable and function management system
-- List processing capabilities
-- Context preservation and state management
-- Error handling and user feedback
-- Integration with TokenRing agent system
+### runAgent
 
-The `ScriptingService` stores scripts using a KeyedRegistry and provides operations:
+Run a sub-agent with a specific message and context:
 
-- `register(name, script)` - Registers a script function
-- `unregister(name)` - Unregisters a script
-- `get(name)` - Gets a script function by name
-- `list()` - Lists all registered scripts
-- `runScript({scriptName, input}, agent)` - Executes a script with the given input
+```typescript
+scriptingService.registerFunction("runAgent", {
+  type: 'native',
+  params: ['agentType', 'message', 'context'],
+  async execute(this: ScriptingThis, agentType: string, message: string, context: string) {
+    const res = await runSubAgent({
+      agentType,
+      headless: this.agent.headless,
+      command: `/work ${message}\n\nImportant Context:\n${context}`,
+      forwardChatOutput: true,
+      forwardSystemOutput: true,
+      forwardHumanRequests: true,
+    }, this.agent, true);
 
-## Inspiration
+    if (res.status === 'success') {
+      return res.response;
+    } else {
+      throw new Error(res.response);
+    }
+  }
+});
+```
 
-The scripting operators used in this package were inspired by the [mlld](https://github.com/mlld-lang/mlld) project, which provides a modular llm scripting language, bringing software engineering to LLM workflows: modularity, versioning, and reproducibility.
+**Parameters:**
+- `agentType` (string): The type of agent to run
+- `message` (string): The message to send to the agent
+- `context` (string): Additional context for the agent
+
+**Returns:** The agent's response as a string
+
+## State Management
+
+The scripting package uses `ScriptingContext` for state persistence:
+
+- Variables, lists, and functions persist across script executions
+- State is cleared when the chat is reset
+- State can be serialized and restored for persistence
+
+```typescript
+// ScriptingContext implements AgentStateSlice
+interface ScriptingContext {
+  variables: Map<string, string>;
+  lists: Map<string, string[]>;
+  functions: Map<string, FunctionDefinition>;
+}
+```
+
+## License
+
+MIT License - see [LICENSE](./LICENSE) file for details.
