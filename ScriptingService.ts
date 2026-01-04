@@ -64,7 +64,7 @@ export default class ScriptingService implements TokenRingService {
     }
   }
 
-  async attach(agent: Agent): Promise<void> {
+  attach(agent: Agent): void {
     agent.initializeState(ScriptingContext, {});
   }
 
