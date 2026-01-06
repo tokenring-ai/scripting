@@ -59,8 +59,11 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
     const chatService = agent.requireServiceByType(ChatService);
     const chatConfig = chatService.getChatConfig(agent);
 
-    const [response] = await runChat(prompt, chatConfig, agent);
-    return response.trim();
+    const response = await runChat(prompt, chatConfig, agent);
+    if (! response.text) {
+      throw new Error(`AI Chat did not produce any text for prompt: ${prompt}`);
+    }
+    return response.text.trim();
   }
 
   const funcMatch = expr.match(/^(\w+)\((.*)\)$/);
