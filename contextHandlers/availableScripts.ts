@@ -1,8 +1,8 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {ChatConfig, ContextItem} from "@tokenring-ai/chat/schema";
+import {ContextItem, ParsedChatConfig} from "@tokenring-ai/chat/schema";
 import ScriptingService from "../ScriptingService.ts";
 
-export default async function * getContextItems(input: string, chatConfig: ChatConfig, params: {}, agent: Agent): AsyncGenerator<ContextItem> {
+export default async function* getContextItems(input: string, chatConfig: ParsedChatConfig, params: {}, agent: Agent): AsyncGenerator<ContextItem> {
   const scriptingService = agent.requireServiceByType(ScriptingService);
 
   const scriptNames = scriptingService.listScripts();
