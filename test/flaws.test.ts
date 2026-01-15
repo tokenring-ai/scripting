@@ -100,7 +100,7 @@ describe('FLAW: JS function body with nested braces', () => {
 });
 
 describe('FLAW: Error handling consistency', () => {
-  it('for command uses errorLine instead of throwing', async () => {
+  it('for command uses errorMessage instead of throwing', async () => {
     const {agent, errors} = createMockAgent();
     await forCmd.execute('$item in @missing { /echo $item }', agent as any);
     expect(errors.length).toBeGreaterThan(0);

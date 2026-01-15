@@ -159,12 +159,12 @@ export default class ScriptingService implements TokenRingService {
     }
 
     try {
-      agent.systemMessage(`Running script: ${scriptName} with ${script.length} commands`);
+      agent.infoMessage(`Running script: ${scriptName} with ${script.length} commands`);
 
       const agentCommandService = agent.requireServiceByType(AgentCommandService);
       for (const command of script) {
         if (command.trim()) {
-          agent.systemMessage(`Executing: ${command}`);
+          agent.infoMessage(`Executing: ${command}`);
           await agentCommandService.executeAgentCommand(agent, command);
         }
       }
@@ -176,7 +176,7 @@ export default class ScriptingService implements TokenRingService {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      agent.systemMessage(`Script ${scriptName} failed: ${errorMessage}`);
+      agent.infoMessage(`Script ${scriptName} failed: ${errorMessage}`);
 
       return {
         ok: false,

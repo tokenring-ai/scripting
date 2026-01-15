@@ -8,13 +8,13 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /prompt $var \"message\"");
+    agent.errorMessage("Usage: /prompt $var \"message\"");
     return;
   }
 
   const match = remainder.match(/^\$(\w+)\s+(.+)$/);
   if (!match) {
-    agent.errorLine("Invalid syntax. Use: /prompt $var \"message\"");
+    agent.errorMessage("Invalid syntax. Use: /prompt $var \"message\"");
     return;
   }
 
@@ -29,9 +29,9 @@ async function execute(remainder: string, agent: Agent) {
 
   if (input) {
     context.setVariable(varName, input);
-    agent.infoLine(`Variable $${varName} = ${input}`);
+    agent.infoMessage(`Variable $${varName} = ${input}`);
   } else {
-    agent.warningLine("User cancelled input");
+    agent.warningMessage("User cancelled input");
   }
 }
 

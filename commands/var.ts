@@ -1,5 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import indent from "@tokenring-ai/utility/string/indent";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import ScriptingService from "../ScriptingService.ts";
@@ -22,16 +23,16 @@ async function execute(remainder: string, agent: Agent) {
     const varName = deleteMatch[1];
     if (context.variables.has(varName)) {
       context.variables.delete(varName);
-      agent.infoLine(`Variable $${varName} deleted`);
+      agent.infoMessage(`Variable $${varName} deleted`);
     } else {
-      agent.errorLine(`Variable $${varName} not defined`);
+      agent.errorMessage(`Variable $${varName} not defined`);
     }
     return;
   }
 
   const match = remainder.match(/^\$(\w+)\s*=\s*(.+)$/);
   if (!match) {
-    agent.errorLine("Invalid syntax. Use: /var $name = value");
+    agent.errorMessage("Invalid syntax. Use: /var $name = value");
     return;
   }
 
@@ -39,16 +40,16 @@ async function execute(remainder: string, agent: Agent) {
 
   // Check for name conflict with lists
   if (context.lists.has(varName)) {
-    agent.errorLine(`Name '${varName}' already exists as a list (@${varName})`);
+    agent.errorMessage(`Name '${varName}' already exists as a list (@${varName})`);
     return;
   }
 
   try {
     const value = await evaluateExpression(expression.trim(), context, agent);
     context.setVariable(varName, value);
-    agent.infoLine(`Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`);
+    agent.infoMessage(`Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`);
   } catch (error) {
-    agent.errorLine(error instanceof Error ? error.message : String(error));
+    agent.errorMessage(error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -85,10 +86,15 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
 }
 
 function showHelp(agent: Agent) {
-  agent.systemMessage("Variable Command Usage:");
-  agent.systemMessage('  /var $name = "value" - Assign static value');
-  agent.systemMessage('  /var $name = llm("prompt") - Assign LLM response');
-  agent.systemMessage('  /var $name = functionName("arg1", "arg2") - Call function');
+  const lines: string[] = [
+    "Variable Command Usage:",
+    indent([
+      '/var $name = "value" - Assign static value',
+      '/var $name = llm("prompt") - Assign LLM response',
+      '/var $name = functionName("arg1", "arg2") - Call function'
+    ], 1)
+  ];
+  agent.infoMessage(lines.join("\n"));
 }
 
 const help: string = `# /var $name = value

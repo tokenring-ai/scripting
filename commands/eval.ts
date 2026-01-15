@@ -10,7 +10,7 @@ async function execute(remainder: string, agent: Agent) {
   const agentCommandService = agent.requireServiceByType(AgentCommandService);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /eval <command with $vars>");
+    agent.errorMessage("Usage: /eval <command with $vars>");
     return;
   }
 

@@ -15,7 +15,7 @@ async function execute(
 }> {
   const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
 
-  agent.infoLine(`[${name}] Running script: ${scriptName}`);
+  agent.infoMessage(`[${name}] Running script: ${scriptName}`);
   if (!scriptName) {
     throw new Error("Script name is required");
   }

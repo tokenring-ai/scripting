@@ -9,7 +9,7 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /sleep <seconds|$var>");
+    agent.errorMessage("Usage: /sleep <seconds|$var>");
     return;
   }
 
@@ -17,13 +17,13 @@ async function execute(remainder: string, agent: Agent) {
   const seconds = parseFloat(interpolated);
 
   if (isNaN(seconds) || seconds < 0) {
-    agent.errorLine(`Invalid sleep duration: ${interpolated}`);
+    agent.errorMessage(`Invalid sleep duration: ${interpolated}`);
     return;
   }
 
-  agent.infoLine(`Sleeping for ${seconds} seconds...`);
+  agent.infoMessage(`Sleeping for ${seconds} seconds...`);
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));
-  agent.infoLine("Sleep complete");
+  agent.infoMessage("Sleep complete");
 }
 
 const help: string = `# /sleep <seconds|$var>

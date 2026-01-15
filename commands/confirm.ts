@@ -8,13 +8,13 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /confirm $var \"message\"");
+    agent.errorMessage("Usage: /confirm $var \"message\"");
     return;
   }
 
   const match = remainder.match(/^\$(\w+)\s+(.+)$/);
   if (!match) {
-    agent.errorLine("Invalid syntax. Use: /confirm $var \"message\"");
+    agent.errorMessage("Invalid syntax. Use: /confirm $var \"message\"");
     return;
   }
 
@@ -30,7 +30,7 @@ async function execute(remainder: string, agent: Agent) {
   const result = confirmed ? 'yes' : 'no';
 
   context.setVariable(varName, result);
-  agent.infoLine(`Variable $${varName} = ${result}`);
+  agent.infoMessage(`Variable $${varName} = ${result}`);
 }
 
 const help: string = `# /confirm $var "message"

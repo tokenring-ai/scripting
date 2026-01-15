@@ -1,5 +1,7 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import indent from "@tokenring-ai/utility/string/indent";
+import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../ScriptingService.ts";
 
 const description = "/script - Run predefined chat command scripts";
@@ -26,48 +28,57 @@ async function execute(remainder: string, agent: Agent) {
       showScriptInfo(args[1], scriptingService, agent);
       break;
     default:
-      agent.systemMessage(`Unknown subcommand: ${subCommand}`);
+      agent.infoMessage(`Unknown subcommand: ${subCommand}`);
       showHelp(agent);
       break;
   }
 }
 
 function showHelp(agent: Agent) {
-  agent.systemMessage("Script Command Usage:");
-  agent.systemMessage("  /script list - List all available scripts");
-  agent.systemMessage("  /script run <scriptName> [input] - Run a script with optional input");
-  agent.systemMessage("  /script info <scriptName> - Show information about a script");
+  const lines: string[] = [
+    "Script Command Usage:",
+    indent([
+      "/script list - List all available scripts",
+      "/script run <scriptName> [input] - Run a script with optional input",
+      "/script info <scriptName> - Show information about a script"
+    ], 1)
+  ];
+  agent.infoMessage(lines.join("\n"));
 }
 
 function listScripts(scriptingService: ScriptingService, agent: Agent) {
   const scripts = scriptingService.listScripts();
 
   if (scripts.length === 0) {
-    agent.systemMessage("No scripts available.");
+    agent.infoMessage("No scripts available.");
     return;
   }
 
-  agent.systemMessage("Available scripts:");
-  scripts.forEach((name) => {
-    agent.systemMessage(`  - ${name}`);
-  });
+  const lines: string[] = [
+    "Available scripts:",
+    markdownList(scripts)
+  ];
+  agent.infoMessage(lines.join("\n"));
 }
 
 function showScriptInfo(scriptName: string | undefined, scriptingService: ScriptingService, agent: Agent) {
   if (!scriptName) {
-    agent.systemMessage("Please provide a script name.");
+    agent.infoMessage("Please provide a script name.");
     return;
   }
 
   const script = scriptingService.getScriptByName(scriptName);
   if (!script) {
-    agent.systemMessage(`Script not found: ${scriptName}`);
+    agent.infoMessage(`Script not found: ${scriptName}`);
     return;
   }
 
-  agent.systemMessage(`Script: ${scriptName}`);
-  agent.systemMessage("Usage:");
-  agent.systemMessage(`  /script run ${scriptName} <input>`);
+  const lines: string[] = [
+    `Script: ${scriptName}`,
+    "Usage:",
+    indent(`/script run ${scriptName} <input>`, 1)
+  ];
+  agent.infoMessage(lines.join("\n"));
 }
 
 async function runScript(
@@ -76,7 +87,7 @@ async function runScript(
   agent: Agent,
 ) {
   if (!args || args.length < 1) {
-    agent.systemMessage("Please provide a script name.");
+    agent.infoMessage("Please provide a script name.");
     return;
   }
 

@@ -10,13 +10,13 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /if $condition { commands } [else { commands }]");
+    agent.errorMessage("Usage: /if $condition { commands } [else { commands }]");
     return;
   }
 
   const prefixMatch = remainder.match(/^\$(\w+)\s*/);
   if (!prefixMatch) {
-    agent.errorLine("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
+    agent.errorMessage("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
     return;
   }
 
@@ -24,7 +24,7 @@ async function execute(remainder: string, agent: Agent) {
   const thenBlock = extractBlock(remainder, prefix.length);
 
   if (!thenBlock) {
-    agent.errorLine("Missing then block { commands }");
+    agent.errorMessage("Missing then block { commands }");
     return;
   }
 
@@ -44,7 +44,7 @@ async function execute(remainder: string, agent: Agent) {
     if (elseMatch) {
       const elseBlock = extractBlock(remainder, thenBlock.endPos + elseMatch[0].length);
       if (!elseBlock) {
-        agent.errorLine("Invalid else block");
+        agent.errorMessage("Invalid else block");
         return;
       }
       body = elseBlock.content;

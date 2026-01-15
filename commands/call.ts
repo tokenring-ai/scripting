@@ -10,13 +10,13 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /call functionName(\"arg1\", \"arg2\")");
+    agent.errorMessage("Usage: /call functionName(\"arg1\", \"arg2\")");
     return;
   }
 
   const match = remainder.trim().match(/^(\w+)\((.*)\)$/);
   if (!match) {
-    agent.errorLine("Invalid syntax. Use: /call functionName(\"arg1\", \"arg2\")");
+    agent.errorMessage("Invalid syntax. Use: /call functionName(\"arg1\", \"arg2\")");
     return;
   }
 
@@ -24,7 +24,7 @@ async function execute(remainder: string, agent: Agent) {
   const scriptingService = agent.requireServiceByType(ScriptingService);
 
   if (!scriptingService) {
-    agent.errorLine("ScriptingService not available");
+    agent.errorMessage("ScriptingService not available");
     return;
   }
 
@@ -37,7 +37,7 @@ async function execute(remainder: string, agent: Agent) {
     const result = await scriptingService.executeFunction(funcName, args, agent);
     agent.chatOutput(Array.isArray(result) ? result.join('\n') : result);
   } catch (error) {
-    agent.errorLine(error instanceof Error ? error.message : String(error));
+    agent.errorMessage(error instanceof Error ? error.message : String(error));
   }
 }
 

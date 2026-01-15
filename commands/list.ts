@@ -1,5 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
@@ -31,14 +32,14 @@ async function execute(remainder: string, agent: Agent) {
 
       // Check for name conflict with variables
       if (context.variables.has(listName)) {
-        agent.errorLine(`Name '${listName}' already exists as a variable ($${listName})`);
+        agent.errorMessage(`Name '${listName}' already exists as a variable ($${listName})`);
         return;
       }
 
       context.setList(listName, items);
-      agent.infoLine(`List @${listName} = [${items.length} items]`);
+      agent.infoMessage(`List @${listName} = [${items.length} items]`);
     } catch (error) {
-      agent.errorLine(error instanceof Error ? error.message : String(error));
+      agent.errorMessage(error instanceof Error ? error.message : String(error));
     }
     return;
   }
@@ -46,7 +47,7 @@ async function execute(remainder: string, agent: Agent) {
   // Check for array literal syntax: @name = ["item1", "item2"]
   const match = remainder.match(/^@(\w+)\s*=\s*\[(.+)\]$/s);
   if (!match) {
-    agent.errorLine("Invalid syntax. Use: /list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\")");
+    agent.errorMessage("Invalid syntax. Use: /list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\")");
     return;
   }
 
@@ -54,7 +55,7 @@ async function execute(remainder: string, agent: Agent) {
 
   // Check for name conflict with variables
   if (context.variables.has(listName)) {
-    agent.errorLine(`Name '${listName}' already exists as a variable ($${listName})`);
+    agent.errorMessage(`Name '${listName}' already exists as a variable ($${listName})`);
     return;
   }
 
@@ -64,14 +65,19 @@ async function execute(remainder: string, agent: Agent) {
   });
 
   context.setList(listName, items);
-  agent.infoLine(`List @${listName} = [${items.length} items]`);
+  agent.infoMessage(`List @${listName} = [${items.length} items]`);
 }
 
 function showHelp(agent: Agent) {
-  agent.systemMessage("List Command Usage:");
-  agent.systemMessage('  /list @name = ["item1", "item2"] - Define list');
-  agent.systemMessage('  /list @name = [$var1, $var2] - List from variables');
-  agent.systemMessage('  /list @name = functionName("arg") - List from function call');
+  const lines: string[] = [
+    "List Command Usage:",
+    indent([
+      '/list @name = ["item1", "item2"] - Define list',
+      '/list @name = [$var1, $var2] - List from variables',
+      '/list @name = functionName("arg") - List from function call'
+    ], 1)
+  ];
+  agent.infoMessage(lines.join("\n"));
 }
 
 const help: string = `# /list @name = ["item1", "item2"]

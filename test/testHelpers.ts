@@ -42,8 +42,8 @@ export function createMockAgent() {
       }
       return null;
     }),
-    errorLine: vi.fn((msg: string) => errors.push(msg)),
-    infoLine: vi.fn((msg: string) => infos.push(msg)),
+    errorMessage: vi.fn((msg: string) => errors.push(msg)),
+    infoMessage: vi.fn((msg: string) => infos.push(msg)),
     chatOutput: vi.fn((msg: string) => outputs.push(msg)),
     systemMessage: vi.fn((msg: string) => infos.push(msg)),
     askHuman: vi.fn(async () => {

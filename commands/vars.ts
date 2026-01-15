@@ -1,5 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/vars - List all variables or show specific variable";
@@ -12,7 +13,7 @@ async function execute(remainder: string, agent: Agent) {
 
   if (trimmed === "clear") {
     context.variables.clear();
-    agent.infoLine("All variables cleared");
+    agent.infoMessage("All variables cleared");
     return;
   }
 
@@ -21,24 +22,27 @@ async function execute(remainder: string, agent: Agent) {
   if (varName) {
     const value = context.getVariable(varName);
     if (value === undefined) {
-      agent.errorLine(`Variable $${varName} not defined`);
+      agent.errorMessage(`Variable $${varName} not defined`);
     } else {
-      agent.infoLine(`$${varName} = ${value}`);
+      agent.infoMessage(`$${varName} = ${value}`);
     }
     return;
   }
 
   const vars = Array.from(context.variables.entries());
   if (vars.length === 0) {
-    agent.infoLine("No variables defined");
+    agent.infoMessage("No variables defined");
     return;
   }
 
-  agent.infoLine("Defined variables:");
-  vars.forEach(([name, value]) => {
-    const preview = value.length > 60 ? value.substring(0, 60) + "..." : value;
-    agent.infoLine(`  $${name} = ${preview}`);
-  });
+  const lines: string[] = [
+    "Defined variables:",
+    markdownList(vars.map(([name, value]) => {
+      const preview = value.length > 60 ? value.substring(0, 60) + "..." : value;
+      return `$${name} = ${preview}`
+    }))
+  ];
+  agent.infoMessage(lines.join("\n"));
 }
 
 const help: string = `# /vars [$name]

@@ -10,13 +10,13 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /for $item in @list { commands }");
+    agent.errorMessage("Usage: /for $item in @list { commands }");
     return;
   }
 
   const prefixMatch = remainder.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
   if (!prefixMatch) {
-    agent.errorLine("Invalid syntax. Use: /for $item in @list { commands }");
+    agent.errorMessage("Invalid syntax. Use: /for $item in @list { commands }");
     return;
   }
 
@@ -24,7 +24,7 @@ async function execute(remainder: string, agent: Agent) {
   const block = extractBlock(remainder, prefix.length);
 
   if (!block) {
-    agent.errorLine("Missing block { commands }");
+    agent.errorMessage("Missing block { commands }");
     return;
   }
 
@@ -33,7 +33,7 @@ async function execute(remainder: string, agent: Agent) {
 
   const items = context.getList(listName);
   if (!items) {
-    agent.errorLine(`List @${listName} not found`);
+    agent.errorMessage(`List @${listName} not found`);
     return;
   }
 
@@ -43,7 +43,7 @@ async function execute(remainder: string, agent: Agent) {
       await executeBlock(commands, agent);
     }
   } catch (error) {
-    agent.errorLine(error instanceof Error ? error.message : String(error));
+    agent.errorMessage(error instanceof Error ? error.message : String(error));
   } finally {
     if (savedItem !== undefined) {
       context.setVariable(itemVar, savedItem);

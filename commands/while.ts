@@ -10,13 +10,13 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /while $condition { commands }");
+    agent.errorMessage("Usage: /while $condition { commands }");
     return;
   }
 
   const prefixMatch = remainder.match(/^\$(\w+)\s*/);
   if (!prefixMatch) {
-    agent.errorLine("Invalid syntax. Use: /while $condition { commands }");
+    agent.errorMessage("Invalid syntax. Use: /while $condition { commands }");
     return;
   }
 
@@ -24,7 +24,7 @@ async function execute(remainder: string, agent: Agent) {
   const block = extractBlock(remainder, prefix.length);
 
   if (!block) {
-    agent.errorLine("Missing block { commands }");
+    agent.errorMessage("Missing block { commands }");
     return;
   }
 
@@ -45,9 +45,9 @@ async function execute(remainder: string, agent: Agent) {
   }
 
   if (iterations >= maxIterations) {
-    agent.errorLine(`While loop exceeded maximum iterations (${maxIterations})`);
+    agent.errorMessage(`While loop exceeded maximum iterations (${maxIterations})`);
   } else if (iterations > 0) {
-    agent.infoLine(`While loop completed ${iterations} iteration${iterations === 1 ? '' : 's'}`);
+    agent.infoMessage(`While loop completed ${iterations} iteration${iterations === 1 ? '' : 's'}`);
   }
 }
 

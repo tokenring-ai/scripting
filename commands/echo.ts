@@ -8,12 +8,12 @@ async function execute(remainder: string, agent: Agent) {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorLine("Usage: /echo <text|$var>");
+    agent.errorMessage("Usage: /echo <text|$var>");
     return;
   }
 
   const output = context.interpolate(remainder);
-  agent.infoLine(output);
+  agent.infoMessage(output);
 }
 
 const help: string = `# /echo <text|$var>
