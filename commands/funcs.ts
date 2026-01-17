@@ -1,6 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import indent from "@tokenring-ai/utility/string/indent";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";

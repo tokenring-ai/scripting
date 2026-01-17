@@ -46,7 +46,7 @@ export function createMockAgent() {
     infoMessage: vi.fn((msg: string) => infos.push(msg)),
     chatOutput: vi.fn((msg: string) => outputs.push(msg)),
     systemMessage: vi.fn((msg: string) => infos.push(msg)),
-    askHuman: vi.fn(async () => {
+    askQuestion: vi.fn(async () => {
       return humanResponses.shift();
     }),
     runCommand: vi.fn(async (cmd: string) => {

@@ -22,9 +22,9 @@ async function execute(remainder: string, agent: Agent) {
   const unquoted = messageExpr.match(/^["'](.*)["']$/s);
   const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
 
-  const input = await agent.askHuman({
-    type: "askForText",
-    message
+  const input = await agent.askForText({
+    message,
+    label: "Input"
   });
 
   if (input) {

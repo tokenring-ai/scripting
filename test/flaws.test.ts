@@ -286,7 +286,7 @@ describe('FLAW: Prompt and confirm message parsing with greedy regex', () => {
     await promptCmd.execute('$name "Enter \"name\" here:"', agent as any);
 
     // Should pass the message with escaped quotes correctly
-    expect(agent.askHuman).toHaveBeenCalledWith(
+    expect(agent.askQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
         type: expect.stringMatching(/ask/),
         message: expect.stringContaining('name')
@@ -301,7 +301,7 @@ describe('FLAW: Prompt and confirm message parsing with greedy regex', () => {
 
     await confirmCmd.execute('$ok "Are you \"sure\"?"', agent as any);
 
-    expect(agent.askHuman).toHaveBeenCalledWith(
+    expect(agent.askQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'askForConfirmation',
         message: expect.stringContaining('sure')

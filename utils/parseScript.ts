@@ -25,7 +25,6 @@ export function parseScript(script: string): string[] {
     if (currentStatement.endsWith('\\')) {
       // Continuation marker
       currentStatement = currentStatement.slice(0, -1).trimEnd();
-      continue;
     } else if (currentStatement.endsWith(';') && braceDepth === 0) {
       // Explicit statement terminator (only if no open braces)
       currentStatement = currentStatement.slice(0, -1).trimEnd();

@@ -265,7 +265,7 @@ describe('confirm command', () => {
     context.setVariable('action', 'delete');
     humanResponses.push(true);
     await confirmCmd.execute('$result "Confirm $action?"', agent as any);
-    expect(agent.askHuman).toHaveBeenCalledWith({
+    expect(agent.askQuestion).toHaveBeenCalledWith({
       type: 'askForConfirmation',
       message: 'Confirm delete?'
     });
@@ -292,7 +292,7 @@ describe('prompt command', () => {
     context.setVariable('field', 'username');
     humanResponses.push('test');
     await promptCmd.execute('$value "Enter $field:"', agent as any);
-    expect(agent.askHuman).toHaveBeenCalledWith(
+    expect(agent.askQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'Enter username:'
       })
