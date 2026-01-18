@@ -1,8 +1,8 @@
 import type {Agent} from "@tokenring-ai/agent";
 import {AgentCommandService} from "@tokenring-ai/agent";
+import {TokenRingService} from "@tokenring-ai/app/types";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
-import {TokenRingService} from "@tokenring-ai/app/types";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
 import {z} from "zod";
 import {ScriptingContext} from "./state/ScriptingContext.ts";

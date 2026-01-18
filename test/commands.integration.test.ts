@@ -1,11 +1,11 @@
-import {describe, expect, it, beforeEach} from 'vitest';
-import echoCmd from '../commands/echo.ts';
-import varCmd from '../commands/var.ts';
-import funcCmd from '../commands/func.ts';
-import listCmd from '../commands/list.ts';
+import {beforeEach, describe, expect, it} from 'vitest';
 import callCmd from '../commands/call.ts';
-import ifCmd from '../commands/if.ts';
+import echoCmd from '../commands/echo.ts';
 import forCmd from '../commands/for.ts';
+import funcCmd from '../commands/func.ts';
+import ifCmd from '../commands/if.ts';
+import listCmd from '../commands/list.ts';
+import varCmd from '../commands/var.ts';
 import {createMockAgent} from './testHelpers.ts';
 
 describe('Command Integration Tests', () => {

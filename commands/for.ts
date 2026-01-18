@@ -38,7 +38,12 @@ async function execute(remainder: string, agent: Agent) {
   }
 
   try {
+    const signal = agent.getAbortSignal();
     for (const value of items) {
+      if (signal.aborted) {
+        agent.warningMessage("For loop was aborted.");
+        return;
+      }
       context.setVariable(itemVar, value);
       await executeBlock(commands, agent);
     }

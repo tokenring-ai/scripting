@@ -1,5 +1,5 @@
-import {vi} from 'vitest';
 import {AgentCommandService} from '@tokenring-ai/agent';
+import {vi} from 'vitest';
 import ScriptingService from '../ScriptingService.ts';
 import {ScriptingContext} from '../state/ScriptingContext.ts';
 

@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {parseArguments} from '../utils/parseArguments.ts';
 import {extractBlock, parseBlock} from '../utils/blockParser.ts';
+import {parseArguments} from '../utils/parseArguments.ts';
 import {parseScript} from '../utils/parseScript.ts';
 
 describe('Utility Functions', () => {

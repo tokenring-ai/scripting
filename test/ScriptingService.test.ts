@@ -1,7 +1,7 @@
-import {describe, expect, it, vi, beforeEach} from 'vitest';
+import {AgentCommandService} from '@tokenring-ai/agent';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ScriptingService from '../ScriptingService.ts';
 import {ScriptingContext} from '../state/ScriptingContext.ts';
-import {AgentCommandService} from '@tokenring-ai/agent';
 
 describe('ScriptingService', () => {
   let service: any;
