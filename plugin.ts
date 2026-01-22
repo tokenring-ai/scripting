@@ -39,9 +39,6 @@ export default {
             agentType: agentType,
             headless: this.agent.headless,
             command: `/work ${message}\n\nImportant Context:\n${context}`,
-            forwardChatOutput: true,
-            forwardSystemOutput: true,
-            forwardHumanRequests: true,
           }, this.agent, true);
 
           if (res.status === 'success') {
