@@ -1,8 +1,20 @@
 import {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
 import type {AgentStateSlice} from "@tokenring-ai/agent/types";
+import {z} from "zod";
 
-export class ScriptingContext implements AgentStateSlice {
+const serializationSchema = z.object({
+  variables: z.array(z.tuple([z.string(), z.string()])),
+  lists: z.array(z.tuple([z.string(), z.array(z.string())])),
+  functions: z.array(z.tuple([z.string(), z.object({
+    type: z.enum(['static', 'llm', 'js']),
+    params: z.array(z.string()),
+    body: z.string()
+  })]))
+});
+
+export class ScriptingContext implements AgentStateSlice<typeof serializationSchema> {
   name = "ScriptingContext";
+  serializationSchema = serializationSchema;
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();
   functions = new Map<string, { type: 'static' | 'llm' | 'js', params: string[], body: string }>();
@@ -15,7 +27,7 @@ export class ScriptingContext implements AgentStateSlice {
     }
   }
 
-  serialize(): object {
+  serialize(): z.output<typeof serializationSchema> {
     return {
       variables: Array.from(this.variables.entries()),
       lists: Array.from(this.lists.entries()),
@@ -23,10 +35,10 @@ export class ScriptingContext implements AgentStateSlice {
     };
   }
 
-  deserialize(data: any): void {
-    this.variables = new Map(data.variables || []);
-    this.lists = new Map(data.lists || []);
-    this.functions = new Map(data.functions || []);
+  deserialize(data: z.output<typeof serializationSchema>): void {
+    this.variables = new Map(data.variables);
+    this.lists = new Map(data.lists);
+    this.functions = new Map(data.functions);
   }
 
   setVariable(name: string, value: string): void {
