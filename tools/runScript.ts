@@ -4,6 +4,7 @@ import {z} from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
 const name = "script_run";
+const displayName = "Scripting/runScript";
 
 async function execute(
   {scriptName, input}: z.infer<typeof inputSchema>,
@@ -37,5 +38,5 @@ const inputSchema = z.object({
 const requiredContextHandlers = ["available-scripts"];
 
 export default {
-  name, description, inputSchema, execute, requiredContextHandlers
+  name, displayName, description, inputSchema, execute, requiredContextHandlers
 } satisfies TokenRingToolDefinition<typeof inputSchema>;
