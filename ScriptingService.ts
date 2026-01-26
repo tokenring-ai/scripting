@@ -107,12 +107,14 @@ export default class ScriptingService implements TokenRingService {
         result = await funcImpl.call({agent}, ...args);
         if (Array.isArray(result)) {
           for (const item of result) {
+            // noinspection SuspiciousTypeOfGuard
             if (typeof item !== 'string') {
               throw new Error(`Function ${funcName} returned an array with non-string item`);
             }
           }
           return result;
         }
+        // noinspection SuspiciousTypeOfGuard
         if (typeof result !== 'string') {
           throw new Error(`Function ${funcName} did not return a string`);
         }
