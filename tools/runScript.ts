@@ -1,5 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import {TokenRingToolDefinition, type TokenRingToolTextResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
@@ -7,24 +7,20 @@ const name = "script_run";
 const displayName = "Scripting/runScript";
 
 async function execute(
-  {scriptName, input}: z.infer<typeof inputSchema>,
+  {scriptName, input}: z.output<typeof inputSchema>,
   agent: Agent,
-): Promise<{
-  ok: boolean;
-  output?: string;
-  error?: string;
-}> {
+): Promise<TokenRingToolTextResult> {
   const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
 
   agent.infoMessage(`[${name}] Running script: ${scriptName}`);
-  if (!scriptName) {
-    throw new Error("Script name is required");
-  }
-  if (!input) {
-    throw new Error("Input is required");
-  }
 
-  return await scriptingService.runScript({scriptName, input}, agent);
+  const result = await scriptingService.runScript({scriptName, input}, agent);
+  
+  if (!result.ok) {
+    throw new Error(result.error || "Script execution failed");
+  }
+  
+  return result.output || "";
 }
 
 const description =
