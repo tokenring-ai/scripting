@@ -1,19 +1,18 @@
 import {AgentCommandService} from "@tokenring-ai/agent";
 import {runSubAgent} from "@tokenring-ai/agent/runSubAgent";
-import {execute as runAgent} from "@tokenring-ai/agent/tools/runAgent"
 import {TokenRingPlugin} from "@tokenring-ai/app";
 import {ChatService} from "@tokenring-ai/chat";
 import {z} from "zod";
 
 import chatCommands from "./chatCommands.ts";
 import contextHandlers from "./contextHandlers.ts";
-import {ScriptingConfigSchema} from "./index.ts";
 import packageJSON from './package.json' with {type: 'json'};
+import {ScriptingServiceConfigSchema} from "./schema.ts";
 import ScriptingService, {ScriptingThis} from "./ScriptingService.js";
 import tools from "./tools.ts";
 
 const packageConfigSchema = z.object({
-  scripting: ScriptingConfigSchema.optional()
+  scripting: ScriptingServiceConfigSchema.prefault({})
 });
 
 export default {

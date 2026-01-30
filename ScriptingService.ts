@@ -4,16 +4,9 @@ import {TokenRingService} from "@tokenring-ai/app/types";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
-import {z} from "zod";
+import type {ParsedScriptingServiceConfig} from "./schema.ts";
 import {ScriptingContext} from "./state/ScriptingContext.ts";
 import {parseScript} from "./utils/parseScript.ts";
-
-export const ScriptSchema = z.union([
-  z.string(),
-  z.array(z.string()),
-]);
-
-export type Script = z.infer<typeof ScriptSchema>;
 
 export type ScriptResult = {
   ok: boolean;
@@ -25,8 +18,6 @@ export type ScriptResult = {
 export type ScriptingThis = {
   agent: Agent;
 }
-
-export type ScriptingServiceOptions = Record<string, Script>;
 
 export type ScriptFunction = {
   type: 'static' | 'llm' | 'js';
@@ -55,7 +46,7 @@ export default class ScriptingService implements TokenRingService {
   getFunction = this.functions.getItemByName;
   listFunctions = this.functions.getAllItemNames;
 
-  constructor(scripts: ScriptingServiceOptions) {
+  constructor(scripts: ParsedScriptingServiceConfig) {
     for (let [name, script] of Object.entries(scripts)) {
       if (Array.isArray(script)) {
         script = script.join(';\n');
