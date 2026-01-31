@@ -67,6 +67,9 @@ context.getFunction('name');
 
 // Variable interpolation
 context.interpolate('Hello, $name'); // Returns interpolated string
+
+// Debug output
+context.show(); // Returns formatted string with all state
 ```
 
 ## Chat Commands
@@ -96,6 +99,8 @@ context.interpolate('Hello, $name'); // Returns interpolated string
 - `/funcs` - List all functions
 - `/funcs name` - Show specific function definition
 - `/funcs clear` - Clear all local functions
+
+**Reserved Function Names**: The following names cannot be used for functions: `var`, `vars`, `func`, `funcs`, `call`, `echo`, `sleep`, `prompt`, `confirm`, `list`, `lists`, `if`, `for`, `while`, `script`
 
 ### List Management
 
@@ -195,7 +200,7 @@ const result = await agent.useTool("script_run", {
 Configure scripts in your application:
 
 ```typescript
-import type {ScriptingConfigSchema} from "@tokenring-ai/scripting";
+import type {ScriptingServiceConfigSchema} from "./schema.ts";
 
 export default {
   // Scripting configuration
@@ -206,13 +211,13 @@ export default {
       "/agent switch editor",
       "/tools enable editing"
     ],
-    publishWorkflow: {
+    publishWorkflow: [
       "/agent switch editor",
       "/template run review filename",
       "/agent switch publisher"
-    }
+    ]
   }
-} satisfies typeof ScriptingConfigSchema;
+} satisfies typeof ScriptingServiceConfigSchema;
 ```
 
 Scripts can be defined as:
@@ -235,9 +240,6 @@ scriptingService.registerFunction("runAgent", {
       agentType,
       headless: this.agent.headless,
       command: `/work ${message}\n\nImportant Context:\n${context}`,
-      forwardChatOutput: true,
-      forwardSystemOutput: true,
-      forwardHumanRequests: true,
     }, this.agent, true);
 
     if (res.status === 'success') {
