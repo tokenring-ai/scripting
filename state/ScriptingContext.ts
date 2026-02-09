@@ -13,7 +13,7 @@ const serializationSchema = z.object({
 });
 
 export class ScriptingContext implements AgentStateSlice<typeof serializationSchema> {
-  name = "ScriptingContext";
+  readonly name = "ScriptingContext";
   serializationSchema = serializationSchema;
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();

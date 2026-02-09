@@ -22,7 +22,7 @@ async function execute(remainder: string, agent: Agent) {
   const unquoted = messageExpr.match(/^["'](.*)["']$/s);
   const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
 
-  const confirmed = await agent.askForConfirmation({
+  const confirmed = await agent.askForApproval({
     message
   });
 

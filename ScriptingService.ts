@@ -33,7 +33,7 @@ export type ScriptFunction = {
  * Registry for chat command scripts and global functions
  */
 export default class ScriptingService implements TokenRingService {
-  name = "ScriptingService";
+  readonly name = "ScriptingService";
   description = "Provides a registry of chat command scripts and global functions";
 
   scripts = new KeyedRegistry<string[]>();
