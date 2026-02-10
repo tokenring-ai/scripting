@@ -1,15 +1,22 @@
-import {AgentCommandService} from '@tokenring-ai/agent';
+import {Agent, AgentCommandService} from '@tokenring-ai/agent';
+import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent";
+import TokenRingApp from "@tokenring-ai/app";
+import createTestingApp from "@tokenring-ai/app/test/createTestingApp";
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ScriptingService from '../ScriptingService.ts';
 import {ScriptingContext} from '../state/ScriptingContext.ts';
 
 describe('ScriptingService', () => {
-  let service: any;
-  let mockAgent: any;
+  let service: ScriptingService;
+  let app: TokenRingApp;
+  let agent: Agent;
   let context: ScriptingContext;
+  let agentCommandService: AgentCommandService;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    app = createTestingApp();
+    agent = createTestingAgent(app);
     
     context = new ScriptingContext();
     
@@ -20,26 +27,11 @@ describe('ScriptingService', () => {
     };
     
     service = new ScriptingService(mockScripts);
-    
-    // Mock agent
-    mockAgent = {
-      getState: vi.fn((StateClass) => {
-        if (StateClass === ScriptingContext) {
-          return context;
-        }
-        return context;
-      }),
-      requireServiceByType: vi.fn((ServiceClass) => {
-        if (ServiceClass === AgentCommandService) {
-          return {
-            executeAgentCommand: vi.fn().mockResolvedValue(undefined)
-          };
-        }
-        return null;
-      }),
-      initializeState: vi.fn(),
-      systemMessage: vi.fn()
-    };
+    app.addServices(service);
+    service.attach(agent);
+
+    agentCommandService = new AgentCommandService();
+    app.addServices(agentCommandService);
   });
 
   describe('constructor and initialization', () => {
@@ -106,11 +98,13 @@ describe('ScriptingService', () => {
 
   describe('function resolution', () => {
     beforeEach(() => {
-      context.defineFunction('localFunc', 'static', [], 'local function');
+      agent.mutateState(ScriptingContext, (state) => {
+        state.defineFunction('localFunc', 'static', [], 'local function');
+      });
     });
 
     it('should resolve functions from local context first', () => {
-      const func = service.resolveFunction('localFunc', mockAgent);
+      const func = service.resolveFunction('localFunc', agent);
       expect(func).toBeDefined();
     });
 
@@ -122,22 +116,20 @@ describe('ScriptingService', () => {
       };
       
       service.registerFunction('globalFunc', mockGlobalFunc);
-      
-      const func = service.resolveFunction('globalFunc', mockAgent);
+
+      const func = service.resolveFunction('globalFunc', agent);
       expect(func).toBeDefined();
     });
 
     it('should return undefined for non-existent functions', () => {
-      const func = service.resolveFunction('nonExistent', mockAgent);
+      const func = service.resolveFunction('nonExistent', agent);
       expect(func).toBeUndefined();
     });
   });
 
   describe('function execution', () => {
     beforeEach(() => {
-      mockAgent.requireServiceByType.mockReturnValue({
-        executeAgentCommand: vi.fn().mockResolvedValue(undefined)
-      });
+      vi.spyOn(agentCommandService, 'executeAgentCommand').mockResolvedValue(undefined);
     });
 
     it('should execute native functions correctly', async () => {
@@ -148,8 +140,8 @@ describe('ScriptingService', () => {
       };
 
       service.registerFunction('nativeFunc', mockNativeFunc);
-      
-      const result = await service.executeFunction('nativeFunc', ['value1', 'value2'], mockAgent);
+
+      const result = await service.executeFunction('nativeFunc', ['value1', 'value2'], agent);
       expect(result).toBe('native result');
       expect(mockNativeFunc.execute).toHaveBeenCalledWith(
         'value1',
@@ -165,8 +157,8 @@ describe('ScriptingService', () => {
       };
 
       service.registerFunction('jsFunc', mockJsFunc);
-      
-      const result = await service.executeFunction('jsFunc', ['5', '3'], mockAgent);
+
+      const result = await service.executeFunction('jsFunc', ['5', '3'], agent);
       expect(result).toBe('53');
     });
 
@@ -176,20 +168,6 @@ describe('ScriptingService', () => {
         params: ['prompt'],
         body: 'Analyze: test prompt'
       };
-
-      mockAgent.requireServiceByType.mockImplementation((ServiceClass) => {
-        if (ServiceClass === AgentCommandService) {
-          return {
-            executeAgentCommand: vi.fn().mockResolvedValue(undefined)
-          };
-        }
-        // Mock ChatService
-        return {
-          getChatConfig: vi.fn().mockReturnValue({
-            model: 'test-model'
-          })
-        };
-      });
 
       service.registerFunction('llmFunc', mockLlmFunc);
       
@@ -207,14 +185,14 @@ describe('ScriptingService', () => {
       };
 
       service.registerFunction('staticFunc', mockStaticFunc);
-      
-      const result = await service.executeFunction('staticFunc', ['World'], mockAgent);
+
+      const result = await service.executeFunction('staticFunc', ['World'], agent);
       expect(result).toBe('Hello, World!');
     });
 
     it('should throw error for missing functions', async () => {
       await expect(
-        service.executeFunction('nonExistent', [], mockAgent)
+        service.executeFunction('nonExistent', [], agent)
       ).rejects.toThrow('Function nonExistent not defined');
     });
 
@@ -228,7 +206,7 @@ describe('ScriptingService', () => {
       service.registerFunction('mismatchFunc', mockFunc);
       
       await expect(
-        service.executeFunction('mismatchFunc', ['arg1'], mockAgent)
+        service.executeFunction('mismatchFunc', ['arg1'], agent)
       ).rejects.toThrow('expects 2 arguments, got 1');
     });
 
@@ -244,8 +222,8 @@ describe('ScriptingService', () => {
       };
 
       service.registerFunction('tempFunc', mockFunc);
-      
-      await service.executeFunction('tempFunc', ['temp_value'], mockAgent);
+
+      await service.executeFunction('tempFunc', ['temp_value'], agent);
       
       // Variable should be restored
       expect(context.getVariable('existing')).toBe('value');
@@ -263,23 +241,18 @@ describe('ScriptingService', () => {
       service.registerFunction('failingFunc', mockFunc);
       
       await expect(
-        service.executeFunction('failingFunc', [], mockAgent)
+        service.executeFunction('failingFunc', [], agent)
       ).rejects.toThrow('Function execution error: Execution failed');
     });
   });
 
   describe('script execution', () => {
-    beforeEach(() => {
-      mockAgent.requireServiceByType.mockReturnValue({
-        executeAgentCommand: vi.fn().mockResolvedValue(undefined)
-      });
-    });
-
     it('should execute scripts successfully', async () => {
+      vi.spyOn(agentCommandService, 'executeAgentCommand').mockResolvedValue(undefined);
       const result = await service.runScript({
         scriptName: 'testScript',
         input: 'test input'
-      }, mockAgent);
+      }, agent);
 
       expect(result.ok).toBe(true);
       expect(result.output).toContain('completed successfully');
@@ -287,16 +260,12 @@ describe('ScriptingService', () => {
 
     it('should handle script execution errors', async () => {
       // Mock executeAgentCommand to throw
-      const errorService = {
-        executeAgentCommand: vi.fn().mockRejectedValue(new Error('Script error'))
-      };
-      
-      mockAgent.requireServiceByType.mockReturnValue(errorService);
-      
+      vi.spyOn(agentCommandService, 'executeAgentCommand').mockRejectedValue(new Error('Script error'))
+
       const result = await service.runScript({
         scriptName: 'testScript',
         input: 'test input'
-      }, mockAgent);
+      }, agent);
 
       expect(result.ok).toBe(false);
       expect(result.error).toContain('Script error');
@@ -304,13 +273,13 @@ describe('ScriptingService', () => {
 
     it('should throw error for missing script names', async () => {
       await expect(
-        service.runScript({ scriptName: '', input: '' }, mockAgent)
+        service.runScript({scriptName: '', input: ''}, agent)
       ).rejects.toThrow('Script name is required');
     });
 
     it('should throw error for non-existent scripts', async () => {
       await expect(
-        service.runScript({ scriptName: 'nonExistent', input: '' }, mockAgent)
+        service.runScript({scriptName: 'nonExistent', input: ''}, agent)
       ).rejects.toThrow('Script not found: nonExistent');
     });
 
@@ -318,20 +287,10 @@ describe('ScriptingService', () => {
       const result = await service.runScript({
         scriptName: 'testScript',
         input: 'test input'
-      }, mockAgent);
+      }, agent);
 
       expect(result.ok).toBe(true);
     });
   });
 
-  describe('service attachment', () => {
-    it('should attach to agent with proper context', async () => {
-      await service.attach(mockAgent);
-      
-      expect(mockAgent.initializeState).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'ScriptingContext' }),
-        {}
-      );
-    });
-  });
 });
