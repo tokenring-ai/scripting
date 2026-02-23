@@ -16,13 +16,13 @@ async function execute(remainder: string, agent: Agent): Promise<string> {
   }
 
   // Check for function call syntax: @name = functionName("arg1", "arg2")
-  const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)$/s);
+  const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
   if (funcMatch) {
     const [, listName, funcName, argsStr] = funcMatch;
     const scriptingService = agent.requireServiceByType(ScriptingService);
 
     const args = parseArguments(argsStr).map(a => {
-      const unquoted = a.match(/^["'](.*)['"']$/);
+      const unquoted = a.match(/^["'](.*)["']$/);
       return unquoted ? unquoted[1] : context.interpolate(a);
     });
 
