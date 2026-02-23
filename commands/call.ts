@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
@@ -6,26 +7,23 @@ import {parseArguments} from "../utils/parseArguments.ts";
 
 const description = "/call - Call a function and display output";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /call functionName(\"arg1\", \"arg2\")");
-    return;
+    throw new CommandFailedError("Usage: /call functionName(\"arg1\", \"arg2\")");
   }
 
   const match = remainder.trim().match(/^(\w+)\((.*)\)$/);
   if (!match) {
-    agent.errorMessage("Invalid syntax. Use: /call functionName(\"arg1\", \"arg2\")");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /call functionName(\"arg1\", \"arg2\")");
   }
 
   const [, funcName, argsStr] = match;
   const scriptingService = agent.requireServiceByType(ScriptingService);
 
   if (!scriptingService) {
-    agent.errorMessage("ScriptingService not available");
-    return;
+    throw new CommandFailedError("ScriptingService not available");
   }
 
   const args = parseArguments(argsStr).map(a => {
@@ -35,9 +33,9 @@ async function execute(remainder: string, agent: Agent) {
 
   try {
     const result = await scriptingService.executeFunction(funcName, args, agent);
-    agent.chatOutput(Array.isArray(result) ? result.join('\n') : result);
+    return Array.isArray(result) ? result.join('\n') : result;
   } catch (error) {
-    agent.errorMessage(error instanceof Error ? error.message : String(error));
+    throw new CommandFailedError(error instanceof Error ? error.message : String(error));
   }
 }
 

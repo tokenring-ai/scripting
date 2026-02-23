@@ -1,19 +1,18 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/echo - Display text or variable value";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /echo <text|$var>");
-    return;
+    throw new CommandFailedError("Usage: /echo <text|$var>");
   }
 
-  const output = context.interpolate(remainder);
-  agent.infoMessage(output);
+  return context.interpolate(remainder);
 }
 
 const help: string = `# /echo <text|$var>

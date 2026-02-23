@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
@@ -6,26 +7,23 @@ import {executeBlock} from "../utils/executeBlock.ts";
 
 const description = "/while - Execute commands while condition is truthy";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /while $condition { commands }");
-    return;
+    throw new CommandFailedError("Usage: /while $condition { commands }");
   }
 
   const prefixMatch = remainder.match(/^\$(\w+)\s*/);
   if (!prefixMatch) {
-    agent.errorMessage("Invalid syntax. Use: /while $condition { commands }");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /while $condition { commands }");
   }
 
   const [prefix, conditionVar] = prefixMatch;
   const block = extractBlock(remainder, prefix.length);
 
   if (!block) {
-    agent.errorMessage("Missing block { commands }");
-    return;
+    throw new CommandFailedError("Missing block { commands }");
   }
 
   const commands = parseBlock(block.content);
@@ -45,10 +43,10 @@ async function execute(remainder: string, agent: Agent) {
   }
 
   if (iterations >= maxIterations) {
-    agent.errorMessage(`While loop exceeded maximum iterations (${maxIterations})`);
-  } else if (iterations > 0) {
-    agent.infoMessage(`While loop completed ${iterations} iteration${iterations === 1 ? '' : 's'}`);
+    throw new CommandFailedError(`While loop exceeded maximum iterations (${maxIterations})`);
   }
+
+  return `While loop completed ${iterations} iteration${iterations === 1 ? '' : 's'}`;
 }
 
 const help: string = `# /while $condition { commands }

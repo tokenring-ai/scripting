@@ -1,29 +1,27 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/sleep - Sleep for specified seconds";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
 
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /sleep <seconds|$var>");
-    return;
+    throw new CommandFailedError("Usage: /sleep <seconds|$var>");
   }
 
   const interpolated = context.interpolate(remainder.trim());
   const seconds = parseFloat(interpolated);
 
   if (isNaN(seconds) || seconds < 0) {
-    agent.errorMessage(`Invalid sleep duration: ${interpolated}`);
-    return;
+    throw new CommandFailedError(`Invalid sleep duration: ${interpolated}`);
   }
 
-  agent.infoMessage(`Sleeping for ${seconds} seconds...`);
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));
-  agent.infoMessage("Sleep complete");
+  return `Slept for ${seconds} seconds`;
 }
 
 const help: string = `# /sleep <seconds|$var>

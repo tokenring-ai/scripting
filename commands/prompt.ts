@@ -1,21 +1,20 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/prompt - Prompt user for input";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /prompt $var \"message\"");
-    return;
+    throw new CommandFailedError("Usage: /prompt $var \"message\"");
   }
 
   const match = remainder.match(/^\$(\w+)\s+(.+)$/);
   if (!match) {
-    agent.errorMessage("Invalid syntax. Use: /prompt $var \"message\"");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /prompt $var \"message\"");
   }
 
   const [, varName, messageExpr] = match;
@@ -29,9 +28,9 @@ async function execute(remainder: string, agent: Agent) {
 
   if (input) {
     context.setVariable(varName, input);
-    agent.infoMessage(`Variable $${varName} = ${input}`);
+    return `Variable $${varName} = ${input}`;
   } else {
-    agent.warningMessage("User cancelled input");
+    return "User cancelled input";
   }
 }
 

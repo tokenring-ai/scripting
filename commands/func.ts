@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
@@ -7,12 +8,11 @@ const description = "/func - Define functions";
 
 const RESERVED_NAMES = ['var', 'vars', 'func', 'funcs', 'call', 'echo', 'sleep', 'prompt', 'confirm', 'list', 'lists', 'if', 'for', 'while', 'script'];
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    showHelp(agent);
-    return;
+    return showHelp();
   }
 
   const deleteMatch = remainder.match(/^delete\s+(\w+)$/);
@@ -20,11 +20,10 @@ async function execute(remainder: string, agent: Agent) {
     const funcName = deleteMatch[1];
     if (context.functions.has(funcName)) {
       context.functions.delete(funcName);
-      agent.infoMessage(`Function ${funcName} deleted`);
+      return `Function ${funcName} deleted`;
     } else {
-      agent.errorMessage(`Function ${funcName} not defined`);
+      throw new CommandFailedError(`Function ${funcName} not defined`);
     }
-    return;
   }
 
   // Match: /func js name($params) { body }
@@ -32,13 +31,11 @@ async function execute(remainder: string, agent: Agent) {
   if (jsMatch) {
     const [, funcName, paramsStr, body] = jsMatch;
     if (RESERVED_NAMES.includes(funcName)) {
-      agent.errorMessage(`Function name '${funcName}' is reserved`);
-      return;
+      throw new CommandFailedError(`Function name '${funcName}' is reserved`);
     }
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
     context.defineFunction(funcName, 'js', params, body.trim());
-    agent.infoMessage(`JavaScript function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`);
-    return;
+    return `JavaScript function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`;
   }
 
   // Match: /func llm name($params) => "prompt"
@@ -46,13 +43,11 @@ async function execute(remainder: string, agent: Agent) {
   if (llmMatch) {
     const [, funcName, paramsStr, body] = llmMatch;
     if (RESERVED_NAMES.includes(funcName)) {
-      agent.errorMessage(`Function name '${funcName}' is reserved`);
-      return;
+      throw new CommandFailedError(`Function name '${funcName}' is reserved`);
     }
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
     context.defineFunction(funcName, 'llm', params, body.trim());
-    agent.infoMessage(`LLM function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`);
-    return;
+    return `LLM function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`;
   }
 
   // Match: /func static name($params) => "text"
@@ -60,19 +55,17 @@ async function execute(remainder: string, agent: Agent) {
   if (staticMatch) {
     const [, funcName, paramsStr, body] = staticMatch;
     if (RESERVED_NAMES.includes(funcName)) {
-      agent.errorMessage(`Function name '${funcName}' is reserved`);
-      return;
+      throw new CommandFailedError(`Function name '${funcName}' is reserved`);
     }
     const params = paramsStr.split(",").map(p => p.trim().replace(/^\$/, "")).filter(Boolean);
     context.defineFunction(funcName, 'static', params, body.trim());
-    agent.infoMessage(`Static function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`);
-    return;
+    return `Static function ${funcName}(${params.map(p => "$" + p).join(", ")}) defined`;
   }
 
-  agent.errorMessage("Invalid syntax. Use: /func static name($param) => \"text\" or /func llm name($param) => \"prompt\" or /func js name($param) { return result; }");
+  throw new CommandFailedError("Invalid syntax. Use: /func static name($param) => \"text\" or /func llm name($param) => \"prompt\" or /func js name($param) { return result; }");
 }
 
-function showHelp(agent: Agent) {
+function showHelp(): string {
   const lines: string[] = [
     "Function Command Usage:",
     indent([
@@ -82,7 +75,7 @@ function showHelp(agent: Agent) {
       '/func delete name - Delete function'
     ], 1)
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 const help: string = `# /func [static|llm|js] name($param1, $param2) => expression

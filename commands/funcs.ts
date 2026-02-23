@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../ScriptingService.ts";
@@ -6,7 +7,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/funcs - List all functions or show specific function";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
 
   const context = agent.getState(ScriptingContext);
   const scriptingService = agent.requireServiceByType(ScriptingService);
@@ -15,29 +16,26 @@ async function execute(remainder: string, agent: Agent) {
 
   if (trimmed === "clear") {
     context.functions.clear();
-    agent.infoMessage("All local functions cleared");
-    return;
+    return "All local functions cleared";
   }
 
   if (trimmed) {
     const func = scriptingService?.resolveFunction(trimmed, agent);
     if (!func) {
-      agent.errorMessage(`Function ${trimmed} not defined`);
+      throw new CommandFailedError(`Function ${trimmed} not defined`);
     } else {
       const typePrefix = func.type === 'static' ? '' : func.type + ' ';
       const separator = func.type === 'js' ? ' {' : ' => ';
       const suffix = func.type === 'js' ? ' }' : '';
-      agent.infoMessage(`${typePrefix}${trimmed}(${func.params.map(p => "$" + p).join(", ")})${separator}${func.type === 'native' ? '...native function' : func.body}${suffix}`);
+      return `${typePrefix}${trimmed}(${func.params.map(p => "$" + p).join(", ")})${separator}${func.type === 'native' ? '...native function' : func.body}${suffix}`;
     }
-    return;
   }
 
   const localFuncs = Array.from(context.functions.entries());
   const globalFuncs = scriptingService?.listFunctions() || [];
 
   if (localFuncs.length === 0 && globalFuncs.length === 0) {
-    agent.infoMessage("No functions defined");
-    return;
+    return "No functions defined";
   }
 
   const lines: string[] = [];
@@ -66,7 +64,7 @@ async function execute(remainder: string, agent: Agent) {
     );
   }
 
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 const help: string = `# /funcs [name]

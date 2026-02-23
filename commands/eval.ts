@@ -1,17 +1,17 @@
 import {AgentCommandService} from "@tokenring-ai/agent";
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/eval - Interpolate variables and execute a command";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
   const agentCommandService = agent.requireServiceByType(AgentCommandService);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /eval <command with $vars>");
-    return;
+    throw new CommandFailedError("Usage: /eval <command with $vars>");
   }
 
   // Interpolate variables (e.g., /echo $var -> /echo actual_value)
@@ -20,6 +20,7 @@ async function execute(remainder: string, agent: Agent) {
   // Execute the resulting command
   await agentCommandService.executeAgentCommand(agent, interpolatedCommand);
 
+  return "Command executed";
 }
 
 const help: string = `# /eval <command>

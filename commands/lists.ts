@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/lists - List all lists or show specific list";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   const listName = remainder?.trim().replace(/^@/, "");
@@ -13,24 +14,22 @@ async function execute(remainder: string, agent: Agent) {
   if (listName) {
     const list = context.getList(listName);
     if (!list) {
-      agent.errorMessage(`List @${listName} not defined`);
+      throw new CommandFailedError(`List @${listName} not defined`);
     } else {
-      agent.infoMessage(`@${listName} = [${list.map(item => `"${item}"`).join(", ")}]`);
+      return `@${listName} = [${list.map(item => `"${item}"`).join(", ")}]`;
     }
-    return;
   }
 
   const lists = Array.from(context.lists.entries());
   if (lists.length === 0) {
-    agent.infoMessage("No lists defined");
-    return;
+    return "No lists defined";
   }
 
   const lines: string[] = [
     "Defined lists:",
     markdownList(lists.map(([name, items]) => `@${name} = [${items.length} items]`))
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 const help: string = `# /lists [@name]

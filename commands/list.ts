@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../ScriptingService.ts";
@@ -7,22 +8,21 @@ import {parseArguments} from "../utils/parseArguments.ts";
 
 const description = "/list - Define or assign lists";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    showHelp(agent);
-    return;
+    return showHelp();
   }
 
   // Check for function call syntax: @name = functionName("arg1", "arg2")
-  const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
+  const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)$/s);
   if (funcMatch) {
     const [, listName, funcName, argsStr] = funcMatch;
     const scriptingService = agent.requireServiceByType(ScriptingService);
 
     const args = parseArguments(argsStr).map(a => {
-      const unquoted = a.match(/^["'](.*)["']$/);
+      const unquoted = a.match(/^["'](.*)['"']$/);
       return unquoted ? unquoted[1] : context.interpolate(a);
     });
 
@@ -32,31 +32,27 @@ async function execute(remainder: string, agent: Agent) {
 
       // Check for name conflict with variables
       if (context.variables.has(listName)) {
-        agent.errorMessage(`Name '${listName}' already exists as a variable ($${listName})`);
-        return;
+        throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
       }
 
       context.setList(listName, items);
-      agent.infoMessage(`List @${listName} = [${items.length} items]`);
+      return `List @${listName} = [${items.length} items]`;
     } catch (error) {
-      agent.errorMessage(error instanceof Error ? error.message : String(error));
+      throw new CommandFailedError(error instanceof Error ? error.message : String(error));
     }
-    return;
   }
 
   // Check for array literal syntax: @name = ["item1", "item2"]
   const match = remainder.match(/^@(\w+)\s*=\s*\[(.+)\]$/s);
   if (!match) {
-    agent.errorMessage("Invalid syntax. Use: /list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\")");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\")");
   }
 
   const [, listName, itemsStr] = match;
 
   // Check for name conflict with variables
   if (context.variables.has(listName)) {
-    agent.errorMessage(`Name '${listName}' already exists as a variable ($${listName})`);
-    return;
+    throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
   }
 
   const items = parseArguments(itemsStr).map(item => {
@@ -65,10 +61,10 @@ async function execute(remainder: string, agent: Agent) {
   });
 
   context.setList(listName, items);
-  agent.infoMessage(`List @${listName} = [${items.length} items]`);
+  return `List @${listName} = [${items.length} items]`;
 }
 
-function showHelp(agent: Agent) {
+function showHelp(): string {
   const lines: string[] = [
     "List Command Usage:",
     indent([
@@ -77,7 +73,7 @@ function showHelp(agent: Agent) {
       '/list @name = functionName("arg") - List from function call'
     ], 1)
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 const help: string = `# /list @name = ["item1", "item2"]

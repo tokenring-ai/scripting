@@ -1,11 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/vars - List all variables or show specific variable";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
 
   const context = agent.getState(ScriptingContext);
 
@@ -13,8 +14,7 @@ async function execute(remainder: string, agent: Agent) {
 
   if (trimmed === "clear") {
     context.variables.clear();
-    agent.infoMessage("All variables cleared");
-    return;
+    return "All variables cleared";
   }
 
   const varName = trimmed?.replace(/^\$/, "");
@@ -22,17 +22,15 @@ async function execute(remainder: string, agent: Agent) {
   if (varName) {
     const value = context.getVariable(varName);
     if (value === undefined) {
-      agent.errorMessage(`Variable $${varName} not defined`);
+      throw new CommandFailedError(`Variable $${varName} not defined`);
     } else {
-      agent.infoMessage(`$${varName} = ${value}`);
+      return `$${varName} = ${value}`;
     }
-    return;
   }
 
   const vars = Array.from(context.variables.entries());
   if (vars.length === 0) {
-    agent.infoMessage("No variables defined");
-    return;
+    return "No variables defined";
   }
 
   const lines: string[] = [
@@ -42,7 +40,7 @@ async function execute(remainder: string, agent: Agent) {
       return `$${name} = ${preview}`
     }))
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 const help: string = `# /vars [$name]

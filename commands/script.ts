@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
@@ -6,35 +7,29 @@ import ScriptingService from "../ScriptingService.ts";
 
 const description = "/script - Run predefined chat command scripts";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
 
   const args = remainder?.trim().split(/\s+/);
   const subCommand = args?.[0]?.toLowerCase();
 
   if (!subCommand) {
-    showHelp(agent);
-    return;
+    return showHelp();
   }
 
   switch (subCommand) {
     case "list":
-      listScripts(scriptingService, agent);
-      break;
+      return listScripts(scriptingService);
     case "run":
-      await runScript(args.slice(1), scriptingService, agent);
-      break;
+      return await runScript(args.slice(1), scriptingService, agent);
     case "info":
-      showScriptInfo(args[1], scriptingService, agent);
-      break;
+      return showScriptInfo(args[1], scriptingService);
     default:
-      agent.infoMessage(`Unknown subcommand: ${subCommand}`);
-      showHelp(agent);
-      break;
+      throw new CommandFailedError(`Unknown subcommand: ${subCommand}`);
   }
 }
 
-function showHelp(agent: Agent) {
+function showHelp(): string {
   const lines: string[] = [
     "Script Command Usage:",
     indent([
@@ -43,34 +38,31 @@ function showHelp(agent: Agent) {
       "/script info <scriptName> - Show information about a script"
     ], 1)
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
-function listScripts(scriptingService: ScriptingService, agent: Agent) {
+function listScripts(scriptingService: ScriptingService): string {
   const scripts = scriptingService.listScripts();
 
   if (scripts.length === 0) {
-    agent.infoMessage("No scripts available.");
-    return;
+    return "No scripts available.";
   }
 
   const lines: string[] = [
     "Available scripts:",
     markdownList(scripts)
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
-function showScriptInfo(scriptName: string | undefined, scriptingService: ScriptingService, agent: Agent) {
+function showScriptInfo(scriptName: string | undefined, scriptingService: ScriptingService): string {
   if (!scriptName) {
-    agent.infoMessage("Please provide a script name.");
-    return;
+    return "Please provide a script name.";
   }
 
   const script = scriptingService.getScriptByName(scriptName);
   if (!script) {
-    agent.infoMessage(`Script not found: ${scriptName}`);
-    return;
+    return `Script not found: ${scriptName}`;
   }
 
   const lines: string[] = [
@@ -78,23 +70,23 @@ function showScriptInfo(scriptName: string | undefined, scriptingService: Script
     "Usage:",
     indent(`/script run ${scriptName} <input>`, 1)
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 async function runScript(
   args: string[],
   scriptingService: ScriptingService,
   agent: Agent,
-) {
+): Promise<string> {
   if (!args || args.length < 1) {
-    agent.infoMessage("Please provide a script name.");
-    return;
+    return "Please provide a script name.";
   }
 
   const scriptName = args[0];
   const input = args.slice(1).join(" ");
 
   await scriptingService.runScript({scriptName, input: input || ""}, agent);
+  return "Script executed";
 }
 
 const help: string = `# /script - Manage and run predefined chat command scripts

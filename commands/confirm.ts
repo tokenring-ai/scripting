@@ -1,21 +1,20 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const description = "/confirm - Prompt user for yes/no confirmation";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /confirm $var \"message\"");
-    return;
+    throw new CommandFailedError("Usage: /confirm $var \"message\"");
   }
 
   const match = remainder.match(/^\$(\w+)\s+(.+)$/);
   if (!match) {
-    agent.errorMessage("Invalid syntax. Use: /confirm $var \"message\"");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /confirm $var \"message\"");
   }
 
   const [, varName, messageExpr] = match;
@@ -29,7 +28,7 @@ async function execute(remainder: string, agent: Agent) {
   const result = confirmed ? 'yes' : 'no';
 
   context.setVariable(varName, result);
-  agent.infoMessage(`Variable $${varName} = ${result}`);
+  return `Variable $${varName} = ${result}`;
 }
 
 const help: string = `# /confirm $var "message"

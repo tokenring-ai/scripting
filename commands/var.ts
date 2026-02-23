@@ -1,7 +1,8 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
+import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
@@ -9,13 +10,12 @@ import {parseArguments} from "../utils/parseArguments.ts";
 
 const description = "/var - Define or assign variables";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
 
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    showHelp(agent);
-    return;
+    return showHelp();
   }
 
   const deleteMatch = remainder.match(/^delete\s+\$(\w+)$/);
@@ -23,33 +23,30 @@ async function execute(remainder: string, agent: Agent) {
     const varName = deleteMatch[1];
     if (context.variables.has(varName)) {
       context.variables.delete(varName);
-      agent.infoMessage(`Variable $${varName} deleted`);
+      return `Variable $${varName} deleted`;
     } else {
-      agent.errorMessage(`Variable $${varName} not defined`);
+      throw new CommandFailedError(`Variable $${varName} not defined`);
     }
-    return;
   }
 
   const match = remainder.match(/^\$(\w+)\s*=\s*(.+)$/);
   if (!match) {
-    agent.errorMessage("Invalid syntax. Use: /var $name = value");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /var $name = value");
   }
 
   const [, varName, expression] = match;
 
   // Check for name conflict with lists
   if (context.lists.has(varName)) {
-    agent.errorMessage(`Name '${varName}' already exists as a list (@${varName})`);
-    return;
+    throw new CommandFailedError(`Name '${varName}' already exists as a list (@${varName})`);
   }
 
   try {
     const value = await evaluateExpression(expression.trim(), context, agent);
     context.setVariable(varName, value);
-    agent.infoMessage(`Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`);
+    return `Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`;
   } catch (error) {
-    agent.errorMessage(error instanceof Error ? error.message : String(error));
+    throw new CommandFailedError(error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -85,7 +82,7 @@ async function evaluateExpression(expr: string, context: ScriptingContext, agent
   return context.interpolate(unquoted ? unquoted[1] : expr);
 }
 
-function showHelp(agent: Agent) {
+function showHelp(): string {
   const lines: string[] = [
     "Variable Command Usage:",
     indent([
@@ -94,7 +91,7 @@ function showHelp(agent: Agent) {
       '/var $name = functionName("arg1", "arg2") - Call function'
     ], 1)
   ];
-  agent.infoMessage(lines.join("\n"));
+  return lines.join("\n");
 }
 
 const help: string = `# /var $name = value

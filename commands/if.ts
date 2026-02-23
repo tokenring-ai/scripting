@@ -1,4 +1,5 @@
 import Agent from "@tokenring-ai/agent/Agent";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
@@ -6,26 +7,23 @@ import {executeBlock} from "../utils/executeBlock.ts";
 
 const description = "/if - Conditional execution";
 
-async function execute(remainder: string, agent: Agent) {
+async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);
 
   if (!remainder?.trim()) {
-    agent.errorMessage("Usage: /if $condition { commands } [else { commands }]");
-    return;
+    throw new CommandFailedError("Usage: /if $condition { commands } [else { commands }]");
   }
 
   const prefixMatch = remainder.match(/^\$(\w+)\s*/);
   if (!prefixMatch) {
-    agent.errorMessage("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
-    return;
+    throw new CommandFailedError("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
   }
 
   const [prefix, conditionVar] = prefixMatch;
   const thenBlock = extractBlock(remainder, prefix.length);
 
   if (!thenBlock) {
-    agent.errorMessage("Missing then block { commands }");
-    return;
+    throw new CommandFailedError("Missing then block { commands }");
   }
 
   const conditionValue = context.getVariable(conditionVar);
@@ -44,17 +42,18 @@ async function execute(remainder: string, agent: Agent) {
     if (elseMatch) {
       const elseBlock = extractBlock(remainder, thenBlock.endPos + elseMatch[0].length);
       if (!elseBlock) {
-        agent.errorMessage("Invalid else block");
-        return;
+        throw new CommandFailedError("Invalid else block");
       }
       body = elseBlock.content;
     } else {
-      return; // No else block and condition is false
+      return "Condition was false, no else block";
     }
   }
 
   const commands = parseBlock(body);
   await executeBlock(commands, agent);
+
+  return "If statement completed";
 }
 
 const help: string = `# /if $condition { commands } [else { commands }]
