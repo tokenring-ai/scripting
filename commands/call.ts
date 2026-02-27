@@ -49,6 +49,7 @@ Call a function and display its output
 `;
 
 export default {
+  name: "call",
   description,
   execute,
   help,

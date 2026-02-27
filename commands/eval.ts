@@ -35,6 +35,7 @@ Interpolates variables in the command string and then executes it.
 `;
 
 export default {
+  name: "eval",
   description,
   execute,
   help,

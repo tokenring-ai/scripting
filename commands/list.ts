@@ -102,6 +102,7 @@ Define or assign lists with various content sources
 - Lists persist across script executions
 - Items can be quoted strings or interpolated variables`;
 export default {
+  name: "list",
   description,
   execute,
   help,

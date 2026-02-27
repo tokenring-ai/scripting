@@ -120,6 +120,7 @@ Define or assign variables with various value types
 - Names cannot conflict with existing lists (prefixed with @)
 - Use /vars to view all variables`;
 export default {
+  name: "var",
   description,
   execute,
   help,

@@ -112,6 +112,7 @@ Define reusable functions with different execution types
 - Use /funcs to view all defined functions
 - Local functions are specific to current context`;
 export default {
+  name: "func",
   description,
   execute,
   help,

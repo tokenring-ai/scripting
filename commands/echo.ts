@@ -26,6 +26,7 @@ Display text or variable value without LLM processing
 `;
 
 export default {
+  name: "echo",
   description,
   execute,
   help,

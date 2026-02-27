@@ -90,6 +90,7 @@ Execute commands conditionally based on variable truthiness
 - Use /var to set condition variables before if statements
 - Else blocks are optional`;
 export default {
+  name: "if",
   description,
   execute,
   help,

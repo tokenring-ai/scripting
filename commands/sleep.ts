@@ -47,6 +47,7 @@ Pause script execution for a specified number of seconds
 - Maximum sleep duration is not explicitly limited
 - Useful for rate limiting or delays in automation`;
 export default {
+  name: "sleep",
   description,
   execute,
   help,

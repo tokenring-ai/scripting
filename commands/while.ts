@@ -80,6 +80,7 @@ Execute commands repeatedly while a condition variable remains truthy
 - Maximum 1000 iterations to prevent infinite loops
 - Use /var $condition = no to break the loop`;
 export default {
+  name: "while",
   description,
   execute,
   help,

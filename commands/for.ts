@@ -68,6 +68,7 @@ Iterate over lists
 **Note:** Separate multiple commands with semicolons or newlines`;
 
 export default {
+  name: "for",
   description,
   execute,
   help,

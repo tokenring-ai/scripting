@@ -98,6 +98,7 @@ List all functions (local and global) or show specific function definition
 - Function definitions show parameter lists and return types
 - Native functions show '...native function' as body`;
 export default {
+  name: "funcs",
   description,
   execute,
   help,

@@ -1,3 +1,4 @@
+import type {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import call from "./commands/call.ts";
 import confirm from "./commands/confirm.ts";
 import echo from "./commands/echo.ts";
@@ -15,9 +16,9 @@ import varCommand from "./commands/var.ts";
 import vars from "./commands/vars.ts";
 import whileCommand from "./commands/while.ts";
 
-export default {
+export default [
   script,
-  var: varCommand,
+  varCommand,
   func,
   vars,
   funcs,
@@ -28,8 +29,8 @@ export default {
   confirm,
   list,
   lists,
-  if: ifCommand,
-  for: forCommand,
-  while: whileCommand,
-  eval: evalCommand,
-};
+  ifCommand,
+  forCommand,
+  whileCommand,
+  evalCommand,
+] satisfies TokenRingAgentCommand[];

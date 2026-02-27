@@ -55,6 +55,7 @@ List all lists or show specific list contents
 - List contents are displayed as JSON-like arrays
 - Lists persist across script executions`;
 export default {
+  name: "lists",
   description,
   execute,
   help,

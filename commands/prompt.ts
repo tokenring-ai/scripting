@@ -56,6 +56,7 @@ Prompt the user for input and store the response in a variable
 - Script pauses until user provides input
 - Input can be any text including special characters`;
 export default {
+  name: "prompt",
   description,
   execute,
   help,

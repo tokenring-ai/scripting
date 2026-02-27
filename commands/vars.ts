@@ -65,6 +65,7 @@ List all variables or show specific variable value
 - Use /var to create or modify variables
 - Variables persist across script executions`;
 export default {
+  name: "vars",
   description,
   execute,
   help,

@@ -112,6 +112,7 @@ const help: string = `# /script - Manage and run predefined chat command scripts
 - Use /script list to see what's available
 - Scripts run in the current context with existing variables`;
 export default {
+  name: "script",
   description,
   execute,
   help,

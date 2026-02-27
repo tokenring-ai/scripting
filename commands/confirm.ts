@@ -43,6 +43,7 @@ Prompt user for yes/no confirmation
 `;
 
 export default {
+  name: "confirm",
   description,
   execute,
   help,
