@@ -114,7 +114,7 @@ export default class ScriptingService implements TokenRingService {
         const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
         const chatService = agent.requireServiceByType(ChatService);
         const chatConfig = chatService.getChatConfig(agent);
-        const response = await runChat(prompt, chatConfig, agent);
+        const response = await runChat({ input: prompt, chatConfig, agent});
         if (! response.text) {
           throw new Error(`AI Chat did not produce any text for prompt: ${prompt}`);
         }
