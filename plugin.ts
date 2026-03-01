@@ -37,7 +37,9 @@ export default {
           const res = await runSubAgent({
             agentType: agentType,
             headless: this.agent.headless,
-            command: `/work ${message}\n\nImportant Context:\n${context}`,
+            input: {
+              message: `/work ${message}\n\nImportant Context:\n${context}`,
+            }
           }, this.agent, true);
 
           if (res.status === 'success') {
