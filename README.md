@@ -1,23 +1,10 @@
 # @tokenring-ai/scripting
 
+Comprehensive scripting language with variables, functions, and LLM integration for automating workflows and chat command sequences.
+
 ## Overview
 
-The TokenRing AI Scripting package provides a lightweight scripting language for automating workflows with variables, functions, lists, and LLM integration. It enables users to create dynamic, reusable command sequences with conditional execution, loops, and interactive prompts.
-
-## Features
-
-- **Scripting Language**: Define and run predefined scripts consisting of chat command sequences
-- **Variables**: Create and manage variables with static values, LLM responses, or function results
-- **Functions**: Define static, LLM, or JavaScript functions with parameters
-- **Lists**: Work with arrays of strings for iteration and processing
-- **Control Flow**: Conditional execution with `/if`, iteration with `/for`, and loops with `/while`
-- **Interactive Prompts**: Collect user input with `/prompt` and `/confirm`
-- **Execution Control**: Pause execution with `/sleep` and evaluate expressions with `/eval`
-- **Native Integration**: Built-in `runAgent` function for running sub-agents
-- **Tool Integration**: Use the `script_run` tool with AI agents
-- **Context Handlers**: Custom context handlers for available scripts
-- **Block Parsing**: Robust block parsing for nested structures
-- **Argument Parsing**: Smart argument parsing respecting quotes and nested structures
+The TokenRing AI Scripting package provides a powerful scripting language for automating workflows, managing variables, defining functions, and integrating with AI models. It supports script execution, control flow (conditionals, loops), variables, lists, and dynamic function execution with support for static, JavaScript, and LLM-powered functions.
 
 ## Installation
 
@@ -25,264 +12,411 @@ The TokenRing AI Scripting package provides a lightweight scripting language for
 bun add @tokenring-ai/scripting
 ```
 
-## Core Components
+## Features
+
+- **Script Management**: Run predefined sequences of chat commands
+- **Scripting Language**: Comprehensive language with variables, functions, and control flow
+- **Variable Interpolation**: Dynamic substitution of variables (`$var`) and lists (`@list`) in text
+- **Function Types**: Static, JavaScript, LLM-powered, and native functions
+- **Control Flow**: Conditionals (`/if`), loops (`/for`, `/while`), and interactive commands
+- **Interactive Commands**: Prompts, confirmations, and user input
+- **State Management**: Persistent variables, lists, and functions across chat sessions
+- **Global Functions**: Register functions available to all scripting contexts
+- **Context Handlers**: Available scripts context for AI assistance
+- **Native Agent Integration**: Built-in `runAgent` function for subagent execution
+- **Block Parsing**: Support for nested blocks with balanced brace parsing
+- **Argument Parsing**: Smart argument parsing that respects quotes and nested structures
+
+## Core Components/API
 
 ### ScriptingService
 
-The `ScriptingService` manages scripts and functions, providing operations for registration and execution:
+Manages and executes scripts, variables, functions, and scripting language features. Implements the `TokenRingService` interface.
+
+**Properties:**
+- `name: "ScriptingService"` - Service identifier
+- `description` - Service description
+- `scripts` - Registry of predefined scripts (KeyedRegistry)
+- `functions` - Registry of global functions (KeyedRegistry)
+
+**Key Methods:**
 
 ```typescript
-// Register a script
-scriptingService.scripts.register(name, parsedCommands);
+// Register a global function
+scriptingService.registerFunction(name, func);
 
-// List all scripts
-scriptingService.listScripts(); // Returns string[]
-
-// Get a script by name
-scriptingService.getScriptByName(name); // Returns string[]
-
-// Run a script with input
-await scriptingService.runScript({scriptName, input}, agent);
-
-// Resolve a function by name (checking both local and global)
-scriptingService.resolveFunction(name, agent);
+// Resolve function from local or global registry
+const func = scriptingService.resolveFunction(name, agent);
 
 // Execute a function with arguments
-await scriptingService.executeFunction(funcName, args, agent);
+const result = await scriptingService.executeFunction(funcName, args, agent);
+
+// Run a script with input
+const result = await scriptingService.runScript({scriptName, input}, agent);
+
+// Get script by name
+const script = scriptingService.getScriptByName(name);
+
+// List all scripts
+const scripts = scriptingService.listScripts();
+
+// Get function by name
+const func = scriptingService.getFunction(name);
+
+// List all functions
+const functions = scriptingService.listFunctions();
 ```
 
-#### ScriptingService Methods
-
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `registerFunction` | `name`, `functionDef` | `void` | Register a global function |
-| `getFunction` | `name` | `ScriptFunction \| undefined` | Get a global function by name |
-| `listFunctions` | None | `string[]` | List all global function names |
-| `resolveFunction` | `name`, `agent` | `ScriptFunction \| undefined` | Resolve function from local or global registry |
-| `executeFunction` | `funcName`, `args`, `agent` | `Promise<string \| string[]>` | Execute a function with arguments |
-| `runScript` | `{scriptName, input}`, `agent` | `Promise<ScriptResult>` | Run a script with input |
+**Function Types:**
+- `static` - Returns fixed text with variable interpolation
+- `js` - JavaScript functions with access to agent context
+- `llm` - LLM-powered functions with prompts
+- `native` - Native function implementations (e.g., `runAgent`)
 
 ### ScriptingContext
 
-The `ScriptingContext` manages state within an agent session:
+Manages state for scripting including variables, lists, and functions. Implements `AgentStateSlice` for persistence.
+
+**Properties:**
+- `name: "ScriptingContext"` - State slice identifier
+- `variables: Map<string, string>` - Variable storage
+- `lists: Map<string, string[]>` - List storage
+- `functions: Map<string, Function>` - Local function storage
+
+**Key Methods:**
 
 ```typescript
-// Variables (prefixed with $)
-context.setVariable('name', 'value');
-context.getVariable('name');
+// Set/get variables
+context.setVariable(name, value);
+const value = context.getVariable(name);
 
-// Lists (prefixed with @)
-context.setList('items', ['a', 'b', 'c']);
-context.getList('items');
+// Set/get lists
+context.setList(name, value);
+const list = context.getList(name);
 
-// Functions (local and global)
-context.defineFunction('greet', 'static', ['name'], '"Hello, $name!"');
-context.getFunction('name');
+// Define/get local functions
+context.defineFunction(name, type, params, body);
+const func = context.getFunction(name);
 
-// Variable interpolation
-context.interpolate('Hello, $name'); // Returns interpolated string
+// Interpolate variables and lists in text
+const text = context.interpolate("Hello, $name! @items");
 
-// Debug output
-context.show(): string[]; // Returns formatted string with all state
+// Serialize/deserialize state
+const serialized = context.serialize();
+context.deserialize(serialized);
 
-// State persistence
-context.serialize(): z.output<typeof serializationSchema>;
-context.deserialize(data: z.output<typeof serializationSchema>): void;
+// Reset state
+context.reset(["chat"]);
 ```
 
-#### ScriptingContext Methods
+### Chat Commands
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `setVariable` | `name`, `value` | `void` | Set a variable value |
-| `getVariable` | `name` | `string \| undefined` | Get a variable value |
-| `setList` | `name`, `value` | `void` | Set a list value |
-| `getList` | `name` | `string[] \| undefined` | Get a list value |
-| `defineFunction` | `name`, `type`, `params`, `body` | `void` | Define a local function |
-| `getFunction` | `name` | `{ type, params, body } \| undefined` | Get a local function |
-| `interpolate` | `text` | `string` | Interpolate variables and lists in text |
-| `show` | None | `string[]` | Get formatted state information |
-| `serialize` | None | `SerializedState` | Serialize state for persistence |
-| `deserialize` | `data` | `void` | Restore state from serialization |
+#### Script Management
+
+- `/script list` - Lists all available scripts
+- `/script run <scriptName> [input]` - Runs the specified script with optional input
+- `/script info <scriptName>` - Shows information about a script
+
+#### Variable Commands
+
+- `/var $name = value` - Define or update a variable
+- `/var delete $name` - Delete a variable
+- `/vars [$name]` - List all variables or show specific
+- `/vars clear` - Clear all variables
+
+#### Function Commands
+
+- `/func static name($param1) => "text"` - Define static function
+- `/func llm name($param1) => "prompt"` - Define LLM function
+- `/func js name($param1) { code }` - Define JavaScript function
+- `/func delete name` - Delete a function
+- `/funcs [name]` - List all functions (local and global)
+- `/funcs clear` - Clear all local functions
+
+#### Function Execution
+
+- `/call functionName("arg1", "arg2")` - Call a function with arguments and display output
+
+#### List Commands
+
+- `/list @name = ["item1", "item2"]` - Define a static list
+- `/list @name = [$var1, $var2]` - Define list from variables
+- `/list @name = functionName("arg")` - Define list from function results
+- `/lists [@name]` - List all lists or show specific contents
+
+#### Output and Control
+
+- `/echo <text|$var>` - Display text or variable value without LLM processing
+- `/sleep <seconds|$var>` - Sleep for specified seconds
+- `/prompt $var "message"` - Prompt user for text input
+- `/confirm $var "message"` - Prompt for yes/no confirmation
+
+#### Control Flow
+
+- `/if $condition { commands } [else { commands }]` - Conditional execution
+- `/for $item in @list { commands }` - Iterate over lists
+- `/while $condition { commands }` - Execute while condition is truthy
+
+#### Evaluation
+
+- `/eval <command with $vars>` - Interpolates variables in the command string and then executes it
 
 ### Context Handlers
 
-The package provides custom context handlers for enhanced functionality:
-
-- **available-scripts**: Returns a list of all available scripts
-
-Context handlers are registered in the plugin and used by the chat service to provide dynamic information to the LLM.
-
-## Chat Commands
-
-### Script Management
-
-- `/script list` - List all available scripts
-- `/script run <name> [input]` - Run a script with optional input
-- `/script info <name>` - Show information about a script
-
-### Variable Management
-
-- `/var $name = "value"` - Define variable with static value
-- `/var $name = llm("prompt")` - Define variable with LLM response
-- `/var $name = functionName("arg")` - Define variable with function result
-- `/var delete $name` - Delete a variable
-- `/vars` - List all variables
-- `/vars $name` - Show specific variable value
-- `/vars clear` - Clear all variables
-
-### Function Management
-
-- `/func static name($param) => "text"` - Define static function
-- `/func llm name($param) => "prompt"` - Define LLM function
-- `/func js name($param) { return result; }` - Define JavaScript function
-- `/func delete name` - Delete a function
-- `/funcs` - List all functions
-- `/funcs name` - Show specific function definition
-- `/funcs clear` - Clear all local functions
-
-### List Management
-
-- `/list @name = ["item1", "item2"]` - Define static list
-- `/list @name = [$var1, $var2]` - Define list from variables
-- `/list @name = functionName("arg")` - Define list from function results
-- `/lists` - List all lists
-- `/lists @name` - Show specific list contents
-
-### Control Flow
-
-- `/echo <text|$var>` - Display text without LLM processing
-- `/sleep <seconds|$var>` - Pause execution for specified time
-- `/prompt $var "message"` - Prompt user for input
-- `/confirm $var "message"` - Prompt for yes/no confirmation
-- `/eval <command>` - Interpolate variables and execute command
-- `/if $condition { commands } [else { commands }]` - Conditional execution
-- `/for $item in @list { commands }` - Iterate over list items
-- `/while $condition { commands }` - Execute while condition is truthy
-- `/call functionName("arg1", "arg2")` - Call function and display output
+- `available-scripts` - Provides context about available scripts for AI assistance
 
 ## Usage Examples
 
-### Basic Variables
+### Basic Variables and Functions
 
 ```bash
+# Define variables
 /var $name = "Alice"
 /var $topic = "AI safety"
-/var $summary = llm("Summarize key points about $topic")
-```
 
-### Functions
-
-```bash
+# Define and use functions
 /func static greet($name) => "Hello, $name!"
-/func llm analyze($text) => "Analyze this: $text"
-/func js wordCount($text) { return $text.split(/\s+/).length; }
+/func llm summary($text) => "Summarize: $text"
+/func js currentDate() { return new Date().toISOString() }
+
+# Use functions
+/var $greeting = greet($name)
+/var $summary = summary($topic)
+
+# Display results
+/echo $name says: $summary
+/echo Current date: $currentDate
 ```
 
 ### Lists and Iteration
 
 ```bash
+# Define lists
 /list @files = ["file1.txt", "file2.txt", "file3.txt"]
+/list @tasks = ["review", "test", "deploy"]
+
+# Iterate over lists
 /for $file in @files {
   /echo Processing $file
+  /sleep 1
+}
+
+/for $task in @tasks {
+  /if $task == "test" {
+    /echo Running tests...
+    /sleep 2
+  } else {
+    /echo Processing $task...
+    /sleep 1
+  }
 }
 ```
 
-### Conditionals and Loops
+### Interactive Workflows
 
 ```bash
-/confirm $proceed "Continue?"
+# Interactive prompts
+/prompt $username "Enter your name:"
+/confirm $proceed "Continue with operation? [y/n]"
+
+# Conditional execution based on user input
 /if $proceed {
-  /echo Continuing with operation...
+  /echo Starting workflow...
+  /script run setupProject $username
 } else {
-  /echo Operation cancelled
+  /echo Operation cancelled.
+}
+```
+
+### LLM-Powered Functions
+
+```bash
+# LLM-powered functions
+/func llm analyze($text) => "Analyze the sentiment of this text: $text"
+
+# Use LLM functions
+/var $sentiment = analyze("I love this product!")
+
+/echo Analysis: $sentiment
+```
+
+### JavaScript Functions
+
+```bash
+# JavaScript functions
+/func js wordCount($text) { 
+  return $text.split(/\s+/).length; 
 }
 
-/var $count = 1
-/while $count <= 5 {
+# Use JavaScript functions
+/var $count = wordCount("Hello world from TokenRing")
+
+/echo Word count: $count
+```
+
+### Script Execution
+
+```bash
+# Define a script (in configuration)
+# scripts: {
+#   setupProject: [
+#     "/agent switch writer",
+#     "/template run projectSetup ${input}",
+#     "/tools enable filesystem",
+#     "/agent switch publisher"
+#   ]
+# }
+
+# Run the script
+/script run setupProject "MyAwesomeProject"
+```
+
+### Calling Native Functions
+
+```bash
+# Execute a subagent using the runAgent function
+/var $result = runAgent("writer", "Generate a summary of the latest AI trends", "Recent breakthroughs in neural networks")
+/echo Sub-agent result: $result
+```
+
+### Control Flow Examples
+
+```bash
+# While loop with counter
+/var $count = "0"
+/while $count < "5" {
   /echo Count: $count
   /var $count = $count + 1
+  /sleep 1
+}
+
+# Complex conditional
+/if $username && $proceed {
+  /echo Welcome $username! Let's proceed with the setup.
+  /script run complexSetup $username
+} else if $username {
+  /echo Welcome back, $username! Please confirm to proceed.
+  /confirm $proceed "Proceed with setup?"
+} else {
+  /echo Please provide your username first.
 }
 ```
 
-### Running Scripts
+## Configuration
 
-```bash
-/script list
-/script run setupProject "MyProject"
-/script info setupProject
-```
-
-### Context Handlers
-
-Context handlers provide dynamic information to the LLM:
+Scripts are configured in your application config file:
 
 ```typescript
-// Available scripts context handler
-// Returns list of all available scripts
-// Used by LLM to understand what scripts are available
-```
-
-## Tools
-
-### script_run
-
-Run a script with the given input. Scripts are predefined sequences of chat commands.
-
-```typescript
-const result = await agent.useTool("script_run", {
-  scriptName: "setupProject",
-  input: "MyProject"
-});
-```
-
-**Parameters:**
-- `scriptName` (string): The name of the script to run
-- `input` (string): The input to pass to the script
-
-**Returns:**
-- `ok` (boolean): Whether the script completed successfully
-- `output` (string, optional): Script output on success
-- `error` (string, optional): Error message on failure
-
-## Plugin Configuration
-
-Configure scripts in your application:
-
-```typescript
-import packageConfigSchema from "@tokenring-ai/scripting";
+import type {ScriptingServiceConfigSchema} from "@tokenring-ai/scripting";
 
 export default {
   scripting: {
     setupProject: [
-      "/agent switch writer",
-      "/template run createOutline ${input}",
-      "/agent switch editor",
-      "/tools enable editing"
+      `/agent switch writer`,
+      `/template run projectSetup ${input}`,
+      `/tools enable filesystem`,
+      `/agent switch publisher`
     ],
     publishWorkflow: [
-      "/agent switch editor",
-      "/template run review filename",
-      "/agent switch publisher"
+      `/agent switch publisher`,
+      `/publish ${input}`,
+      `/notify "Published successfully"`
     ]
   }
-} satisfies typeof packageConfigSchema;
+} satisfies typeof ScriptingServiceConfigSchema;
 ```
 
 Scripts can be defined as:
 - Arrays of command strings
 - Single strings with commands separated by newlines or semicolons
-- Functions returning command arrays
+
+## Integration
+
+### Plugin Registration
+
+```typescript
+import scriptingPlugin from "@tokenring-ai/scripting/plugin";
+
+app.install(scriptingPlugin, {
+  scripting: {
+    // Script configurations
+  }
+});
+```
+
+### Service Registration
+
+The package automatically registers `ScriptingService`:
+
+```typescript
+const scriptingService = new ScriptingService(config.scripting ?? {});
+app.addServices(scriptingService);
+
+// Register function with the service
+scriptingService.registerFunction("runAgent", {
+  type: 'native',
+  params: ['agentType', 'message', 'context'],
+  async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
+    // Implementation
+  }
+});
+```
+
+### Tool Registration
+
+The package registers the `script_run` tool:
+
+```typescript
+chatService.addTools([
+  {
+    name: "script_run",
+    description: "Run a script with the given input",
+    inputSchema: z.object({
+      scriptName: z.string(),
+      input: z.string()
+    }),
+    execute: async ({scriptName, input}, agent) => {
+      const scriptingService = agent.requireServiceByType(ScriptingService);
+      return await scriptingService.runScript({scriptName, input}, agent);
+    }
+  }
+]);
+```
+
+### Context Handler Registration
+
+The package registers context handlers:
+
+```typescript
+chatService.registerContextHandlers({
+  'available-scripts': async function* getContextItems({agent}) {
+    const scriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptNames = scriptingService.listScripts();
+    
+    if (scriptNames.length > 0) {
+      yield {
+        role: "user",
+        content: `Available scripts:\n` +
+          scriptNames.map(name => `- ${name}`).join("\n")
+      };
+    }
+  }
+});
+```
+
+## RPC Endpoints
+
+The scripting package does not define direct RPC endpoints. Instead, it provides:
+
+- **Chat Commands**: Available via the `AgentCommandService`
+- **Tools**: Available via the `ChatService`
+- **Functions**: Available through the `ScriptingService`
 
 ## State Management
 
 The scripting package uses `ScriptingContext` for state persistence:
 
-- Variables, lists, and functions persist across script executions
-- State is cleared when the chat is reset
-- State can be serialized and restored for persistence
-
-### State Schema
+### State Slice
 
 ```typescript
 interface ScriptingContext {
@@ -292,32 +426,36 @@ interface ScriptingContext {
 }
 ```
 
-### State Serialization
+### Persistence
 
-The context supports serialization and deserialization:
+State is automatically persisted and restored:
 
 ```typescript
-// Serialize state
+// State is initialized when agent attaches to service
+agent.initializeState(ScriptingContext, {});
+
+// State is serialized for checkpointing
 const serialized = context.serialize();
 
-// Deserialize state
+// State is restored from checkpoint
 context.deserialize(serialized);
-```
 
-### State Reset
-
-State is automatically reset when the chat is reset:
-
-```typescript
-// Reset happens on chat reset
+// State is reset on chat reset
 context.reset(["chat"]);
 ```
+
+### Checkpoint Generation
+
+State checkpoints are generated automatically during:
+- Chat session persistence
+- Agent state serialization
+- Checkpoint-based recovery
 
 ## Native Functions
 
 ### runAgent
 
-Run a sub-agent with a specific message and context:
+The scripting package provides a built-in `runAgent` function for running subagents:
 
 ```typescript
 scriptingService.registerFunction("runAgent", {
@@ -325,9 +463,11 @@ scriptingService.registerFunction("runAgent", {
   params: ['agentType', 'message', 'context'],
   async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
     const res = await runSubAgent({
-      agentType,
+      agentType: agentType,
       headless: this.agent.headless,
-      command: `/work ${message}\n\nImportant Context:\n${context}`,
+      input: {
+        message: `/work ${message}\n\nImportant Context:\n${context}`,
+      }
     }, this.agent, true);
 
     if (res.status === 'success') {
@@ -340,130 +480,180 @@ scriptingService.registerFunction("runAgent", {
 ```
 
 **Parameters:**
-- `agentType` (string): The type of agent to run
-- `message` (string): The message to send to the agent
-- `context` (string): Additional context for the agent
+- `agentType` (string) - The type of agent to run
+- `message` (string) - The message to send to the agent
+- `context` (string) - Additional context for the agent
 
 **Returns:** The agent's response as a string
+
+**Throws:** Error if subagent execution fails
 
 ## Reserved Function Names
 
 The following names cannot be used for functions:
-`var`, `vars`, `func`, `funcs`, `call`, `echo`, `sleep`, `prompt`, `confirm`, `list`, `lists`, `if`, `for`, `while`, `script`
-
-## Integration with Agent System
-
-The package integrates with the Token Ring agent system by:
-
-1. **State Management**: Registers ScriptingContext as an agent state slice for persistence
-2. **Command Registration**: Registers chat commands with AgentCommandService
-3. **Service Registration**: Implements TokenRingService for integration with the app framework
-4. **Tool Registration**: Registers tools with ChatService
-5. **Context Handlers**: Registers context handlers with ChatService
-
-## Configuration Schema
-
-The plugin configuration uses Zod schema validation:
-
-```typescript
-const packageConfigSchema = z.object({
-  scripting: ScriptingServiceConfigSchema.default({})
-});
-
-const ScriptingServiceConfigSchema = z.record(z.string(), ScriptSchema);
-```
-
-## Scripting Language Features
-
-### Variable Interpolation
-
-Variables are automatically interpolated in strings using `$varName` syntax:
-
-```bash
-/var $name = "Alice"
-/var $greeting = "Hello, $name!"  # Result: "Hello, Alice!"
-```
-
-### List Interpolation
-
-Lists are interpolated using `@listName` syntax:
-
-```bash
-/list @colors = ["red", "green", "blue"]
-/echo Colors: @colors  # Result: "Colors: red, green, blue"
-```
-
-### Function Calls
-
-Functions can be called with arguments:
-
-```bash
-/func static greet($name) => "Hello, $name!"
-/var $message = greet("Alice")
-```
-
-### Block Parsing
-
-The package includes robust block parsing utilities:
-
-- `extractBlock(input, startPos)` - Extract a balanced block from input
-- `parseBlock(body)` - Parse block content into individual commands
-
-These utilities handle nested structures and string literals properly.
-
-### Argument Parsing
-
-The package includes smart argument parsing:
-
-- `parseArguments(argsStr)` - Parse function arguments respecting quotes and nested structures
-
-This utility handles complex argument strings with nested quotes and parentheses.
-
-### Script Parsing
-
-The package includes script parsing utilities:
-
-- `parseScript(script)` - Parse a script string into an array of command strings
-
-This utility handles multi-line scripts with blocks and semicolon terminators.
+- `var`, `vars`, `func`, `funcs`, `call`, `echo`, `sleep`, `prompt`, `confirm`, `list`, `lists`, `if`, `for`, `while`, `script`
 
 ## Error Handling
 
 The scripting system provides comprehensive error handling:
 
-- Invalid command syntax
-- Undefined variables or functions
-- Runtime execution errors
-- Infinite loop protection (max 1000 iterations for while loops)
-- Function argument validation
-- List and variable name conflicts
+- **Invalid command syntax**: Throws `CommandFailedError` with descriptive message
+- **Undefined variables**: Throws error when accessing undefined variable
+- **Undefined functions**: Throws error when calling undefined function
+- **Runtime execution errors**: Catches and reports JavaScript execution errors
+- **Infinite loop protection**: Maximum 1000 iterations for while loops
+- **Function argument validation**: Validates argument count matches parameter count
+- **List and variable name conflicts**: Prevents naming conflicts between variables and lists
+- **Unmatched braces**: Throws error for unbalanced block syntax
 
-## Development
+**Error Types:**
+- `CommandFailedError` - For command syntax and execution errors
+- `Error` - For function execution and runtime errors
 
-### Testing
+## Utility Functions
 
-The package includes Vitest configuration for testing:
+### parseArguments
 
-```bash
-bun run test
+Parses function arguments respecting quotes and nested structures:
+
+```typescript
+function parseArguments(argsStr: string): string[] {
+  // Handles quoted strings, nested parentheses, and escaped characters
+}
 ```
 
-### Building
-
-```bash
-bun run build
+**Examples:**
+```typescript
+parseArguments('"hello", "world"') // ['hello', 'world']
+parseArguments('arg1, (nested), arg3') // ['arg1', '(nested)', 'arg3']
 ```
 
-### Watch Mode
+### parseScript
 
-```bash
-bun run test:watch
+Parses script content into individual commands:
+
+```typescript
+function parseScript(script: string): string[] {
+  // Handles multi-line scripts, semicolon separators, and block structures
+}
 ```
 
-### Coverage
+**Examples:**
+```typescript
+parseScript('/echo hello; /echo world') // ['/echo hello', '/echo world']
+parseScript('/echo hello\n/echo world') // ['/echo hello', '/echo world']
+```
+
+### blockParser
+
+Provides block parsing utilities:
+
+- `extractBlock(input, startPos)` - Extracts a balanced block from input
+- `parseBlock(body)` - Parses block content into individual commands
+
+**Examples:**
+```typescript
+extractBlock('/if $cond { /echo true } else { /echo false }', 0)
+// { content: '/echo true } else { /echo false', endPos: 45 }
+
+parseBlock('/echo hello; /echo world') // ['/echo hello', '/echo world']
+```
+
+### executeBlock
+
+Executes a list of commands in the given agent context:
+
+```typescript
+async function executeBlock(commands: string[], agent: Agent): Promise<void> {
+  // Executes each command, handling both direct commands and interpolated text
+}
+```
+
+## Best Practices
+
+### Variable Naming
+
+- Use descriptive names: `$userName` instead of `$u`
+- Prefix variables with `$` when referencing
+- Use camelCase for multi-word names
+
+### Function Design
+
+- Keep functions focused on single responsibilities
+- Use descriptive function names
+- Document function purpose in comments
+- Test functions independently
+
+### Script Organization
+
+- Group related commands into scripts
+- Use meaningful script names
+- Document script purpose and expected input
+- Keep scripts modular and reusable
+
+### Error Handling
+
+- Check for undefined variables before use
+- Validate function arguments
+- Use try-catch for critical operations
+- Provide meaningful error messages
+
+### Performance
+
+- Avoid unnecessary function calls
+- Use static functions for simple text generation
+- Limit while loop iterations
+- Cache frequently used values in variables
+
+## Testing
+
+The package uses vitest for testing with coverage reports:
 
 ```bash
-bun run test:coverage
+bun run test          # Run tests
+bun run test:watch    # Watch mode
+bun run test:coverage # Generate coverage report
+```
+
+## Package Structure
+
+```
+pkg/scripting/
+├── index.ts                 # Type exports and schema
+├── plugin.ts                # Plugin registration
+├── ScriptingService.ts      # Core scripting service
+├── schema.ts                # Configuration schema
+├── commands.ts              # Command registry
+├── tools.ts                 # Tool registry
+├── contextHandlers.ts       # Context handler registry
+├── commands/              # Chat command implementations
+│   ├── script.ts          # Script management
+│   ├── var.ts             # Variable definition
+│   ├── func.ts            # Function definition
+│   ├── vars.ts            # Variable listing
+│   ├── funcs.ts           # Function listing
+│   ├── call.ts            # Function execution
+│   ├── echo.ts            # Text output
+│   ├── sleep.ts           # Delay execution
+│   ├── prompt.ts          # User input
+│   ├── confirm.ts         # Confirmation
+│   ├── list.ts            # List definition
+│   ├── lists.ts           # List listing
+│   ├── if.ts              # Conditional execution
+│   ├── for.ts             # List iteration
+│   ├── while.ts           # Loop execution
+│   └── eval.ts            # Dynamic execution
+├── tools/                 # Tool implementations
+│   └── runScript.ts       # Script execution tool
+├── state/                 # State management
+│   └── ScriptingContext.ts # Context state slice
+├── utils/                 # Utility functions
+│   ├── parseScript.ts     # Script parsing
+│   ├── parseArguments.ts  # Argument parsing
+│   ├── executeBlock.ts    # Block execution
+│   └── blockParser.ts     # Block parsing
+└── design/                # Design documentation
+    └── PATTERNS.md        # Product design patterns
 ```
 
 ## Dependencies
@@ -480,6 +670,13 @@ bun run test:coverage
 
 - `vitest` (^4.0.18) - Testing framework
 - `typescript` (^5.9.3) - TypeScript compiler
+
+## Related Components
+
+- **@tokenring-ai/agent** - Core agent system
+- **@tokenring-ai/chat** - Chat service and tools
+- **@tokenring-ai/app** - Application framework
+- **@tokenring-ai/utility** - Utility functions
 
 ## License
 
