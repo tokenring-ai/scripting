@@ -106,7 +106,7 @@ const serialized = context.serialize();
 context.deserialize(serialized);
 
 // Reset state
-context.reset(["chat"]);
+context.reset();
 ```
 
 ### Chat Commands
@@ -302,6 +302,19 @@ context.reset(["chat"]);
 }
 ```
 
+### Variable Assignment with LLM
+
+```bash
+# Assign LLM response to variable
+/var $summary = llm("Summarize the latest AI developments in 3 sentences")
+
+# Use LLM with variable interpolation
+/var $text = "The project aims to build an AI system"
+/var $analysis = llm("Analyze this text: $text")
+
+/echo Analysis: $analysis
+```
+
 ## Configuration
 
 Scripts are configured in your application config file:
@@ -441,7 +454,7 @@ const serialized = context.serialize();
 context.deserialize(serialized);
 
 // State is reset on chat reset
-context.reset(["chat"]);
+context.reset();
 ```
 
 ### Checkpoint Generation
@@ -535,6 +548,7 @@ Parses script content into individual commands:
 ```typescript
 function parseScript(script: string): string[] {
   // Handles multi-line scripts, semicolon separators, and block structures
+  // Respects brace depth for nested blocks
 }
 ```
 
@@ -542,6 +556,7 @@ function parseScript(script: string): string[] {
 ```typescript
 parseScript('/echo hello; /echo world') // ['/echo hello', '/echo world']
 parseScript('/echo hello\n/echo world') // ['/echo hello', '/echo world']
+parseScript('/if $cond { /echo true }') // ['/if $cond { /echo true }']
 ```
 
 ### blockParser

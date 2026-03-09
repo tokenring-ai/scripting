@@ -1,5 +1,4 @@
-import {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
-import type {AgentStateSlice} from "@tokenring-ai/agent/types";
+import {AgentStateSlice} from "@tokenring-ai/agent/types";
 import {z} from "zod";
 
 const serializationSchema = z.object({
@@ -12,19 +11,19 @@ const serializationSchema = z.object({
   })]))
 });
 
-export class ScriptingContext implements AgentStateSlice<typeof serializationSchema> {
-  readonly name = "ScriptingContext";
-  serializationSchema = serializationSchema;
+export class ScriptingContext extends AgentStateSlice<typeof serializationSchema> {
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();
   functions = new Map<string, { type: 'static' | 'llm' | 'js', params: string[], body: string }>();
 
-  reset(what: ResetWhat[]): void {
-    if (what.includes("chat")) {
-      this.variables.clear();
-      this.lists.clear();
-      this.functions.clear();
-    }
+  constructor() {
+    super("ScriptingContext", serializationSchema);
+  }
+
+  reset(): void {
+    this.variables.clear();
+    this.lists.clear();
+    this.functions.clear();
   }
 
   serialize(): z.output<typeof serializationSchema> {
