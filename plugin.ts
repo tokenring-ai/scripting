@@ -38,6 +38,7 @@ export default {
             agentType: agentType,
             headless: this.agent.headless,
             input: {
+              from: "Scripting plugin runAgent",
               message: `/work ${message}\n\nImportant Context:\n${context}`,
             }
           }, this.agent, true);
