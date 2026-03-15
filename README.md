@@ -71,7 +71,28 @@ const functions = scriptingService.listFunctions();
 - `static` - Returns fixed text with variable interpolation
 - `js` - JavaScript functions with access to agent context
 - `llm` - LLM-powered functions with prompts
-- `native` - Native function implementations (e.g., `runAgent`)
+- `native` - Native function implementations (e.g., `runAgent`) - only available globally
+
+**Types:**
+
+```typescript
+export type ScriptResult = {
+  ok: boolean;
+  output?: string;
+  error?: string;
+  nextScriptResult?: ScriptResult;
+}
+
+export type ScriptFunction = {
+  type: 'static' | 'llm' | 'js';
+  params: string[];
+  body: string;
+} | {
+  type: 'native';
+  params: string[];
+  execute(...args: string[]): string | string[] | Promise<string | string[]>;
+};
+```
 
 ### ScriptingContext
 
@@ -81,7 +102,7 @@ Manages state for scripting including variables, lists, and functions. Implement
 - `name: "ScriptingContext"` - State slice identifier
 - `variables: Map<string, string>` - Variable storage
 - `lists: Map<string, string[]>` - List storage
-- `functions: Map<string, Function>` - Local function storage
+- `functions: Map<string, Function>` - Local function storage (static, llm, js only)
 
 **Key Methods:**
 
@@ -107,6 +128,20 @@ context.deserialize(serialized);
 
 // Reset state
 context.reset();
+```
+
+**Serialization Schema:**
+
+```typescript
+const serializationSchema = z.object({
+  variables: z.array(z.tuple([z.string(), z.string()])),
+  lists: z.array(z.tuple([z.string(), z.array(z.string())])),
+  functions: z.array(z.tuple([z.string(), z.object({
+    type: z.enum(['static', 'llm', 'js']),
+    params: z.array(z.string()),
+    body: z.string()
+  })]))
+});
 ```
 
 ### Chat Commands
@@ -320,7 +355,7 @@ context.reset();
 Scripts are configured in your application config file:
 
 ```typescript
-import type {ScriptingServiceConfigSchema} from "@tokenring-ai/scripting";
+import {ScriptingServiceConfigSchema} from "@tokenring-ai/scripting";
 
 export default {
   scripting: {
@@ -336,7 +371,7 @@ export default {
       `/notify "Published successfully"`
     ]
   }
-} satisfies typeof ScriptingServiceConfigSchema;
+} satisfies z.input<typeof ScriptingServiceConfigSchema>;
 ```
 
 Scripts can be defined as:
@@ -468,7 +503,7 @@ State checkpoints are generated automatically during:
 
 ### runAgent
 
-The scripting package provides a built-in `runAgent` function for running subagents:
+The scripting package provides a built-in `runAgent` function for running subagents. This is registered globally by the plugin and is not available as a local function.
 
 ```typescript
 scriptingService.registerFunction("runAgent", {
@@ -530,7 +565,7 @@ The scripting system provides comprehensive error handling:
 Parses function arguments respecting quotes and nested structures:
 
 ```typescript
-function parseArguments(argsStr: string): string[] {
+export function parseArguments(argsStr: string): string[] {
   // Handles quoted strings, nested parentheses, and escaped characters
 }
 ```
@@ -546,7 +581,7 @@ parseArguments('arg1, (nested), arg3') // ['arg1', '(nested)', 'arg3']
 Parses script content into individual commands:
 
 ```typescript
-function parseScript(script: string): string[] {
+export function parseScript(script: string): string[] {
   // Handles multi-line scripts, semicolon separators, and block structures
   // Respects brace depth for nested blocks
 }
@@ -579,7 +614,7 @@ parseBlock('/echo hello; /echo world') // ['/echo hello', '/echo world']
 Executes a list of commands in the given agent context:
 
 ```typescript
-async function executeBlock(commands: string[], agent: Agent): Promise<void> {
+export async function executeBlock(commands: string[], agent: Agent): Promise<void> {
   // Executes each command, handling both direct commands and interpolated text
 }
 ```
@@ -634,7 +669,7 @@ bun run test:coverage # Generate coverage report
 
 ```
 pkg/scripting/
-├── index.ts                 # Type exports and schema
+├── index.ts                 # Type exports
 ├── plugin.ts                # Plugin registration
 ├── ScriptingService.ts      # Core scripting service
 ├── schema.ts                # Configuration schema
@@ -667,8 +702,17 @@ pkg/scripting/
 │   ├── parseArguments.ts  # Argument parsing
 │   ├── executeBlock.ts    # Block execution
 │   └── blockParser.ts     # Block parsing
-└── design/                # Design documentation
-    └── PATTERNS.md        # Product design patterns
+├── contextHandlers/       # Context handler implementations
+│   └── availableScripts.ts # Available scripts context
+└── test/                  # Test files
+    ├── blockParser.test.ts
+    ├── context.test.ts
+    ├── ScriptingService.test.ts
+    ├── commands.integration.test.ts
+    ├── utils.test.ts
+    ├── commands.test.ts
+    ├── flaws.test.ts
+    └── functions.test.ts
 ```
 
 ## Dependencies
@@ -683,7 +727,7 @@ pkg/scripting/
 
 ### Development Dependencies
 
-- `vitest` (^4.0.18) - Testing framework
+- `vitest` (^4.1.0) - Testing framework
 - `typescript` (^5.9.3) - TypeScript compiler
 
 ## Related Components
