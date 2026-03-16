@@ -4,7 +4,7 @@ import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/vars - List all variables or show specific variable";
+const description = "List all variables or show specific variable";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
 

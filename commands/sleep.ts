@@ -3,7 +3,7 @@ import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/sleep - Sleep for specified seconds";
+const description = "Sleep for specified seconds";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
 

@@ -6,7 +6,7 @@ import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
-const description = "/list - Define or assign lists";
+const description = "Define or assign lists";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);

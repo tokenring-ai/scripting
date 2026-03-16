@@ -5,7 +5,7 @@ import indent from "@tokenring-ai/utility/string/indent";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../ScriptingService.ts";
 
-const description = "/script - Run predefined chat command scripts";
+const description = "Run predefined chat command scripts";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
   const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);

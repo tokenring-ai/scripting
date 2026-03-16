@@ -5,7 +5,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-const description = "/while - Execute commands while condition is truthy";
+const description = "Execute commands while condition is truthy";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);

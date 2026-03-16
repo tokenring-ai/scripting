@@ -3,7 +3,7 @@ import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/confirm - Prompt user for yes/no confirmation";
+const description = "Prompt user for yes/no confirmation";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);

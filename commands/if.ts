@@ -5,7 +5,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
-const description = "/if - Conditional execution";
+const description = "Conditional execution";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
   const context = agent.getState(ScriptingContext);

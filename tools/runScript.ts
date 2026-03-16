@@ -23,8 +23,7 @@ async function execute(
   return result.output || "";
 }
 
-const description =
-  "Run a script with the given input. Scripts are predefined sequences of chat commands.";
+const description = "Run a script with the given input. Scripts are predefined sequences of chat commands.";
 
 const inputSchema = z.object({
   scriptName: z.string().describe("The name of the script to run."),

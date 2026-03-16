@@ -4,7 +4,7 @@ import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/func - Define functions";
+const description = "Define functions";
 
 const RESERVED_NAMES = ['var', 'vars', 'func', 'funcs', 'call', 'echo', 'sleep', 'prompt', 'confirm', 'list', 'lists', 'if', 'for', 'while', 'script'];
 

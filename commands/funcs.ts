@@ -5,7 +5,7 @@ import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
-const description = "/funcs - List all functions or show specific function";
+const description = "List all functions or show specific function";
 
 async function execute(remainder: string, agent: Agent): Promise<string> {
 
