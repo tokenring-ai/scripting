@@ -5,7 +5,7 @@ const serializationSchema = z.object({
   variables: z.array(z.tuple([z.string(), z.string()])),
   lists: z.array(z.tuple([z.string(), z.array(z.string())])),
   functions: z.array(z.tuple([z.string(), z.object({
-    type: z.enum(['static', 'llm', 'js']),
+    type: z.enum(['expression', 'llm', 'js']),
     params: z.array(z.string()),
     body: z.string()
   })]))
@@ -14,7 +14,7 @@ const serializationSchema = z.object({
 export class ScriptingContext extends AgentStateSlice<typeof serializationSchema> {
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();
-  functions = new Map<string, { type: 'static' | 'llm' | 'js', params: string[], body: string }>();
+  functions = new Map<string, { type: 'expression' | 'llm' | 'js', params: string[], body: string }>();
 
   constructor() {
     super("ScriptingContext", serializationSchema);
@@ -56,11 +56,11 @@ export class ScriptingContext extends AgentStateSlice<typeof serializationSchema
     return this.lists.get(name);
   }
 
-  defineFunction(name: string, type: 'static' | 'llm' | 'js', params: string[], body: string): void {
+  defineFunction(name: string, type: 'expression' | 'llm' | 'js', params: string[], body: string): void {
     this.functions.set(name, {type, params, body});
   }
 
-  getFunction(name: string): { type: 'static' | 'llm' | 'js', params: string[], body: string } | undefined {
+  getFunction(name: string): { type: 'expression' | 'llm' | 'js', params: string[], body: string } | undefined {
     return this.functions.get(name);
   }
 

@@ -10,7 +10,7 @@ Advanced patterns, techniques, and best practices for complex workflows.
 
 ```bash
 # Stage 1: Research and gather information
-/func llm research($topic, $angle) => "Research $topic from the perspective of $angle"
+/function define llm research($topic, $angle) => "Research $topic from the perspective of $angle"
 
 /var $topic = "artificial intelligence"
 /var $technical = research($topic, "technical implementation")
@@ -21,18 +21,18 @@ Advanced patterns, techniques, and best practices for complex workflows.
 /var $synthesis = llm("Synthesize these perspectives into a cohesive narrative:\n\nTechnical: $technical\n\nBusiness: $business\n\nEthical: $ethical")
 
 # Stage 3: Structure content
-/func llm createStructure($content) => "Create a detailed outline with sections and subsections for: $content"
+/function define llm createStructure($content) => "Create a detailed outline with sections and subsections for: $content"
 /var $structure = createStructure($synthesis)
 
 # Stage 4: Expand each section
-/func llm expandSection($structure, $section) => "Based on this structure: $structure\n\nWrite a detailed section for: $section"
+/function define llm expandSection($structure, $section) => "Based on this structure: $structure\n\nWrite a detailed section for: $section"
 
 /var $intro = expandSection($structure, "Introduction")
 /var $body = expandSection($structure, "Main Content")
 /var $conclusion = expandSection($structure, "Conclusion")
 
 # Stage 5: Polish and format
-/func js formatArticle($title, $intro, $body, $conclusion) {
+/function define js formatArticle($title, $intro, $body, $conclusion) {
   const date = new Date().toLocaleDateString();
   return `# ${$title}
 *Published: ${date}*
@@ -56,9 +56,9 @@ ${$conclusion}`;
 
 ```bash
 # Decision function
-/func llm shouldExpand($text) => "Is this text too brief and needs expansion? Answer only 'yes' or 'no': $text"
+/function define llm shouldExpand($text) => "Is this text too brief and needs expansion? Answer only 'yes' or 'no': $text"
 
-/func js needsExpansion($decision) {
+/function define js needsExpansion($decision) {
   return $decision.toLowerCase().includes('yes');
 }
 
@@ -67,7 +67,7 @@ ${$conclusion}`;
 /var $decision = shouldExpand($draft)
 
 # Conditional expansion
-/func llm expand($text) => "Expand this text with more details and examples: $text"
+/function define llm expand($text) => "Expand this text with more details and examples: $text"
 
 /var $needsMore = needsExpansion($decision)
 /echo Needs expansion: $needsMore
@@ -80,9 +80,9 @@ ${$conclusion}`;
 
 ```bash
 # Define processing functions
-/func llm processA($input) => "Process $input for aspect A"
-/func llm processB($input) => "Process $input for aspect B"
-/func llm processC($input) => "Process $input for aspect C"
+/function define llm processA($input) => "Process $input for aspect A"
+/function define llm processB($input) => "Process $input for aspect B"
+/function define llm processC($input) => "Process $input for aspect C"
 
 # Process in parallel (conceptually - actual execution is sequential)
 /var $input = "Your input data"
@@ -101,15 +101,15 @@ ${$conclusion}`;
 
 ```bash
 # Define composable functions
-/func js clean($text) {
+/function define js clean($text) {
   return $text.trim().replace(/\s+/g, ' ');
 }
 
-/func js lowercase($text) {
+/function define js lowercase($text) {
   return $text.toLowerCase();
 }
 
-/func js removeSpecial($text) {
+/function define js removeSpecial($text) {
   return $text.replace(/[^\w\s]/g, '');
 }
 
@@ -125,7 +125,7 @@ ${$conclusion}`;
 
 ```bash
 # Template function that takes a formatter
-/func llm formatAs($content, $format) => "Format this content as $format: $content"
+/function define llm formatAs($content, $format) => "Format this content as $format: $content"
 
 /var $data = "Key points: AI, ML, DL"
 /var $bullets = formatAs($data, "bullet points")
@@ -157,16 +157,16 @@ ${$conclusion}`;
 ### JSON Processing Pipeline
 
 ```bash
-/func js parseJson($json) {
+/function define js parseJson($json) {
   return JSON.parse($json);
 }
 
-/func js extractField($json, $field) {
+/function define js extractField($json, $field) {
   const data = JSON.parse($json);
   return data[$field] || '';
 }
 
-/func js transformJson($json, $mapping) {
+/function define js transformJson($json, $mapping) {
   const data = JSON.parse($json);
   const mappings = JSON.parse($mapping);
   const result = {};
@@ -186,7 +186,7 @@ ${$conclusion}`;
 ### Text Normalization
 
 ```bash
-/func js normalize($text) {
+/function define js normalize($text) {
   return $text
     .trim()
     .toLowerCase()
@@ -194,13 +194,13 @@ ${$conclusion}`;
     .replace(/\s+/g, ' ');
 }
 
-/func js titleCase($text) {
+/function define js titleCase($text) {
   return $text.split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 }
 
-/func js slugify($text) {
+/function define js slugify($text) {
   return $text
     .toLowerCase()
     .trim()
@@ -223,12 +223,12 @@ ${$conclusion}`;
 ### Validation Functions
 
 ```bash
-/func js isValidEmail($email) {
+/function define js isValidEmail($email) {
   const regex = /^[\w.-]+@[\w.-]+\.\w+$/;
   return regex.test($email) ? 'valid' : 'invalid';
 }
 
-/func js isValidUrl($url) {
+/function define js isValidUrl($url) {
   try {
     new URL($url);
     return 'valid';
@@ -237,7 +237,7 @@ ${$conclusion}`;
   }
 }
 
-/func js validateLength($text, $min, $max) {
+/function define js validateLength($text, $min, $max) {
   const len = $text.length;
   if (len < parseInt($min)) return `too short (min: ${$min})`;
   if (len > parseInt($max)) return `too long (max: ${$max})`;
@@ -257,7 +257,7 @@ ${$conclusion}`;
 ### Safe Parsing
 
 ```bash
-/func js safeParseJson($json) {
+/function define js safeParseJson($json) {
   try {
     const data = JSON.parse($json);
     return JSON.stringify(data, null, 2);
@@ -293,7 +293,7 @@ ${$conclusion}`;
 /var $largeText = "Very long text content..."
 
 # Process in chunks
-/func js chunk($text, $size) {
+/function define js chunk($text, $size) {
   const chunks = [];
   for (let i = 0; i < $text.length; i += parseInt($size)) {
     chunks.push($text.slice(i, i + parseInt($size)));
@@ -322,7 +322,7 @@ ${$conclusion}`;
 ### Template System
 
 ```bash
-/func js applyTemplate($template, $vars) {
+/function define js applyTemplate($template, $vars) {
   const variables = JSON.parse($vars);
   let result = $template;
   for (const [key, value] of Object.entries(variables)) {
@@ -341,15 +341,15 @@ ${$conclusion}`;
 
 ```bash
 # Define pipeline stages
-/func js stage1($input) {
+/function define js stage1($input) {
   return $input.toUpperCase();
 }
 
-/func js stage2($input) {
+/function define js stage2($input) {
   return $input.split('').reverse().join('');
 }
 
-/func js stage3($input) {
+/function define js stage3($input) {
   return $input.replace(/[AEIOU]/g, '*');
 }
 
@@ -368,11 +368,11 @@ ${$conclusion}`;
 Break complex workflows into small, reusable functions:
 
 ```bash
-✓ /func js clean($text) { ... }
-✓ /func js validate($text) { ... }
-✓ /func js format($text) { ... }
+✓ /function define js clean($text) { ... }
+✓ /function define js validate($text) { ... }
+✓ /function define js format($text) { ... }
 
-✗ /func js processEverything($text) { /* 100 lines */ }
+✗ /function define js processEverything($text) { /* 100 lines */ }
 ```
 
 ### 2. Clear Naming
@@ -380,8 +380,8 @@ Break complex workflows into small, reusable functions:
 Use descriptive names that indicate purpose:
 
 ```bash
-✓ /func js extractEmailAddresses($text) { ... }
-✗ /func js extract($text) { ... }
+✓ /function define js extractEmailAddresses($text) { ... }
+✗ /function define js extract($text) { ... }
 ```
 
 ### 3. Error Handling
@@ -389,7 +389,7 @@ Use descriptive names that indicate purpose:
 Always handle potential errors:
 
 ```bash
-/func js safeParse($json) {
+/function define js safeParse($json) {
   try {
     return JSON.parse($json);
   } catch (error) {
@@ -405,7 +405,7 @@ Document complex functions:
 ```bash
 # Extracts all URLs from text and returns them as a newline-separated list
 # Returns empty string if no URLs found
-/func js extractUrls($text) {
+/function define js extractUrls($text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return ($text.match(urlRegex) || []).join('\n');
 }
@@ -416,7 +416,7 @@ Document complex functions:
 Test functions before using in workflows:
 
 ```bash
-/func js wordCount($text) {
+/function define js wordCount($text) {
   return $text.split(/\s+/).length;
 }
 
@@ -453,7 +453,7 @@ Test functions before using in workflows:
 ### 3. Validation Functions
 
 ```bash
-/func js debugInfo($var) {
+/function define js debugInfo($var) {
   return `Type: ${typeof $var}, Length: ${$var.length}, Value: ${$var}`;
 }
 

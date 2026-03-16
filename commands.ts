@@ -4,24 +4,44 @@ import confirm from "./commands/confirm.ts";
 import echo from "./commands/echo.ts";
 import evalCommand from "./commands/eval.ts";
 import forCommand from "./commands/for.ts";
-import func from "./commands/func.ts";
-import funcs from "./commands/funcs.ts";
+import funcDelete from "./commands/func/delete.ts";
+import funcJs from "./commands/func/defineJs.ts";
+import funcLlm from "./commands/func/defineLLM.ts";
+import funcStatic from "./commands/func/defineExpression.ts";
+import funcsClear from "./commands/func/clear.ts";
+import funcsList from "./commands/func/list.ts";
+import funcsShow from "./commands/func/show.ts";
 import ifCommand from "./commands/if.ts";
 import list from "./commands/list.ts";
 import lists from "./commands/lists.ts";
 import prompt from "./commands/prompt.ts";
-import script from "./commands/script.ts";
+import scriptInfo from "./commands/script/info.ts";
+import scriptList from "./commands/script/list.ts";
+import scriptRun from "./commands/script/run.ts";
 import sleep from "./commands/sleep.ts";
-import varCommand from "./commands/var.ts";
-import vars from "./commands/vars.ts";
+import varDelete from "./commands/var/delete.ts";
+import varCommand from "./commands/var/set.ts";
+import varsClear from "./commands/vars/clear.ts";
+import vars from "./commands/vars/list.ts";
+import varsShow from "./commands/vars/show.ts";
 import whileCommand from "./commands/while.ts";
 
 export default [
-  script,
+  scriptList,
+  scriptRun,
+  scriptInfo,
   varCommand,
-  func,
+  varDelete,
+  funcStatic,
+  funcLlm,
+  funcJs,
+  funcDelete,
   vars,
-  funcs,
+  varsShow,
+  varsClear,
+  funcsList,
+  funcsShow,
+  funcsClear,
   call,
   echo,
   sleep,
@@ -33,4 +53,4 @@ export default [
   forCommand,
   whileCommand,
   evalCommand,
-] satisfies TokenRingAgentCommand[];
+] as const satisfies readonly TokenRingAgentCommand<any>[];

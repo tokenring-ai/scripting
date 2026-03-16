@@ -346,7 +346,7 @@ describe('FLAW: Function name validation missing', () => {
   it('should reject function names that shadow commands', async () => {
     const {agent, context, errors} = createMockAgent();
 
-    await funcCmd.execute('static if($x) => "value"', agent as any);
+    await funcCmd.execute('expression if($x) => "value"', agent as any);
 
     // Should reject reserved command names
     expect(errors.length).toBeGreaterThan(0);
@@ -357,8 +357,8 @@ describe('FLAW: Function name validation missing', () => {
   it('should allow valid function names with underscores and numbers', async () => {
     const {agent, context, errors} = createMockAgent();
 
-    await funcCmd.execute('static _private($x) => "value"', agent as any);
-    await funcCmd.execute('static func123($x) => "value"', agent as any);
+    await funcCmd.execute('expression _private($x) => "value"', agent as any);
+    await funcCmd.execute('expression func123($x) => "value"', agent as any);
 
     // These should be allowed
     expect(errors.length).toBe(0);

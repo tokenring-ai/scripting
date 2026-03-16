@@ -2,7 +2,7 @@
 
 ## Overview
 
-Functions are reusable templates that accept parameters. There are three types: static text functions, LLM functions,
+Functions are reusable templates that accept parameters. There are three types: expression text functions, LLM functions,
 and JavaScript functions.
 
 ## Function Types
@@ -14,15 +14,15 @@ Return text with variable interpolation.
 **Syntax:**
 
 ```bash
-/func static functionName($param1, $param2) => "text with $param1 and $param2"
+/function define expr functionName($param1, $param2) => "text with $param1 and $param2"
 ```
 
 **Examples:**
 
 ```bash
-/func static greet($name) => "Hello, $name! Welcome to TokenRing."
-/func static formatEmail($to, $subject) => "To: $to\nSubject: $subject"
-/func static template($title, $content) => "# $title\n\n$content"
+/function define expr greet($name) => "Hello, $name! Welcome to TokenRing."
+/function define expr formatEmail($to, $subject) => "To: $to\nSubject: $subject"
+/function define expr template($title, $content) => "# $title\n\n$content"
 ```
 
 **Usage:**
@@ -39,16 +39,16 @@ Send prompts to the AI agent and return responses.
 **Syntax:**
 
 ```bash
-/func llm functionName($param1, $param2) => "prompt with $param1 and $param2"
+/function define llm functionName($param1, $param2) => "prompt with $param1 and $param2"
 ```
 
 **Examples:**
 
 ```bash
-/func llm summarize($text) => "Summarize in one sentence: $text"
-/func llm translate($text, $lang) => "Translate to $lang: $text"
-/func llm analyze($topic) => "Provide a detailed analysis of $topic"
-/func llm compare($item1, $item2) => "Compare and contrast $item1 and $item2"
+/function define llm summarize($text) => "Summarize in one sentence: $text"
+/function define llm translate($text, $lang) => "Translate to $lang: $text"
+/function define llm analyze($topic) => "Provide a detailed analysis of $topic"
+/function define llm compare($item1, $item2) => "Compare and contrast $item1 and $item2"
 ```
 
 **Usage:**
@@ -73,7 +73,7 @@ Execute JavaScript code for computations and data processing.
 **Syntax:**
 
 ```bash
-/func js functionName($param1, $param2) {
+/function define js functionName($param1, $param2) {
   // JavaScript code
   return result;
 }
@@ -84,15 +84,15 @@ Execute JavaScript code for computations and data processing.
 String manipulation:
 
 ```bash
-/func js uppercase($text) {
+/function define js uppercase($text) {
   return $text.toUpperCase();
 }
 
-/func js lowercase($text) {
+/function define js lowercase($text) {
   return $text.toLowerCase();
 }
 
-/func js trim($text) {
+/function define js trim($text) {
   return $text.trim();
 }
 ```
@@ -100,11 +100,11 @@ String manipulation:
 Math operations:
 
 ```bash
-/func js wordCount($text) {
+/function define js wordCount($text) {
   return $text.split(/\s+/).length;
 }
 
-/func js add($a, $b) {
+/function define js add($a, $b) {
   return parseInt($a) + parseInt($b);
 }
 ```
@@ -112,11 +112,11 @@ Math operations:
 Date/time:
 
 ```bash
-/func js timestamp() {
+/function define js timestamp() {
   return new Date().toISOString();
 }
 
-/func js formatDate($date) {
+/function define js formatDate($date) {
   return new Date($date).toLocaleDateString();
 }
 ```
@@ -124,12 +124,12 @@ Date/time:
 JSON processing:
 
 ```bash
-/func js parseJson($json) {
+/function define js parseJson($json) {
   const data = JSON.parse($json);
   return JSON.stringify(data, null, 2);
 }
 
-/func js extractField($json, $field) {
+/function define js extractField($json, $field) {
   const data = JSON.parse($json);
   return data[$field];
 }
@@ -138,11 +138,11 @@ JSON processing:
 Array operations:
 
 ```bash
-/func js joinList($items, $separator) {
+/function define js joinList($items, $separator) {
   return $items.split(',').map(s => s.trim()).join($separator);
 }
 
-/func js sortList($items) {
+/function define js sortList($items) {
   return $items.split(',').map(s => s.trim()).sort().join(', ');
 }
 ```
@@ -150,12 +150,12 @@ Array operations:
 Text processing:
 
 ```bash
-/func js extractUrls($text) {
+/function define js extractUrls($text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return ($text.match(urlRegex) || []).join('\n');
 }
 
-/func js removeSpecialChars($text) {
+/function define js removeSpecialChars($text) {
   return $text.replace(/[^\w\s]/g, '');
 }
 ```
@@ -190,17 +190,17 @@ Execute and display output immediately:
 
 ```bash
 # Static function
-/func static greet($name) => "Hello, $name!"
+/function define expr greet($name) => "Hello, $name!"
 /var $greeting = greet("Alice")
 /call greet("Bob")
 
 # LLM function
-/func llm summarize($text) => "Summarize: $text"
+/function define llm summarize($text) => "Summarize: $text"
 /var $summary = summarize("Long article...")
 /call summarize("Another article...")
 
 # JavaScript function
-/func js wordCount($text) { return $text.split(/\s+/).length; }
+/function define js wordCount($text) { return $text.split(/\s+/).length; }
 /var $count = wordCount("This is a test")
 /call wordCount("Count these words")
 ```
@@ -243,11 +243,11 @@ Combine literals and variables:
 ### Pre-process with JS, Analyze with LLM
 
 ```bash
-/func js cleanText($text) {
+/function define js cleanText($text) {
   return $text.replace(/[^\w\s]/g, '').toLowerCase();
 }
 
-/func llm analyze($text) => "Analyze this text: $text"
+/function define llm analyze($text) => "Analyze this text: $text"
 
 /var $raw = "Hello!!! World??? 123..."
 /var $clean = cleanText($raw)
@@ -257,9 +257,9 @@ Combine literals and variables:
 ### LLM Response, Extract with JS
 
 ```bash
-/func llm getCount($question) => "$question Answer with just a number."
+/function define llm getCount($question) => "$question Answer with just a number."
 
-/func js extractNumber($text) {
+/function define js extractNumber($text) {
   const match = $text.match(/\d+/);
   return match ? parseInt(match[0]) : 0;
 }
@@ -271,13 +271,13 @@ Combine literals and variables:
 ### Multi-stage Pipeline
 
 ```bash
-/func js timestamp() {
+/function define js timestamp() {
   return new Date().toISOString();
 }
 
-/func llm research($topic) => "Research $topic and provide key findings"
+/function define llm research($topic) => "Research $topic and provide key findings"
 
-/func js formatMarkdown($title, $content, $date) {
+/function define js formatMarkdown($title, $content, $date) {
   return `# ${$title}\n\n${$content}\n\n---\n*Generated: ${$date}*`;
 }
 
@@ -346,7 +346,7 @@ Local functions take precedence:
 
 ```bash
 # Override global function
-/func js readFile($path) {
+/function define js readFile($path) {
   return "Custom implementation for " + $path;
 }
 
@@ -364,43 +364,43 @@ Local functions take precedence:
 ### 1. Choose the Right Type
 
 ```bash
-✓ /func js wordCount($text) { return $text.split(/\s+/).length; }
-✓ /func llm summarize($text) => "Summarize: $text"
-✓ /func static greet($name) => "Hello, $name!"
+✓ /function define js wordCount($text) { return $text.split(/\s+/).length; }
+✓ /function define llm summarize($text) => "Summarize: $text"
+✓ /function define expr greet($name) => "Hello, $name!"
 
-✗ /func llm wordCount($text) => "Count words in: $text"
+✗ /function define llm wordCount($text) => "Count words in: $text"
 ```
 
-Use JS for computation, LLM for analysis, static for templates.
+Use JS for computation, LLM for analysis, expression for templates.
 
 ### 2. Modular Functions
 
 ```bash
-✓ /func llm summarize($text) => "Summarize: $text"
-✓ /func llm analyze($text) => "Analyze: $text"
+✓ /function define llm summarize($text) => "Summarize: $text"
+✓ /function define llm analyze($text) => "Analyze: $text"
 
-✗ /func llm doEverything($text) => "Summarize, analyze, and translate: $text"
+✗ /function define llm doEverything($text) => "Summarize, analyze, and translate: $text"
 ```
 
 ### 3. Clear Prompts
 
 ```bash
-✓ /func llm getBenefits($topic) => "List 3 benefits of $topic with examples"
-✗ /func llm vague($topic) => "$topic stuff"
+✓ /function define llm getBenefits($topic) => "List 3 benefits of $topic with examples"
+✗ /function define llm vague($topic) => "$topic stuff"
 ```
 
 ### 4. Descriptive Names
 
 ```bash
-✓ /func js extractUrls($text) { ... }
-✗ /func js extract($text) { ... }
+✓ /function define js extractUrls($text) { ... }
+✗ /function define js extract($text) { ... }
 ```
 
 ### 5. Document Complex Functions
 
 ```bash
 # Extract all email addresses from text
-/func js extractEmails($text) {
+/function define js extractEmails($text) {
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
   return ($text.match(emailRegex) || []).join('\n');
 }
@@ -411,7 +411,7 @@ Use JS for computation, LLM for analysis, static for templates.
 ### Parameterized Workflows
 
 ```bash
-/func llm workflow($input, $format) => "Process $input and output as $format"
+/function define llm workflow($input, $format) => "Process $input and output as $format"
 
 /var $json = workflow($data, "JSON")
 /var $markdown = workflow($data, "Markdown")
@@ -422,21 +422,21 @@ Use JS for computation, LLM for analysis, static for templates.
 
 ```bash
 # Via JavaScript
-/func js shouldProcess($text) {
+/function define js shouldProcess($text) {
   return $text.length > 100 ? "yes" : "no";
 }
 
 /var $decision = shouldProcess($article)
 
 # Via LLM
-/func llm decide($plan) => "Should we proceed with $plan? Answer yes or no"
+/function define llm decide($plan) => "Should we proceed with $plan? Answer yes or no"
 /var $decision = decide($plan)
 ```
 
 ### Data Transformation
 
 ```bash
-/func js csvToJson($csv) {
+/function define js csvToJson($csv) {
   const lines = $csv.split('\n');
   const headers = lines[0].split(',');
   const rows = lines.slice(1).map(line => {

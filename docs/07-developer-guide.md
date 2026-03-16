@@ -46,7 +46,7 @@ Return text with variable interpolation:
 scriptingService.registerFunction({
   name: "greeting",
   item: {
-    type: 'static',
+    type: 'expression',
     params: ['name'],
     body: '"Hello, $name! Welcome to the system."'
   }
@@ -304,7 +304,7 @@ This allows users to override global functions:
 /var $result = readFile("file.txt")
 
 # User overrides with local function
-/func js readFile($path) {
+/function define js readFile($path) {
   return "Custom implementation for " + $path;
 }
 

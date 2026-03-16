@@ -66,10 +66,10 @@ agents and LLMs.
 | `/var delete $name`                | Delete variable            |
 | `/vars`                            | List variables             |
 | `/vars clear`                      | Clear all variables        |
-| `/func static name($p) => "text"`  | Define static function     |
-| `/func llm name($p) => "prompt"`   | Define LLM function        |
-| `/func js name($p) { code }`       | Define JavaScript function |
-| `/func delete name`                | Delete function            |
+| `/function define expr name($p) => "text"`  | Define expression function     |
+| `/function define llm name($p) => "prompt"`   | Define LLM function        |
+| `/function define js name($p) { code }`       | Define JavaScript function |
+| `/function delete name`                | Delete function            |
 | `/funcs`                           | List functions             |
 | `/funcs clear`                     | Clear local functions      |
 | `/call name("arg")`                | Call function              |
@@ -114,8 +114,8 @@ agents and LLMs.
 **Function Composition:**
 
 ```bash
-/func js clean($text) { return $text.trim(); }
-/func llm analyze($text) => "Analyze: $text"
+/function define js clean($text) { return $text.trim(); }
+/function define llm analyze($text) => "Analyze: $text"
 /var $result = analyze(clean($input))
 ```
 
@@ -155,7 +155,7 @@ agents and LLMs.
 
 - **Function composition** - Chain multiple operations
 - **Error handling** - Graceful error management
-- **Type flexibility** - Mix static, LLM, and JS functions
+- **Type flexibility** - Mix expression, LLM, and JS functions
 - **Session persistence** - Variables persist during session
 - **Override capability** - Local functions override global
 

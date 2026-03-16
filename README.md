@@ -4,7 +4,7 @@ Comprehensive scripting language with variables, functions, and LLM integration 
 
 ## Overview
 
-The TokenRing AI Scripting package provides a powerful scripting language for automating workflows, managing variables, defining functions, and integrating with AI models. It supports script execution, control flow (conditionals, loops), variables, lists, and dynamic function execution with support for static, JavaScript, and LLM-powered functions.
+The TokenRing AI Scripting package provides a powerful scripting language for automating workflows, managing variables, defining functions, and integrating with AI models. It supports script execution, control flow (conditionals, loops), variables, lists, and dynamic function execution with support for expression, JavaScript, and LLM-powered functions.
 
 ## Installation
 
@@ -68,7 +68,7 @@ const functions = scriptingService.listFunctions();
 ```
 
 **Function Types:**
-- `static` - Returns fixed text with variable interpolation
+- `expression` - Returns fixed text with variable interpolation
 - `js` - JavaScript functions with access to agent context
 - `llm` - LLM-powered functions with prompts
 - `native` - Native function implementations (e.g., `runAgent`) - only available globally
@@ -84,7 +84,7 @@ export type ScriptResult = {
 }
 
 export type ScriptFunction = {
-  type: 'static' | 'llm' | 'js';
+  type: 'expression' | 'llm' | 'js';
   params: string[];
   body: string;
 } | {
@@ -102,7 +102,7 @@ Manages state for scripting including variables, lists, and functions. Implement
 - `name: "ScriptingContext"` - State slice identifier
 - `variables: Map<string, string>` - Variable storage
 - `lists: Map<string, string[]>` - List storage
-- `functions: Map<string, Function>` - Local function storage (static, llm, js only)
+- `functions: Map<string, Function>` - Local function storage (expression, llm, js only)
 
 **Key Methods:**
 
@@ -137,7 +137,7 @@ const serializationSchema = z.object({
   variables: z.array(z.tuple([z.string(), z.string()])),
   lists: z.array(z.tuple([z.string(), z.array(z.string())])),
   functions: z.array(z.tuple([z.string(), z.object({
-    type: z.enum(['static', 'llm', 'js']),
+    type: z.enum(['expression', 'llm', 'js']),
     params: z.array(z.string()),
     body: z.string()
   })]))
@@ -161,10 +161,10 @@ const serializationSchema = z.object({
 
 #### Function Commands
 
-- `/func static name($param1) => "text"` - Define static function
-- `/func llm name($param1) => "prompt"` - Define LLM function
-- `/func js name($param1) { code }` - Define JavaScript function
-- `/func delete name` - Delete a function
+- `/function define expr name($param1) => "text"` - Define expression function
+- `/function define llm name($param1) => "prompt"` - Define LLM function
+- `/function define js name($param1) { code }` - Define JavaScript function
+- `/function delete name` - Delete a function
 - `/funcs [name]` - List all functions (local and global)
 - `/funcs clear` - Clear all local functions
 
@@ -174,7 +174,7 @@ const serializationSchema = z.object({
 
 #### List Commands
 
-- `/list @name = ["item1", "item2"]` - Define a static list
+- `/list @name = ["item1", "item2"]` - Define a expression list
 - `/list @name = [$var1, $var2]` - Define list from variables
 - `/list @name = functionName("arg")` - Define list from function results
 - `/lists [@name]` - List all lists or show specific contents
@@ -210,9 +210,9 @@ const serializationSchema = z.object({
 /var $topic = "AI safety"
 
 # Define and use functions
-/func static greet($name) => "Hello, $name!"
-/func llm summary($text) => "Summarize: $text"
-/func js currentDate() { return new Date().toISOString() }
+/function define expr greet($name) => "Hello, $name!"
+/function define llm summary($text) => "Summarize: $text"
+/function define js currentDate() { return new Date().toISOString() }
 
 # Use functions
 /var $greeting = greet($name)
@@ -267,7 +267,7 @@ const serializationSchema = z.object({
 
 ```bash
 # LLM-powered functions
-/func llm analyze($text) => "Analyze the sentiment of this text: $text"
+/function define llm analyze($text) => "Analyze the sentiment of this text: $text"
 
 # Use LLM functions
 /var $sentiment = analyze("I love this product!")
@@ -279,7 +279,7 @@ const serializationSchema = z.object({
 
 ```bash
 # JavaScript functions
-/func js wordCount($text) { 
+/function define js wordCount($text) { 
   return $text.split(/\s+/).length; 
 }
 
@@ -470,7 +470,7 @@ The scripting package uses `ScriptingContext` for state persistence:
 interface ScriptingContext {
   variables: Map<string, string>;
   lists: Map<string, string[]>;
-  functions: Map<string, { type: 'static' | 'llm' | 'js', params: string[], body: string }>;
+  functions: Map<string, { type: 'expression' | 'llm' | 'js', params: string[], body: string }>;
 }
 ```
 
@@ -651,7 +651,7 @@ export async function executeBlock(commands: string[], agent: Agent): Promise<vo
 ### Performance
 
 - Avoid unnecessary function calls
-- Use static functions for simple text generation
+- Use expression functions for simple text generation
 - Limit while loop iterations
 - Cache frequently used values in variables
 

@@ -4,9 +4,9 @@ import funcsCmd from '../commands/funcs.ts';
 import {createMockAgent} from './testHelpers.ts';
 
 describe('func command', () => {
-  it('defines static function', async () => {
+  it('defines expression function', async () => {
     const {agent, context, infos} = createMockAgent();
-    await funcCmd.execute('static greet($name) => "Hello, $name"', agent as any);
+    await funcCmd.execute('expression greet($name) => "Hello, $name"', agent as any);
     expect(context.getFunction('greet')).toBeDefined();
     expect(infos[0]).toContain('greet($name)');
   });
@@ -29,14 +29,14 @@ describe('func command', () => {
 
   it('handles multiple parameters', async () => {
     const {agent, context} = createMockAgent();
-    await funcCmd.execute('static add($a, $b) => "$a + $b"', agent as any);
+    await funcCmd.execute('expression add($a, $b) => "$a + $b"', agent as any);
     const func = context.getFunction('add');
     expect(func?.params).toEqual(['a', 'b']);
   });
 
   it('deletes function', async () => {
     const {agent, context, infos} = createMockAgent();
-    context.defineFunction('test', 'static', [], 'body');
+    context.defineFunction('test', 'expression', [], 'body');
     await funcCmd.execute('delete test', agent as any);
     expect(context.getFunction('test')).toBeUndefined();
     expect(infos[0]).toContain('deleted');
@@ -58,7 +58,7 @@ describe('func command', () => {
 describe('funcs command', () => {
   it('lists all functions', async () => {
     const {agent, context, infos} = createMockAgent();
-    context.defineFunction('greet', 'static', ['name'], '"Hello"');
+    context.defineFunction('greet', 'expression', ['name'], '"Hello"');
     context.defineFunction('analyze', 'llm', ['text'], '"Analyze"');
     await funcsCmd.execute('', agent as any);
     expect(infos.join('\n')).toContain('greet');
@@ -67,7 +67,7 @@ describe('funcs command', () => {
 
   it('shows specific function', async () => {
     const {agent, context, infos} = createMockAgent();
-    context.defineFunction('greet', 'static', ['name'], '"Hello, $name"');
+    context.defineFunction('greet', 'expression', ['name'], '"Hello, $name"');
     await funcsCmd.execute('greet', agent as any);
     expect(infos[0]).toContain('greet($name)');
     expect(infos[0]).toContain('"Hello, $name"');
@@ -91,7 +91,7 @@ describe('funcs command', () => {
 
   it('clears all functions', async () => {
     const {agent, context, infos} = createMockAgent();
-    context.defineFunction('test', 'static', [], 'body');
+    context.defineFunction('test', 'expression', [], 'body');
     await funcsCmd.execute('clear', agent as any);
     expect(context.functions.size).toBe(0);
     expect(infos[0]).toContain('cleared');

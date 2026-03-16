@@ -72,7 +72,7 @@ describe('ScriptingService', () => {
 
     it('should list all registered functions', () => {
       const mockFunction = {
-        type: 'static',
+        type: 'expression',
         params: ['x'],
         body: 'test body'
       };
@@ -99,7 +99,7 @@ describe('ScriptingService', () => {
   describe('function resolution', () => {
     beforeEach(() => {
       agent.mutateState(ScriptingContext, (state) => {
-        state.defineFunction('localFunc', 'static', [], 'local function');
+        state.defineFunction('localFunc', 'expression', [], 'local function');
       });
     });
 
@@ -177,16 +177,16 @@ describe('ScriptingService', () => {
       expect(func?.type).toBe('llm');
     });
 
-    it('should execute static functions correctly', async () => {
+    it('should execute expression functions correctly', async () => {
       const mockStaticFunc = {
-        type: 'static',
+        type: 'expression',
         params: ['name'],
         body: 'Hello, $name!'
       };
 
-      service.registerFunction('staticFunc', mockStaticFunc);
+      service.registerFunction('expressionFunc', mockStaticFunc);
 
-      const result = await service.executeFunction('staticFunc', ['World'], agent);
+      const result = await service.executeFunction('expressionFunc', ['World'], agent);
       expect(result).toBe('Hello, World!');
     });
 
@@ -198,7 +198,7 @@ describe('ScriptingService', () => {
 
     it('should throw error for argument count mismatch', async () => {
       const mockFunc = {
-        type: 'static',
+        type: 'expression',
         params: ['param1', 'param2'],
         body: 'test'
       };

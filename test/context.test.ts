@@ -38,9 +38,9 @@ describe('ScriptingContext', () => {
 
   describe('functions', () => {
     it('defines and gets functions', () => {
-      context.defineFunction('greet', 'static', ['name'], '"Hello"');
+      context.defineFunction('greet', 'expression', ['name'], '"Hello"');
       const func = context.getFunction('greet');
-      expect(func?.type).toBe('static');
+      expect(func?.type).toBe('expression');
       expect(func?.params).toEqual(['name']);
       expect(func?.body).toBe('"Hello"');
     });
@@ -98,7 +98,7 @@ describe('ScriptingContext', () => {
     it('clears all data on chat reset', () => {
       context.setVariable('name', 'Alice');
       context.setList('items', ['a', 'b']);
-      context.defineFunction('test', 'static', [], 'body');
+      context.defineFunction('test', 'expression', [], 'body');
 
       context.reset(['chat']);
 
@@ -118,7 +118,7 @@ describe('ScriptingContext', () => {
     it('serializes and deserializes state', () => {
       context.setVariable('name', 'Alice');
       context.setList('items', ['a', 'b']);
-      context.defineFunction('test', 'static', ['x'], 'body');
+      context.defineFunction('test', 'expression', ['x'], 'body');
 
       const serialized = context.serialize();
       const newContext = new ScriptingContext();

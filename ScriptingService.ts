@@ -20,7 +20,7 @@ export type ScriptingThis = {
 }
 
 export type ScriptFunction = {
-  type: 'static' | 'llm' | 'js';
+  type: 'expression' | 'llm' | 'js';
   params: string[];
   body: string;
 } | {

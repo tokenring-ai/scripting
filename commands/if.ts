@@ -1,60 +1,16 @@
-import Agent from "@tokenring-ai/agent/Agent";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {extractBlock, parseBlock} from "../utils/blockParser.js";
 import {executeBlock} from "../utils/executeBlock.ts";
 
+const inputSchema = {
+  args: {},
+  prompt: {description: "If condition and blocks", required: true},
+  allowAttachments: false,
+} as const satisfies AgentCommandInputSchema;
+
 const description = "Conditional execution";
-
-async function execute(remainder: string, agent: Agent): Promise<string> {
-  const context = agent.getState(ScriptingContext);
-
-  if (!remainder?.trim()) {
-    throw new CommandFailedError("Usage: /if $condition { commands } [else { commands }]");
-  }
-
-  const prefixMatch = remainder.match(/^\$(\w+)\s*/);
-  if (!prefixMatch) {
-    throw new CommandFailedError("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
-  }
-
-  const [prefix, conditionVar] = prefixMatch;
-  const thenBlock = extractBlock(remainder, prefix.length);
-
-  if (!thenBlock) {
-    throw new CommandFailedError("Missing then block { commands }");
-  }
-
-  const conditionValue = context.getVariable(conditionVar);
-  const isTruthy = conditionValue &&
-    conditionValue !== 'false' &&
-    conditionValue !== '0' &&
-    conditionValue !== 'no';
-
-  let body: string;
-
-  if (isTruthy) {
-    body = thenBlock.content;
-  } else {
-    // Check for else block
-    const elseMatch = remainder.slice(thenBlock.endPos).match(/^\s*else\s*/);
-    if (elseMatch) {
-      const elseBlock = extractBlock(remainder, thenBlock.endPos + elseMatch[0].length);
-      if (!elseBlock) {
-        throw new CommandFailedError("Invalid else block");
-      }
-      body = elseBlock.content;
-    } else {
-      return "Condition was false, no else block";
-    }
-  }
-
-  const commands = parseBlock(body);
-  await executeBlock(commands, agent);
-
-  return "If statement completed";
-}
 
 const help: string = `# /if $condition { commands } [else { commands }]
 
@@ -89,9 +45,57 @@ Execute commands conditionally based on variable truthiness
 - Nested if statements are supported
 - Use /var to set condition variables before if statements
 - Else blocks are optional`;
+
 export default {
   name: "if",
   description,
-  execute,
+  inputSchema,
+  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const context = agent.getState(ScriptingContext);
+
+    if (!prompt?.trim()) {
+      throw new CommandFailedError("Usage: /if $condition { commands } [else { commands }]");
+    }
+
+    const prefixMatch = prompt.match(/^\$(\w+)\s*/);
+    if (!prefixMatch) {
+      throw new CommandFailedError("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
+    }
+
+    const [prefix, conditionVar] = prefixMatch;
+    const thenBlock = extractBlock(prompt, prefix.length);
+
+    if (!thenBlock) {
+      throw new CommandFailedError("Missing then block { commands }");
+    }
+
+    const conditionValue = context.getVariable(conditionVar);
+    const isTruthy = conditionValue &&
+      conditionValue !== 'false' &&
+      conditionValue !== '0' &&
+      conditionValue !== 'no';
+
+    let body: string;
+
+    if (isTruthy) {
+      body = thenBlock.content;
+    } else {
+      const elseMatch = prompt.slice(thenBlock.endPos).match(/^\s*else\s*/);
+      if (elseMatch) {
+        const elseBlock = extractBlock(prompt, thenBlock.endPos + elseMatch[0].length);
+        if (!elseBlock) {
+          throw new CommandFailedError("Invalid else block");
+        }
+        body = elseBlock.content;
+      } else {
+        return "Condition was false, no else block";
+      }
+    }
+
+    const commands = parseBlock(body);
+    await executeBlock(commands, agent);
+
+    return "If statement completed";
+  },
   help,
-} satisfies TokenRingAgentCommand
+} satisfies TokenRingAgentCommand<typeof inputSchema>;

@@ -1,19 +1,14 @@
-import Agent from "@tokenring-ai/agent/Agent";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
+const inputSchema = {
+  args: {},
+  prompt: {description: "Text or variable", required: true},
+  allowAttachments: false,
+} as const satisfies AgentCommandInputSchema;
+
 const description = "Display text or variable value";
-
-async function execute(remainder: string, agent: Agent): Promise<string> {
-  const context = agent.getState(ScriptingContext);
-
-  if (!remainder?.trim()) {
-    throw new CommandFailedError("Usage: /echo <text|$var>");
-  }
-
-  return context.interpolate(remainder);
-}
 
 const help: string = `# /echo <text|$var>
 
@@ -28,6 +23,15 @@ Display text or variable value without LLM processing
 export default {
   name: "echo",
   description,
-  execute,
+  inputSchema,
+  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const context = agent.getState(ScriptingContext);
+
+    if (!prompt?.trim()) {
+      throw new CommandFailedError("Usage: /echo <text|$var>");
+    }
+
+    return context.interpolate(prompt);
+  },
   help,
-} satisfies TokenRingAgentCommand
+} satisfies TokenRingAgentCommand<typeof inputSchema>;

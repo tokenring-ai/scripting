@@ -43,10 +43,10 @@ The `llm()` function sends a prompt to the current agent and stores the response
 Store function output in variables:
 
 ```bash
-/func greet($name) => "Hello, $name!"
+/function greet($name) => "Hello, $name!"
 /var $greeting = greet("Alice")
 
-/func js wordCount($text) { return $text.split(/\s+/).length; }
+/function define js wordCount($text) { return $text.split(/\s+/).length; }
 /var $count = wordCount("This is a test")
 ```
 

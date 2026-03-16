@@ -103,7 +103,7 @@ Functions support multiple types:
 // Static function pattern
 {
   name: "greet",
-  type: "static",
+  type: "expression",
   parameters: ["name"],
   template: "Hello, ${name}! Welcome to our service."
 }
@@ -134,7 +134,7 @@ async function executeFunction(name: string, args: Record<string, any>): Promise
   const func = getFunction(name);
   
   switch (func.type) {
-    case "static":
+    case "expression":
       return executeStaticFunction(func, args);
     case "llm":
       return executeLlmFunction(func, args);
@@ -513,7 +513,7 @@ describe("Script Execution", () => {
 ```typescript
 // Test utilities
 class TestHelpers {
-  static createContext(overrides?: object): ScriptingContext {
+  expression createContext(overrides?: object): ScriptingContext {
     return {
       variables: new Map(Object.entries(overrides || {})),
       lists: new Map(),
@@ -522,7 +522,7 @@ class TestHelpers {
     };
   }
   
-  static expectCommand(text: string) {
+  expression expectCommand(text: string) {
     return {
       toParse: (parser: CommandParser) => {
         const result = parser.parse(text);

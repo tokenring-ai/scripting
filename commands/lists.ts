@@ -1,36 +1,18 @@
-import Agent from "@tokenring-ai/agent/Agent";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
+const inputSchema = {
+  args: {},
+  prompt: {
+    description: "List name",
+    required: false,
+  },
+  allowAttachments: false,
+} as const satisfies AgentCommandInputSchema;
+
 const description = "List all lists or show specific list";
-
-async function execute(remainder: string, agent: Agent): Promise<string> {
-  const context = agent.getState(ScriptingContext);
-
-  const listName = remainder?.trim().replace(/^@/, "");
-
-  if (listName) {
-    const list = context.getList(listName);
-    if (!list) {
-      throw new CommandFailedError(`List @${listName} not defined`);
-    } else {
-      return `@${listName} = [${list.map(item => `"${item}"`).join(", ")}]`;
-    }
-  }
-
-  const lists = Array.from(context.lists.entries());
-  if (lists.length === 0) {
-    return "No lists defined";
-  }
-
-  const lines: string[] = [
-    "Defined lists:",
-    markdownList(lists.map(([name, items]) => `@${name} = [${items.length} items]`))
-  ];
-  return lines.join("\n");
-}
 
 const help: string = `# /lists [@name]
 
@@ -54,9 +36,35 @@ List all lists or show specific list contents
 - Lists are prefixed with @ to distinguish from variables
 - List contents are displayed as JSON-like arrays
 - Lists persist across script executions`;
+
 export default {
   name: "lists",
   description,
-  execute,
+  inputSchema,
+  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const context = agent.getState(ScriptingContext);
+
+    const listName = prompt?.trim().replace(/^@/, "");
+
+    if (listName) {
+      const list = context.getList(listName);
+      if (!list) {
+        throw new CommandFailedError(`List @${listName} not defined`);
+      } else {
+        return `@${listName} = [${list.map(item => `"${item}"`).join(", ")}]`;
+      }
+    }
+
+    const lists = Array.from(context.lists.entries());
+    if (lists.length === 0) {
+      return "No lists defined";
+    }
+
+    const lines: string[] = [
+      "Defined lists:",
+      markdownList(lists.map(([name, items]) => `@${name} = [${items.length} items]`))
+    ];
+    return lines.join("\n");
+  },
   help,
-} satisfies TokenRingAgentCommand
+} satisfies TokenRingAgentCommand<typeof inputSchema>;

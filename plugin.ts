@@ -25,7 +25,7 @@ export default {
       chatService.registerContextHandlers(contextHandlers);
     });
     app.waitForService(AgentCommandService, agentCommandService =>
-      agentCommandService.addAgentCommands(agentCommands)
+      agentCommandService.addAgentCommands([...agentCommands])
     );
     const scriptingService = new ScriptingService(config.scripting ?? {});
     app.addServices(scriptingService);

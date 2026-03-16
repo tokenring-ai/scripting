@@ -10,8 +10,8 @@ Real-world examples demonstrating scripting capabilities.
 
 ```bash
 # Define the workflow functions
-/func llm generateOutline($subject, $audience) => "Create a detailed article outline about $subject for $audience"
-/func llm expandSection($outline, $section) => "Based on this outline: $outline, write a detailed section for: $section"
+/function define llm generateOutline($subject, $audience) => "Create a detailed article outline about $subject for $audience"
+/function define llm expandSection($outline, $section) => "Based on this outline: $outline, write a detailed section for: $section"
 
 # Generate outline
 /var $outline = generateOutline("machine learning", "beginners")
@@ -38,11 +38,11 @@ Real-world examples demonstrating scripting capabilities.
 /var $tags = llm("Generate 5 relevant tags for an article about $topic")
 
 # Add metadata
-/func js timestamp() {
+/function define js timestamp() {
   return new Date().toISOString();
 }
 
-/func js formatPost($title, $content, $tags, $date) {
+/function define js formatPost($title, $content, $tags, $date) {
   return `---
 title: ${$title}
 date: ${$date}
@@ -63,7 +63,7 @@ ${$content}`;
 
 ```bash
 # Define research function
-/func llm research($query, $source) => "Research $query using $source and provide key findings with citations"
+/function define llm research($query, $source) => "Research $query using $source and provide key findings with citations"
 
 # Gather information from multiple sources
 /var $topic = "quantum computing applications"
@@ -80,7 +80,7 @@ ${$content}`;
 
 ```bash
 # Define comparison function
-/func llm compare($item1, $item2, $criteria) => "Compare $item1 and $item2 based on $criteria. Provide a detailed analysis."
+/function define llm compare($item1, $item2, $criteria) => "Compare $item1 and $item2 based on $criteria. Provide a detailed analysis."
 
 # Research topics
 /var $topic1 = "React"
@@ -104,22 +104,22 @@ ${$content}`;
 
 ```bash
 # Define processing functions
-/func js wordCount($text) {
+/function define js wordCount($text) {
   return $text.split(/\s+/).length;
 }
 
-/func js extractUrls($text) {
+/function define js extractUrls($text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return ($text.match(urlRegex) || []).join('\n');
 }
 
-/func js extractEmails($text) {
+/function define js extractEmails($text) {
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
   return ($text.match(emailRegex) || []).join('\n');
 }
 
-/func llm summarize($text) => "Provide a concise summary of: $text"
-/func llm sentiment($text) => "Analyze the sentiment of this text (positive/negative/neutral): $text"
+/function define llm summarize($text) => "Provide a concise summary of: $text"
+/function define llm sentiment($text) => "Analyze the sentiment of this text (positive/negative/neutral): $text"
 
 # Process document
 /var $document = "Your long document text here..."
@@ -142,7 +142,7 @@ ${$content}`;
 ### CSV to JSON Conversion
 
 ```bash
-/func js csvToJson($csv) {
+/function define js csvToJson($csv) {
   const lines = $csv.split('\n');
   const headers = lines[0].split(',').map(h => h.trim());
   const rows = lines.slice(1).filter(line => line.trim()).map(line => {
@@ -170,7 +170,7 @@ Carol,35,SF"
 
 ```bash
 # Define translation function
-/func llm translate($text, $lang) => "Translate the following text to $lang, maintaining the original tone and style: $text"
+/function define llm translate($text, $lang) => "Translate the following text to $lang, maintaining the original tone and style: $text"
 
 # Source content
 /var $original = "Welcome to our platform. We're excited to have you here!"
@@ -192,7 +192,7 @@ Carol,35,SF"
 ### Localization with Context
 
 ```bash
-/func llm localize($text, $lang, $context) => "Localize this text for $lang speakers, considering $context: $text"
+/function define llm localize($text, $lang, $context) => "Localize this text for $lang speakers, considering $context: $text"
 
 /var $message = "Your order has been shipped!"
 /var $context = "e-commerce notification"
@@ -211,7 +211,7 @@ Carol,35,SF"
 ### Markdown Formatting
 
 ```bash
-/func js formatMarkdown($title, $content, $author) {
+/function define js formatMarkdown($title, $content, $author) {
   const date = new Date().toLocaleDateString();
   return `# ${$title}
 
@@ -238,7 +238,7 @@ ${$content}
 ### HTML Generation
 
 ```bash
-/func js toHtml($title, $content) {
+/function define js toHtml($title, $content) {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -266,10 +266,10 @@ ${$content}
 
 ```bash
 # Define review functions
-/func llm checkGrammar($text) => "Review this text for grammar and spelling errors: $text"
-/func llm checkClarity($text) => "Evaluate the clarity and readability of this text: $text"
-/func llm checkTone($text, $target) => "Evaluate if this text matches the $target tone: $text"
-/func llm suggest($text) => "Suggest improvements for this text: $text"
+/function define llm checkGrammar($text) => "Review this text for grammar and spelling errors: $text"
+/function define llm checkClarity($text) => "Evaluate the clarity and readability of this text: $text"
+/function define llm checkTone($text, $target) => "Evaluate if this text matches the $target tone: $text"
+/function define llm suggest($text) => "Suggest improvements for this text: $text"
 
 # Review content
 /var $draft = "Your draft content here..."
@@ -289,9 +289,9 @@ ${$content}
 ### SEO Optimization
 
 ```bash
-/func llm generateKeywords($content) => "Extract 10 relevant SEO keywords from: $content"
-/func llm generateMeta($content) => "Generate a meta description (150-160 chars) for: $content"
-/func llm generateTitle($content) => "Generate an SEO-optimized title (50-60 chars) for: $content"
+/function define llm generateKeywords($content) => "Extract 10 relevant SEO keywords from: $content"
+/function define llm generateMeta($content) => "Generate a meta description (150-160 chars) for: $content"
+/function define llm generateTitle($content) => "Generate an SEO-optimized title (50-60 chars) for: $content"
 
 /var $article = "Your article content..."
 
@@ -310,7 +310,7 @@ ${$content}
 
 ```bash
 # Define Q&A function
-/func llm ask($question, $context) => "Based on this context: $context\n\nAnswer this question: $question"
+/function define llm ask($question, $context) => "Based on this context: $context\n\nAnswer this question: $question"
 
 # Build knowledge base
 /var $topic = "machine learning"
@@ -346,11 +346,11 @@ ${$content}
 ### Date and Time Formatting
 
 ```bash
-/func js now() {
+/function define js now() {
   return new Date().toISOString();
 }
 
-/func js formatDate($iso, $format) {
+/function define js formatDate($iso, $format) {
   const date = new Date($iso);
   if ($format === 'short') return date.toLocaleDateString();
   if ($format === 'long') return date.toLocaleDateString('en-US', { 
@@ -371,7 +371,7 @@ ${$content}
 ### Text Statistics
 
 ```bash
-/func js stats($text) {
+/function define js stats($text) {
   const words = $text.split(/\s+/).length;
   const chars = $text.length;
   const sentences = $text.split(/[.!?]+/).filter(s => s.trim()).length;

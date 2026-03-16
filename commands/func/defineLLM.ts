@@ -1,0 +1,38 @@
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import {ScriptingContext} from "../../state/ScriptingContext.ts";
+import {parseFunctionSignature} from "./_shared.ts";
+
+const inputSchema = {
+  prompt: {
+    description: 'LLM function definition in the form name($param) => "prompt"',
+    required: true,
+  },
+  allowAttachments: false,
+} as const satisfies AgentCommandInputSchema;
+
+export default {
+  name: "function define llm",
+  description: "Define an LLM-backed scripting function",
+  aliases: ["func define llm"],
+  help: `# /function define llm <signature> => <prompt>
+
+Define an LLM function that sends an interpolated prompt to the model.
+
+## Example
+
+/function define llm analyze($text) => "Analyze: $text"`,
+  inputSchema,
+  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const match = prompt.match(/^(.+?)\s*=>\s*(.+)$/s);
+    if (!match) {
+      throw new CommandFailedError('Invalid syntax. Use: /function define llm name($param) => "prompt"');
+    }
+
+    const [, signature, body] = match;
+    const {funcName, params} = parseFunctionSignature(signature.trim());
+    const context = agent.getState(ScriptingContext);
+    context.defineFunction(funcName, "llm", params, body.trim());
+    return `LLM function ${funcName}(${params.map((param) => "$" + param).join(", ")}) defined`;
+  },
+} satisfies TokenRingAgentCommand<typeof inputSchema>;

@@ -34,7 +34,7 @@ describe('echo command', () => {
 });
 
 describe('var command', () => {
-  it('assigns static value', async () => {
+  it('assigns expression value', async () => {
     const {agent, context, infos} = createMockAgent();
     await varCmd.execute('$name = "Alice"', agent as any);
     expect(context.getVariable('name')).toBe('Alice');

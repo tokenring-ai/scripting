@@ -47,7 +47,7 @@ describe('Command Integration Tests', () => {
   });
 
   describe('var command integration', () => {
-    it('should create variables with static values', async () => {
+    it('should create variables with expression values', async () => {
       await varCmd.execute('$name = "Alice"', agent);
       
       expect(context.getVariable('name')).toBe('Alice');
@@ -63,7 +63,7 @@ describe('Command Integration Tests', () => {
     });
 
     it('should handle function calls in var assignments', async () => {
-      context.defineFunction('testFunc', 'static', ['arg'], 'test result');
+      context.defineFunction('testFunc', 'expression', ['arg'], 'test result');
       
       await varCmd.execute('$result = testFunc("test")', agent);
       
@@ -91,19 +91,19 @@ describe('Command Integration Tests', () => {
       // This test just verifies that LLM expressions don't crash
       context.defineFunction('llmFunc', 'llm', [], 'test prompt');
       
-      await varCmd.execute('$result = "static"', agent);
+      await varCmd.execute('$result = "expression"', agent);
       
-      expect(context.getVariable('result')).toBe('static');
+      expect(context.getVariable('result')).toBe('expression');
     });
   });
 
   describe('func command integration', () => {
-    it('should define static functions', async () => {
-      await funcCmd.execute('static greet($name) => "Hello, $name"', agent);
+    it('should define expression functions', async () => {
+      await funcCmd.execute('expression greet($name) => "Hello, $name"', agent);
       
       const func = context.getFunction('greet');
       expect(func).toBeDefined();
-      expect(func?.type).toBe('static');
+      expect(func?.type).toBe('expression');
     });
 
     it('should define LLM functions', async () => {
@@ -123,13 +123,13 @@ describe('Command Integration Tests', () => {
     });
 
     it('should prevent reserved function names', async () => {
-      await funcCmd.execute('static if($x) => "value"', agent);
+      await funcCmd.execute('expression if($x) => "value"', agent);
       
       expect(errors[0]).toContain('reserved');
     });
 
     it('should delete functions', async () => {
-      context.defineFunction('testFunc', 'static', [], 'test');
+      context.defineFunction('testFunc', 'expression', [], 'test');
       
       await funcCmd.execute('delete testFunc', agent);
       
@@ -161,7 +161,7 @@ describe('Command Integration Tests', () => {
     });
 
     it('should handle function calls that return arrays', async () => {
-      context.defineFunction('getItems', 'static', [], 'test');
+      context.defineFunction('getItems', 'expression', [], 'test');
       
       await listCmd.execute('@results = ["item1", "item2"]', agent);
       
@@ -185,7 +185,7 @@ describe('Command Integration Tests', () => {
 
   describe('call command integration', () => {
     it('should call functions with arguments', async () => {
-      context.defineFunction('testFunc', 'static', ['arg1', 'arg2'], 'result');
+      context.defineFunction('testFunc', 'expression', ['arg1', 'arg2'], 'result');
       
       await callCmd.execute('testFunc("arg1", "arg2")', agent);
       
@@ -199,7 +199,7 @@ describe('Command Integration Tests', () => {
     });
 
     it('should handle array results', async () => {
-      context.defineFunction('getItems', 'static', [], 'items');
+      context.defineFunction('getItems', 'expression', [], 'items');
       
       await callCmd.execute('getItems()', agent);
       
@@ -281,7 +281,7 @@ describe('Command Integration Tests', () => {
     it('should handle variable interpolation across commands', async () => {
       await varCmd.execute('$name = "Alice"', agent);
       await echoCmd.execute('Hello $name', agent);
-      await funcCmd.execute('static greet($name) => "Hello, $name"', agent);
+      await funcCmd.execute('expression greet($name) => "Hello, $name"', agent);
       
       expect(infos).toContain('Hello Alice');
     });
@@ -294,7 +294,7 @@ describe('Command Integration Tests', () => {
     });
 
     it('should handle function definitions and calls', async () => {
-      await funcCmd.execute('static process($text) => "Processed: $text"', agent);
+      await funcCmd.execute('expression process($text) => "Processed: $text"', agent);
       await callCmd.execute('process("hello")', agent);
       
       expect(outputs.length).toBeGreaterThan(0);

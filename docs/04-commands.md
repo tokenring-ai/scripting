@@ -81,43 +81,43 @@ Display all variables or a specific variable.
 
 ### `/func` - Define Function
 
-Define static, LLM, or JavaScript functions.
+Define expression, LLM, or JavaScript functions.
 
 **Syntax:**
 
 ```bash
 # Static function
-/func static name($param1, $param2) => "text with $param1"
+/function define expr name($param1, $param2) => "text with $param1"
 
 # LLM function
-/func llm name($param1, $param2) => "prompt with $param1"
+/function define llm name($param1, $param2) => "prompt with $param1"
 
 # JavaScript function
-/func js name($param1, $param2) {
+/function define js name($param1, $param2) {
   // JavaScript code
   return result;
 }
 
 # Delete function
-/func delete name
+/function delete name
 ```
 
 **Examples:**
 
 ```bash
 # Static
-/func static greet($name) => "Hello, $name!"
+/function define expr greet($name) => "Hello, $name!"
 
 # LLM
-/func llm summarize($text) => "Summarize: $text"
+/function define llm summarize($text) => "Summarize: $text"
 
 # JavaScript
-/func js wordCount($text) {
+/function define js wordCount($text) {
   return $text.split(/\s+/).length;
 }
 
 # Delete
-/func delete greet
+/function delete greet
 ```
 
 **Notes:**
@@ -538,7 +538,7 @@ Execute multiple commands in sequence:
 Use functions for conditional logic:
 
 ```bash
-/func js shouldProcess($text) {
+/function define js shouldProcess($text) {
   return $text.length > 100 ? "yes" : "no";
 }
 
@@ -587,7 +587,7 @@ Function errors are displayed:
 JavaScript execution errors are caught:
 
 ```bash
-/func js broken($x) {
+/function define js broken($x) {
   throw new Error("Something went wrong");
 }
 
@@ -600,7 +600,7 @@ JavaScript execution errors are caught:
 JavaScript functions timeout after 5 seconds:
 
 ```bash
-/func js infinite() {
+/function define js infinite() {
   while(true) {}
 }
 
@@ -629,8 +629,8 @@ JavaScript functions timeout after 5 seconds:
 ### 3. Combine Function Types
 
 ```bash
-/func js clean($text) { return $text.trim().toLowerCase(); }
-/func llm analyze($text) => "Analyze: $text"
+/function define js clean($text) { return $text.trim().toLowerCase(); }
+/function define llm analyze($text) => "Analyze: $text"
 
 /var $cleaned = clean($rawData)
 /var $analysis = analyze($cleaned)
@@ -646,7 +646,7 @@ JavaScript functions timeout after 5 seconds:
 ### 5. Test Functions with `/call`
 
 ```bash
-/func static greet($name) => "Hello, $name!"
+/function define expr greet($name) => "Hello, $name!"
 /call greet("Test")
 # Verify output before using in variables
 ```

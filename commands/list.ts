@@ -1,68 +1,17 @@
-import Agent from "@tokenring-ai/agent/Agent";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
 
+const inputSchema = {
+  args: {},
+  prompt: {description: "List definition", required: true},
+  allowAttachments: false,
+} as const satisfies AgentCommandInputSchema;
+
 const description = "Define or assign lists";
-
-async function execute(remainder: string, agent: Agent): Promise<string> {
-  const context = agent.getState(ScriptingContext);
-
-  if (!remainder?.trim()) {
-    return showHelp();
-  }
-
-  // Check for function call syntax: @name = functionName("arg1", "arg2")
-  const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
-  if (funcMatch) {
-    const [, listName, funcName, argsStr] = funcMatch;
-    const scriptingService = agent.requireServiceByType(ScriptingService);
-
-    const args = parseArguments(argsStr).map(a => {
-      const unquoted = a.match(/^["'](.*)["']$/);
-      return unquoted ? unquoted[1] : context.interpolate(a);
-    });
-
-    try {
-      const result = await scriptingService.executeFunction(funcName, args, agent);
-      const items = Array.isArray(result) ? result : [result];
-
-      // Check for name conflict with variables
-      if (context.variables.has(listName)) {
-        throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
-      }
-
-      context.setList(listName, items);
-      return `List @${listName} = [${items.length} items]`;
-    } catch (error) {
-      throw new CommandFailedError(error instanceof Error ? error.message : String(error));
-    }
-  }
-
-  // Check for array literal syntax: @name = ["item1", "item2"]
-  const match = remainder.match(/^@(\w+)\s*=\s*\[(.+)\]$/s);
-  if (!match) {
-    throw new CommandFailedError("Invalid syntax. Use: /list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\")");
-  }
-
-  const [, listName, itemsStr] = match;
-
-  // Check for name conflict with variables
-  if (context.variables.has(listName)) {
-    throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
-  }
-
-  const items = parseArguments(itemsStr).map(item => {
-    const unquoted = item.match(/^["'](.*)["']$/);
-    return unquoted ? unquoted[1] : context.interpolate(item);
-  });
-
-  context.setList(listName, items);
-  return `List @${listName} = [${items.length} items]`;
-}
 
 function showHelp(): string {
   const lines: string[] = [
@@ -101,9 +50,61 @@ Define or assign lists with various content sources
 - Use /lists to view all defined lists
 - Lists persist across script executions
 - Items can be quoted strings or interpolated variables`;
+
 export default {
   name: "list",
   description,
-  execute,
+  inputSchema,
+  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const context = agent.getState(ScriptingContext);
+
+    if (!prompt?.trim()) {
+      return showHelp();
+    }
+
+    const funcMatch = prompt.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
+    if (funcMatch) {
+      const [, listName, funcName, argsStr] = funcMatch;
+      const scriptingService = agent.requireServiceByType(ScriptingService);
+
+      const args = parseArguments(argsStr).map(a => {
+        const unquoted = a.match(/^["'](.*)['"']$/);
+        return unquoted ? unquoted[1] : context.interpolate(a);
+      });
+
+      try {
+        const result = await scriptingService.executeFunction(funcName, args, agent);
+        const items = Array.isArray(result) ? result : [result];
+
+        if (context.variables.has(listName)) {
+          throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
+        }
+
+        context.setList(listName, items);
+        return `List @${listName} = [${items.length} items]`;
+      } catch (error) {
+        throw new CommandFailedError(error instanceof Error ? error.message : String(error));
+      }
+    }
+
+    const match = prompt.match(/^@(\w+)\s*=\s*\[(.+)\]$/s);
+    if (!match) {
+      throw new CommandFailedError("Invalid syntax. Use: /list @name = [\"item1\", \"item2\"] or /list @name = functionName(\"arg\")");
+    }
+
+    const [, listName, itemsStr] = match;
+
+    if (context.variables.has(listName)) {
+      throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
+    }
+
+    const items = parseArguments(itemsStr).map(item => {
+      const unquoted = item.match(/^["'](.*)['"']$/);
+      return unquoted ? unquoted[1] : context.interpolate(item);
+    });
+
+    context.setList(listName, items);
+    return `List @${listName} = [${items.length} items]`;
+  },
   help,
-} satisfies TokenRingAgentCommand
+} satisfies TokenRingAgentCommand<typeof inputSchema>;

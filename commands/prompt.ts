@@ -1,38 +1,14 @@
-import Agent from "@tokenring-ai/agent/Agent";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
+const inputSchema = {
+  args: {},
+  prompt: {description: "Variable and message", required: true},
+  allowAttachments: false,
+} as const satisfies AgentCommandInputSchema;
+
 const description = "Prompt user for input";
-
-async function execute(remainder: string, agent: Agent): Promise<string> {
-  const context = agent.getState(ScriptingContext);
-
-  if (!remainder?.trim()) {
-    throw new CommandFailedError("Usage: /prompt $var \"message\"");
-  }
-
-  const match = remainder.match(/^\$(\w+)\s+(.+)$/);
-  if (!match) {
-    throw new CommandFailedError("Invalid syntax. Use: /prompt $var \"message\"");
-  }
-
-  const [, varName, messageExpr] = match;
-  const unquoted = messageExpr.match(/^["'](.*)["']$/s);
-  const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
-
-  const input = await agent.askForText({
-    message,
-    label: "Input"
-  });
-
-  if (input) {
-    context.setVariable(varName, input);
-    return `Variable $${varName} = ${input}`;
-  } else {
-    return "User cancelled input";
-  }
-}
 
 const help: string = `# /prompt $var "message"
 
@@ -55,9 +31,38 @@ Prompt the user for input and store the response in a variable
 - Useful for interactive scripts and workflows
 - Script pauses until user provides input
 - Input can be any text including special characters`;
+
 export default {
   name: "prompt",
   description,
-  execute,
+  inputSchema,
+  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const context = agent.getState(ScriptingContext);
+
+    if (!prompt?.trim()) {
+      throw new CommandFailedError("Usage: /prompt $var \"message\"");
+    }
+
+    const match = prompt.match(/^\$(\w+)\s+(.+)$/);
+    if (!match) {
+      throw new CommandFailedError("Invalid syntax. Use: /prompt $var \"message\"");
+    }
+
+    const [, varName, messageExpr] = match;
+    const unquoted = messageExpr.match(/^["'](.*)['"']$/s);
+    const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
+
+    const input = await agent.askForText({
+      message,
+      label: "Input"
+    });
+
+    if (input) {
+      context.setVariable(varName, input);
+      return `Variable $${varName} = ${input}`;
+    } else {
+      return "User cancelled input";
+    }
+  },
   help,
-} satisfies TokenRingAgentCommand
+} satisfies TokenRingAgentCommand<typeof inputSchema>;

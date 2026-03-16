@@ -9,7 +9,7 @@ provides variables, functions, and seamless LLM integration for building dynamic
 
 - **Variables** - Store data and LLM responses with `$` prefix
 - **Lists** - Store arrays of items with `@` prefix
-- **Functions** - Three types: static text, LLM prompts, and JavaScript
+- **Functions** - Three types: expression text, LLM prompts, and JavaScript
 - **LLM Integration** - Direct integration with AI agents
 - **Variable Interpolation** - Automatic substitution in prompts and text
 - **Control Flow** - Conditionals (`/if`), loops (`/for`, `/while`) with semicolon or newline delimiters
@@ -32,9 +32,9 @@ Variables store values and are prefixed with `$`:
 Functions are reusable templates with parameters:
 
 ```bash
-/func static greet($name) => "Hello, $name!"
-/func llm summarize($text) => "Summarize: $text"
-/func js wordCount($text) { return $text.split(/\s+/).length; }
+/function define expr greet($name) => "Hello, $name!"
+/function define llm summarize($text) => "Summarize: $text"
+/function define js wordCount($text) { return $text.split(/\s+/).length; }
 ```
 
 ### Calling Functions
