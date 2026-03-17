@@ -1,37 +1,33 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {description: "Text or variable", required: true},
-  allowAttachments: false,
+  positionals: [{
+    name: "expression",
+    description: "Text or variable to display",
+    required: true,
+    greedy: true,
+  }],
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Display text or variable value";
 
-const help: string = `# /echo <text|$var>
+const help: string = `Display text or variable value without LLM processing.
 
-Display text or variable value without LLM processing
-
-## Examples
+## Example
 
 /echo $summary
-/echo Hello, $name!
-`;
+/echo Hello, $name!`;
 
 export default {
   name: "echo",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals: {expression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    if (!prompt?.trim()) {
-      throw new CommandFailedError("Usage: /echo <text|$var>");
-    }
-
-    return context.interpolate(prompt);
+    return context.interpolate(expression);
   },
   help,
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

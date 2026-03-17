@@ -4,19 +4,20 @@ import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {evaluateExpression} from "./_shared.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "assignment",
     description: "Variable assignment in the form $name = value",
     required: true,
-  },
+    greedy: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "var set",
   description: "Set a scripting variable",
-  help: `# /var set $name = value
-
-Assign a expression value, llm(...) result, or function result to a variable.
+  help: `Assign an expression value, llm(...) result, or function result to a variable.
 
 ## Example
 
@@ -24,9 +25,9 @@ Assign a expression value, llm(...) result, or function result to a variable.
 /var set $greeting = llm("Say hello")
 /var set $result = process($input)`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
-    const match = prompt.match(/^\$(\w+)\s*=\s*(.+)$/);
+    const match = positionals.assignment.match(/^\$(\w+)\s*=\s*(.+)$/);
     if (!match) {
       throw new CommandFailedError("Invalid syntax. Use: /var set $name = value");
     }

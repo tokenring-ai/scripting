@@ -1,54 +1,45 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {description: "Variable and message", required: true},
+  positionals: [
+    {
+      name: "varName",
+      description: "Variable to store input in (with $ prefix)",
+      required: true,
+    },
+    {
+      name: "messageExpression",
+      description: "Message to display to the user",
+      required: true,
+      greedy: true,
+    },
+  ],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Prompt user for input";
 
-const help: string = `# /prompt $var "message"
+const help: string = `Prompt the user for input and store the response in a variable.
 
-Prompt the user for input and store the response in a variable
-
-## Syntax
-
-/prompt $variable "message"   - Prompt user and store response
-
-## Examples
+## Example
 
 /prompt $name "Enter your name:"
-/prompt $age "How old are you?"
-/prompt $continue "Process next item? (y/n)"
-
-## Notes
-
-- The message supports variable interpolation
-- User input is stored as-is (no processing)
-- Useful for interactive scripts and workflows
-- Script pauses until user provides input
-- Input can be any text including special characters`;
+/prompt $age "How old are you?"`;
 
 export default {
   name: "prompt",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    if (!prompt?.trim()) {
-      throw new CommandFailedError("Usage: /prompt $var \"message\"");
-    }
+    const varName = positionals.varName.replace(/^\$/, "");
+    if (!varName) throw new CommandFailedError('Usage: /prompt $var "message"');
 
-    const match = prompt.match(/^\$(\w+)\s+(.+)$/);
-    if (!match) {
-      throw new CommandFailedError("Invalid syntax. Use: /prompt $var \"message\"");
-    }
-
-    const [, varName, messageExpr] = match;
+    const messageExpr = positionals.messageExpression;
     const unquoted = messageExpr.match(/^["'](.*)['"']$/s);
     const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
 

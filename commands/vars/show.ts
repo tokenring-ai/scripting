@@ -3,22 +3,26 @@ import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentComma
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "varName",
     description: "Variable name to show, with or without the $ prefix",
     required: true,
-  },
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "vars show",
   description: "Show a scripting variable",
-  help: `# /vars show $name
+  help: `Show the full value of a variable.
 
-Show the full value of a variable.`,
+## Example
+
+/vars show $name`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const varName = prompt.trim().replace(/^\$/, "");
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const varName = positionals.varName.replace(/^\$/, "");
     const context = agent.getState(ScriptingContext);
     const value = context.getVariable(varName);
     if (value === undefined) {

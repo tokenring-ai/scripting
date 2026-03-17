@@ -8,9 +8,7 @@ const inputSchema = {
 export default {
   name: "vars clear",
   description: "Clear all scripting variables",
-  help: `# /vars clear
-
-Remove all variables from the current scripting context.`,
+  help: `Remove all variables from the current scripting context.`,
   inputSchema,
   execute: async ({agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);

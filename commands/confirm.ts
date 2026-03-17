@@ -4,45 +4,49 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {description: "Variable and message", required: true},
+  positionals: [
+    {
+      name: 'varName',
+      description: "Variable to store the result",
+      required: true,
+    },
+    {
+      name: 'message',
+      description: "Confirmation message to display to the user",
+      required: true,
+      greedy: true,
+    },
+  ],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Prompt user for yes/no confirmation";
 
-const help: string = `# /confirm $var "message"
-
-Prompt user for yes/no confirmation
+const help: string = `Prompt user for yes/no confirmation
 
 - Stores 'yes' or 'no' in variable
 
 ## Example
 
-/confirm $proceed "Continue with operation?"
+/confirm $proceed Continue with operation?
 `;
 
 export default {
   name: "confirm",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    if (!prompt?.trim()) {
-      throw new CommandFailedError("Usage: /confirm $var \"message\"");
-    }
-
-    const match = prompt.match(/^\$(\w+)\s+(.+)$/);
+    const match = positionals.varName.match(/^\$(\w+)$/);
     if (!match) {
-      throw new CommandFailedError("Invalid syntax. Use: /confirm $var \"message\"");
+      throw new CommandFailedError("Invalid variable name. Use: /confirm $var message...");
     }
 
-    const [, varName, messageExpr] = match;
-    const unquoted = messageExpr.match(/^["'](.*)['"']$/s);
-    const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
+    const [, varName] = match;
 
     const confirmed = await agent.askForApproval({
-      message
+      message: positionals.message
     });
 
     const result = confirmed ? 'yes' : 'no';

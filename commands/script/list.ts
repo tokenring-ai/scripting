@@ -9,9 +9,7 @@ const inputSchema = {
 export default {
   name: "script list",
   description: "List available scripts",
-  help: `# /script list
-
-List all available predefined scripts.`,
+  help: `List all available predefined scripts.`,
   inputSchema,
   execute: async ({agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);

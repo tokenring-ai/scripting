@@ -4,47 +4,32 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {description: "Sleep duration", required: true},
+  positionals: [{
+    name: "seconds",
+    description: "Sleep duration in seconds",
+    required: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Sleep for specified seconds";
 
-const help: string = `# /sleep <seconds|$var>
+const help: string = `Pause script execution for a specified number of seconds.
 
-Pause script execution for a specified number of seconds
+## Example
 
-## Syntax
-
-- \`/sleep <number>\` - Sleep for exact number of seconds
-- \`/sleep $variable\` - Sleep for value stored in variable
-
-## Examples
-
-/sleep 5                - Sleep for exactly 5 seconds
-/sleep $delay           - Sleep for value of $delay variable
-/sleep 0.5              - Sleep for half a second
-
-## Notes
-
-- Accepts both integer and decimal values
-- Variable values are interpolated before parsing
-- Minimum sleep duration is 0 seconds (no delay)
-- Maximum sleep duration is not explicitly limited
-- Useful for rate limiting or delays in automation`;
+/sleep 5
+/sleep $delay
+/sleep 0.5`;
 
 export default {
   name: "sleep",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    if (!prompt?.trim()) {
-      throw new CommandFailedError("Usage: /sleep <seconds|$var>");
-    }
-
-    const interpolated = context.interpolate(prompt.trim());
+    const interpolated = context.interpolate(positionals.seconds);
     const seconds = parseFloat(interpolated);
 
     if (isNaN(seconds) || seconds < 0) {

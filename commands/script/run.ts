@@ -3,33 +3,37 @@ import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentComma
 import ScriptingService from "../../ScriptingService.ts";
 
 const inputSchema = {
-  prompt: {
-    description: "Script name followed by optional input",
-    required: true,
-  },
+  args: {},
+  positionals: [
+    {
+      name: "scriptName",
+      description: "Script name",
+      required: true,
+    },
+    {
+      name: "input",
+      description: "Optional input for the script",
+      required: false,
+      defaultValue: "",
+      greedy: true,
+    },
+  ],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "script run",
   description: "Run a predefined script",
-  help: `# /script run <name> [input]
-
-Run a predefined script with optional input.
+  help: `Run a predefined script with optional input.
 
 ## Example
 
 /script run myScript
-/script run myScript data`,
+/script run myScript some input data`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const [scriptName, ...inputParts] = prompt.trim().split(/\s+/);
-    if (!scriptName) {
-      throw new CommandFailedError("Please provide a script name.");
-    }
-
+  execute: async ({positionals: { scriptName, input }, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
-    await scriptingService.runScript({scriptName, input: inputParts.join(" ")}, agent);
+    await scriptingService.runScript({scriptName, input}, agent);
     return "Script executed";
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

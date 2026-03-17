@@ -12,9 +12,7 @@ export default {
   name: "functions list",
   description: "List all scripting functions",
   aliases: ["function list"],
-  help: `# /functions list
-
-List all local and global functions.
+  help: `List all local and global functions.
 
 ## Example
 

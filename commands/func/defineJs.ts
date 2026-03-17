@@ -4,10 +4,13 @@ import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {parseFunctionSignature} from "./_shared.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "definition",
     description: "JavaScript function definition in the form name($param) { ... }",
     required: true,
-  },
+    greedy: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
@@ -15,16 +18,14 @@ export default {
   name: "function define js",
   description: "Define a JavaScript scripting function",
   aliases: ["function define javascript", "func define js", "func define javascript"],
-  help: `# /function define js <signature> { <body> }
-
-Define a JavaScript function with access to context variables.
+  help: `Define a JavaScript function with access to context variables.
 
 ## Example
 
 /function define js wordCount($text) { return $text.split(/\\s+/).length; }`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const match = prompt.match(/^(.+?)\s*\{(.+)\}$/s);
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const match = positionals.definition.match(/^(.+?)\s*\{(.+)\}$/s);
     if (!match) {
       throw new CommandFailedError("Invalid syntax. Use: /function define js name($param) { return result; }");
     }

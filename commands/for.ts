@@ -6,41 +6,38 @@ import {executeBlock} from "../utils/executeBlock.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {description: "For loop syntax", required: true},
+  positionals: [{
+    name: "expression",
+    description: "For loop syntax: $item in @list { commands }",
+    required: true,
+    greedy: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Iterate over lists";
 
-const help: string = `# /for $item in @list { commands }
+const help: string = `Iterate over a list, executing commands for each item.
 
-Iterate over lists
-
-## Examples
+## Example
 
 /for $file in @files { /echo Processing $file }
-/for $x in @items { /echo $x; /var $y = process($x) }
-
-**Note:** Separate multiple commands with semicolons or newlines`;
+/for $x in @items { /echo $x }`;
 
 export default {
   name: "for",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals: {expression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    if (!prompt?.trim()) {
-      throw new CommandFailedError("Usage: /for $item in @list { commands }");
-    }
-
-    const prefixMatch = prompt.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
+    const prefixMatch = expression.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
     if (!prefixMatch) {
       throw new CommandFailedError("Invalid syntax. Use: /for $item in @list { commands }");
     }
 
     const [prefix, itemVar, listName] = prefixMatch;
-    const block = extractBlock(prompt, prefix.length);
+    const block = extractBlock(expression, prefix.length);
 
     if (!block) {
       throw new CommandFailedError("Missing block { commands }");

@@ -4,10 +4,13 @@ import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {parseFunctionSignature} from "./_shared.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "definition",
     description: 'LLM function definition in the form name($param) => "prompt"',
     required: true,
-  },
+    greedy: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
@@ -15,16 +18,14 @@ export default {
   name: "function define llm",
   description: "Define an LLM-backed scripting function",
   aliases: ["func define llm"],
-  help: `# /function define llm <signature> => <prompt>
-
-Define an LLM function that sends an interpolated prompt to the model.
+  help: `Define an LLM function that sends an interpolated prompt to the model.
 
 ## Example
 
 /function define llm analyze($text) => "Analyze: $text"`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const match = prompt.match(/^(.+?)\s*=>\s*(.+)$/s);
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const match = positionals.definition.match(/^(.+?)\s*=>\s*(.+)$/s);
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /function define llm name($param) => "prompt"');
     }

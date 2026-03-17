@@ -3,22 +3,25 @@ import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentComma
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "varName",
     description: "Variable name to delete, with or without the $ prefix",
     required: true,
-  },
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "var delete",
   description: "Delete a scripting variable",
-  help: `# /var delete $name
+  help: `Delete a variable from the current scripting context.
 
-Delete a variable from the current scripting context.`,
+## Example
+
+/var delete $name`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const varName = prompt.trim().replace(/^\$/, "");
+  execute: async ({positionals: {varName}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     if (!/^\w+$/.test(varName)) {
       throw new CommandFailedError("Invalid syntax. Use: /var delete $name");
     }

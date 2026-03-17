@@ -3,10 +3,12 @@ import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentComma
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "funcName",
     description: "Function name to delete",
     required: true,
-  },
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
@@ -14,16 +16,13 @@ export default {
   name: "function delete",
   description: "Delete a scripting function",
   aliases: ["func delete"],
-  help: `# /function delete <name>
-
-Delete a previously defined local function.
+  help: `Delete a previously defined local function.
 
 ## Example
 
 /function delete greet`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const funcName = prompt.trim();
+  execute: async ({positionals: {funcName}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     if (!/^\w+$/.test(funcName)) {
       throw new CommandFailedError("Invalid syntax. Use: /function delete <name>");
     }

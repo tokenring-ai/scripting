@@ -4,22 +4,25 @@ import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../../ScriptingService.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "scriptName",
     description: "Script name",
     required: true,
-  },
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "script info",
   description: "Show script information",
-  help: `# /script info <name>
+  help: `Show information about a predefined script.
 
-Show information about a predefined script.`,
+## Example
+
+/script info myScript`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const scriptName = prompt.trim();
+  execute: async ({positionals: {scriptName}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
     const script = scriptingService.getScriptByName(scriptName);
     if (!script) {

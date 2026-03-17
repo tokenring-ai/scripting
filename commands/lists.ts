@@ -1,50 +1,35 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {
-    description: "List name",
+  positionals: [{
+    name: "listName",
+    description: "List name to show",
     required: false,
-  },
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 const description = "List all lists or show specific list";
 
-const help: string = `# /lists [@name]
+const help: string = `List all lists or show specific list contents.
 
-List all lists or show specific list contents
+## Example
 
-## Syntax
-
-/lists                    - List all defined lists
-/lists @name              - Show contents of specific list
-
-## Examples
-
-/lists                    - Display all lists with item counts
-/lists @files             - Show all items in @files list
-/lists @names             - Display all names in @names list
-
-## Notes
-
-- Lists are arrays of strings that can be iterated over
-- Use /list to create new lists
-- Lists are prefixed with @ to distinguish from variables
-- List contents are displayed as JSON-like arrays
-- Lists persist across script executions`;
+/lists
+/lists @files`;
 
 export default {
   name: "lists",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const listName = prompt?.trim().replace(/^@/, "");
+    const listName = positionals.listName?.replace(/^@/, "");
 
     if (listName) {
       const list = context.getList(listName);
@@ -60,11 +45,7 @@ export default {
       return "No lists defined";
     }
 
-    const lines: string[] = [
-      "Defined lists:",
-      markdownList(lists.map(([name, items]) => `@${name} = [${items.length} items]`))
-    ];
-    return lines.join("\n");
+    return ["Defined lists:", markdownList(lists.map(([name, items]) => `@${name} = [${items.length} items]`))].join("\n");
   },
   help,
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

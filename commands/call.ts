@@ -6,43 +6,37 @@ import {parseArguments} from "../utils/parseArguments.ts";
 
 const inputSchema = {
   args: {},
-  prompt: {description: "Function call", required: true},
+  positionals: [{
+    name: "callExpression",
+    description: "Function call expression, e.g. greet(\"World\")",
+    required: true,
+    greedy: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Call a function and display output";
 
-const help: string = `# /call functionName("arg1", "arg2")
-
-Call a function and display its output
+const help: string = `Call a function and display its output.
 
 ## Example
 
-/call search("AI trends", "Google")
-`;
+/call search("AI trends", "Google")`;
 
 export default {
   name: "call",
   description,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals: {callExpression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    if (!prompt?.trim()) {
-      throw new CommandFailedError("Usage: /call functionName(\"arg1\", \"arg2\")");
-    }
-
-    const match = prompt.trim().match(/^(\w+)\((.*)\)$/);
+    const match = callExpression.match(/^(\w+)\((.*)\)$/);
     if (!match) {
-      throw new CommandFailedError("Invalid syntax. Use: /call functionName(\"arg1\", \"arg2\")");
+      throw new CommandFailedError('Invalid syntax. Use: /call functionName("arg1", "arg2")');
     }
 
     const [, funcName, argsStr] = match;
     const scriptingService = agent.requireServiceByType(ScriptingService);
-
-    if (!scriptingService) {
-      throw new CommandFailedError("ScriptingService not available");
-    }
 
     const args = parseArguments(argsStr).map(a => {
       const unquoted = a.match(/^["'](.*)['"']$/);

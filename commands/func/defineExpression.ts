@@ -4,10 +4,13 @@ import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {parseFunctionSignature} from "./_shared.ts";
 
 const inputSchema = {
-  prompt: {
+  args: {},
+  positionals: [{
+    name: "definition",
     description: 'A function expression in the form greet($name) => "Hello, $name!"',
     required: true,
-  },
+    greedy: true,
+  }],
   allowAttachments: false,
 } as const satisfies AgentCommandInputSchema;
 
@@ -15,16 +18,14 @@ export default {
   name: "function define expr",
   description: "Define a function that evaluates an expression",
   aliases: ["function define expression", "func define expr", "func define expression"],
-  help: `# /function define expr <signature> => <expression>
-
-Define a function that evaluates and expression and returns text with variable interpolation.
+  help: `Define a function that evaluates an expression and returns text with variable interpolation.
 
 ## Example
 
 /function define expr greet($name) => "Hello, $name!"`,
   inputSchema,
-  execute: async ({prompt, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const match = prompt.match(/^(.+?)\s*=>\s*(.+)$/s);
+  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const match = positionals.definition.match(/^(.+?)\s*=>\s*(.+)$/s);
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /function define expr name($param) => "text"');
     }

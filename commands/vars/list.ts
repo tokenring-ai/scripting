@@ -9,9 +9,7 @@ const inputSchema = {
 export default {
   name: "vars list",
   description: "List all scripting variables",
-  help: `# /vars list
-
-List all variables in the current scripting context.`,
+  help: `List all variables in the current scripting context.`,
   inputSchema,
   execute: async ({agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
