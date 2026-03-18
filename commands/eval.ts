@@ -4,13 +4,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "command",
-    description: "Command with variables to interpolate and execute",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "command", description: "Command with variables to interpolate and execute", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Interpolate variables and execute a command";
@@ -27,11 +21,11 @@ export default {
   name: "eval",
   description,
   inputSchema,
-  execute: async ({positionals: {command}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
     const agentCommandService = agent.requireServiceByType(AgentCommandService);
 
-    const interpolatedCommand = context.interpolate(command);
+    const interpolatedCommand = context.interpolate(remainder);
     await agentCommandService.executeAgentCommand(agent, interpolatedCommand);
 
     return "Command executed";

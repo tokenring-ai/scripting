@@ -1,24 +1,10 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../../ScriptingService.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [
-    {
-      name: "scriptName",
-      description: "Script name",
-      required: true,
-    },
-    {
-      name: "input",
-      description: "Optional input for the script",
-      required: false,
-      defaultValue: "",
-      greedy: true,
-    },
-  ],
-  allowAttachments: false,
+  positionals: [{name: "scriptName", description: "Script name", required: true}],
+  remainder: {name: "input", description: "Optional input for the script"}
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -31,9 +17,9 @@ export default {
 /script run myScript
 /script run myScript some input data`,
   inputSchema,
-  execute: async ({positionals: { scriptName, input }, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals: {scriptName}, remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
-    await scriptingService.runScript({scriptName, input}, agent);
+    await scriptingService.runScript({scriptName, input: remainder ?? ""}, agent);
     return "Script executed";
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

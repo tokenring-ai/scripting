@@ -8,8 +8,7 @@ const inputSchema = {
     name: "funcName",
     description: "Function name to delete",
     required: true,
-  }],
-  allowAttachments: false,
+  }]
 } as const satisfies AgentCommandInputSchema;
 
 export default {

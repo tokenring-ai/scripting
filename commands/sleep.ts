@@ -8,8 +8,7 @@ const inputSchema = {
     name: "seconds",
     description: "Sleep duration in seconds",
     required: true,
-  }],
-  allowAttachments: false,
+  }]
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Sleep for specified seconds";

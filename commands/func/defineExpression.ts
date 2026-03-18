@@ -5,13 +5,7 @@ import {parseFunctionSignature} from "./_shared.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "definition",
-    description: 'A function expression in the form greet($name) => "Hello, $name!"',
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "definition", description: 'A function expression in the form greet($name) => "Hello, $name!"', required: true}
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -24,8 +18,8 @@ export default {
 
 /function define expr greet($name) => "Hello, $name!"`,
   inputSchema,
-  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const match = positionals.definition.match(/^(.+?)\s*=>\s*(.+)$/s);
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const match = remainder.match(/^(.+?)\s*=>\s*(.+)$/s);
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /function define expr name($param) => "text"');
     }

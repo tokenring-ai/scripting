@@ -5,13 +5,7 @@ import {parseFunctionSignature} from "./_shared.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "definition",
-    description: "JavaScript function definition in the form name($param) { ... }",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "definition", description: "JavaScript function definition in the form name($param) { ... }", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -24,8 +18,8 @@ export default {
 
 /function define js wordCount($text) { return $text.split(/\\s+/).length; }`,
   inputSchema,
-  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const match = positionals.definition.match(/^(.+?)\s*\{(.+)\}$/s);
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+    const match = remainder.match(/^(.+?)\s*\{(.+)\}$/s);
     if (!match) {
       throw new CommandFailedError("Invalid syntax. Use: /function define js name($param) { return result; }");
     }

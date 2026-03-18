@@ -5,13 +5,7 @@ import {evaluateExpression} from "./_shared.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "assignment",
-    description: "Variable assignment in the form $name = value",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "assignment", description: "Variable assignment in the form $name = value", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -25,9 +19,9 @@ export default {
 /var set $greeting = llm("Say hello")
 /var set $result = process($input)`,
   inputSchema,
-  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
-    const match = positionals.assignment.match(/^\$(\w+)\s*=\s*(.+)$/);
+    const match = remainder.match(/^\$(\w+)\s*=\s*(.+)$/);
     if (!match) {
       throw new CommandFailedError("Invalid syntax. Use: /var set $name = value");
     }

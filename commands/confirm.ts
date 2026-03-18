@@ -4,20 +4,8 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [
-    {
-      name: 'varName',
-      description: "Variable to store the result",
-      required: true,
-    },
-    {
-      name: 'message',
-      description: "Confirmation message to display to the user",
-      required: true,
-      greedy: true,
-    },
-  ],
-  allowAttachments: false,
+  positionals: [{name: 'varName', description: "Variable to store the result", required: true}],
+  remainder: {name: 'message', description: "Confirmation message to display to the user", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Prompt user for yes/no confirmation";
@@ -35,7 +23,7 @@ export default {
   name: "confirm",
   description,
   inputSchema,
-  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const match = positionals.varName.match(/^\$(\w+)$/);
@@ -46,7 +34,7 @@ export default {
     const [, varName] = match;
 
     const confirmed = await agent.askForApproval({
-      message: positionals.message
+      message: remainder
     });
 
     const result = confirmed ? 'yes' : 'no';

@@ -1,23 +1,11 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [
-    {
-      name: "varName",
-      description: "Variable to store input in (with $ prefix)",
-      required: true,
-    },
-    {
-      name: "messageExpression",
-      description: "Message to display to the user",
-      required: true,
-      greedy: true,
-    },
-  ],
-  allowAttachments: false,
+  positionals: [{name: "varName", description: "Variable to store input in (with $ prefix)", required: true}],
+  remainder: {name: "messageExpression", description: "Message to display to the user", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Prompt user for input";
@@ -33,13 +21,12 @@ export default {
   name: "prompt",
   description,
   inputSchema,
-  execute: async ({positionals, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({positionals, remainder: messageExpr, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const varName = positionals.varName.replace(/^\$/, "");
     if (!varName) throw new CommandFailedError('Usage: /prompt $var "message"');
 
-    const messageExpr = positionals.messageExpression;
     const unquoted = messageExpr.match(/^["'](.*)['"']$/s);
     const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
 

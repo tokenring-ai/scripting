@@ -4,9 +4,7 @@ import ScriptingService from "../../ScriptingService.ts";
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {formatFunctionDefinition} from "./_shared.ts";
 
-const inputSchema = {
-  allowAttachments: false,
-} as const satisfies AgentCommandInputSchema;
+const inputSchema = {} as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "functions list",

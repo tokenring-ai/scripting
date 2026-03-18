@@ -6,13 +6,7 @@ import {parseArguments} from "../utils/parseArguments.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "callExpression",
-    description: "Function call expression, e.g. greet(\"World\")",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "callExpression", description: "Function call expression, e.g. greet(\"World\")", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Call a function and display output";
@@ -27,10 +21,10 @@ export default {
   name: "call",
   description,
   inputSchema,
-  execute: async ({positionals: {callExpression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const match = callExpression.match(/^(\w+)\((.*)\)$/);
+    const match = remainder.match(/^(\w+)\((.*)\)$/);
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /call functionName("arg1", "arg2")');
     }

@@ -1,5 +1,5 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
@@ -9,8 +9,7 @@ const inputSchema = {
     name: "listName",
     description: "List name to show",
     required: false,
-  }],
-  allowAttachments: false,
+  }]
 } as const satisfies AgentCommandInputSchema;
 
 const description = "List all lists or show specific list";

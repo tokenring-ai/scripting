@@ -6,13 +6,7 @@ import {executeBlock} from "../utils/executeBlock.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "expression",
-    description: "For loop syntax: $item in @list { commands }",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "expression", description: "For loop syntax: $item in @list { commands }", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Iterate over lists";
@@ -28,16 +22,16 @@ export default {
   name: "for",
   description,
   inputSchema,
-  execute: async ({positionals: {expression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const prefixMatch = expression.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
+    const prefixMatch = remainder.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
     if (!prefixMatch) {
       throw new CommandFailedError("Invalid syntax. Use: /for $item in @list { commands }");
     }
 
     const [prefix, itemVar, listName] = prefixMatch;
-    const block = extractBlock(expression, prefix.length);
+    const block = extractBlock(remainder, prefix.length);
 
     if (!block) {
       throw new CommandFailedError("Missing block { commands }");

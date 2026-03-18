@@ -3,12 +3,7 @@ import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "expression",
-    description: "Text or variable to display",
-    required: true,
-    greedy: true,
-  }],
+  remainder: {name: "expression", description: "Text or variable to display", required: true},
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Display text or variable value";
@@ -24,10 +19,10 @@ export default {
   name: "echo",
   description,
   inputSchema,
-  execute: async ({positionals: {expression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    return context.interpolate(expression);
+    return context.interpolate(remainder);
   },
   help,
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

@@ -2,9 +2,7 @@ import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentComma
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 
-const inputSchema = {
-  allowAttachments: false,
-} as const satisfies AgentCommandInputSchema;
+const inputSchema = {} as const satisfies AgentCommandInputSchema;
 
 export default {
   name: "vars list",

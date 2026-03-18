@@ -1,5 +1,5 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
@@ -7,13 +7,7 @@ import {parseArguments} from "../utils/parseArguments.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "definition",
-    description: "List definition, e.g. @name = [\"item1\", \"item2\"]",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "definition", description: "List definition, e.g. @name = [\"item1\", \"item2\"]", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Define or assign lists";
@@ -37,10 +31,10 @@ export default {
   name: "list",
   description,
   inputSchema,
-  execute: async ({positionals: { definition }, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const funcMatch = definition.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
+    const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
     if (funcMatch) {
       const [, listName, funcName, argsStr] = funcMatch;
       const scriptingService = agent.requireServiceByType(ScriptingService);
@@ -65,7 +59,7 @@ export default {
       }
     }
 
-    const match = definition.match(/^@(\w+)\s*=\s*\[(.+)\]$/s);
+    const match = remainder.match(/^@(\w+)\s*=\s*\[(.+)\]$/s);
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /list @name = ["item1", "item2"] or /list @name = functionName("arg")');
     }

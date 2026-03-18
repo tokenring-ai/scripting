@@ -9,8 +9,7 @@ const inputSchema = {
     name: "scriptName",
     description: "Script name",
     required: true,
-  }],
-  allowAttachments: false,
+  }]
 } as const satisfies AgentCommandInputSchema;
 
 export default {

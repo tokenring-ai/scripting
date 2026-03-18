@@ -8,8 +8,7 @@ const inputSchema = {
     name: "varName",
     description: "Variable name to delete, with or without the $ prefix",
     required: true,
-  }],
-  allowAttachments: false,
+  }]
 } as const satisfies AgentCommandInputSchema;
 
 export default {

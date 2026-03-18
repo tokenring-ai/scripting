@@ -6,13 +6,7 @@ import {executeBlock} from "../utils/executeBlock.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "expression",
-    description: "If condition and blocks: $condition { commands } [else { commands }]",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "expression", description: "If condition and blocks: $condition { commands } [else { commands }]", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Conditional execution";
@@ -28,16 +22,16 @@ export default {
   name: "if",
   description,
   inputSchema,
-  execute: async ({positionals: {expression}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const prefixMatch = expression.match(/^\$(\w+)\s*/);
+    const prefixMatch = remainder.match(/^\$(\w+)\s*/);
     if (!prefixMatch) {
       throw new CommandFailedError("Invalid syntax. Use: /if $condition { commands } [else { commands }]");
     }
 
     const [prefix, conditionVar] = prefixMatch;
-    const thenBlock = extractBlock(expression, prefix.length);
+    const thenBlock = extractBlock(remainder, prefix.length);
 
     if (!thenBlock) {
       throw new CommandFailedError("Missing then block { commands }");
@@ -54,9 +48,9 @@ export default {
     if (isTruthy) {
       body = thenBlock.content;
     } else {
-      const elseMatch = expression.slice(thenBlock.endPos).match(/^\s*else\s*/);
+      const elseMatch = remainder.slice(thenBlock.endPos).match(/^\s*else\s*/);
       if (elseMatch) {
-        const elseBlock = extractBlock(expression, thenBlock.endPos + elseMatch[0].length);
+        const elseBlock = extractBlock(remainder, thenBlock.endPos + elseMatch[0].length);
         if (!elseBlock) {
           throw new CommandFailedError("Invalid else block");
         }

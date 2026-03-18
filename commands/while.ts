@@ -6,13 +6,7 @@ import {executeBlock} from "../utils/executeBlock.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "expression",
-    description: "While condition and block: $condition { commands }",
-    required: true,
-    greedy: true,
-  }],
-  allowAttachments: false,
+  remainder: {name: "expression", description: "While condition and block: $condition { commands }", required: true}
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Execute commands while condition is truthy";
@@ -27,16 +21,16 @@ export default {
   name: "while",
   description,
   inputSchema,
-  execute: async ({positionals: { expression }, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const prefixMatch = expression.match(/^\$(\w+)\s*/);
+    const prefixMatch = remainder.match(/^\$(\w+)\s*/);
     if (!prefixMatch) {
       throw new CommandFailedError("Invalid syntax. Use: /while $condition { commands }");
     }
 
     const [prefix, conditionVar] = prefixMatch;
-    const block = extractBlock(expression, prefix.length);
+    const block = extractBlock(remainder, prefix.length);
 
     if (!block) {
       throw new CommandFailedError("Missing block { commands }");
