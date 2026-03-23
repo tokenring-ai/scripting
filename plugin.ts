@@ -1,5 +1,4 @@
-import {AgentCommandService} from "@tokenring-ai/agent";
-import {runSubAgent} from "@tokenring-ai/agent/runSubAgent";
+import {AgentCommandService, SubAgentService} from "@tokenring-ai/agent";
 import {TokenRingPlugin} from "@tokenring-ai/app";
 import {ChatService} from "@tokenring-ai/chat";
 import {z} from "zod";
@@ -34,14 +33,16 @@ export default {
         type: 'native',
         params: ['agentType', 'message', 'context'],
         async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
-          const res = await runSubAgent({
+          const subAgentService = this.agent.requireServiceByType(SubAgentService);
+          const res = await subAgentService.runSubAgent({
             agentType: agentType,
             headless: this.agent.headless,
             input: {
               from: "Scripting plugin runAgent",
               message: `/work ${message}\n\nImportant Context:\n${context}`,
-            }
-          }, this.agent, true);
+            },
+            parentAgent: this.agent
+          });
 
           if (res.status === 'success') {
             return res.response;
