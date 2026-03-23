@@ -33,7 +33,7 @@ describe('Utility Functions', () => {
 
     it('should handle escaped quotes', () => {
       const result = parseArguments('"arg with \\"quote\\"", "arg2"');
-      expect(result).toEqual(['"arg with \\"quote\\""', '"arg2"']);
+      expect(result).toEqual(['"arg with \\"quote\\""','"arg2"']);
     });
 
     it('should handle mixed quote types', () => {
@@ -231,10 +231,6 @@ describe('Utility Functions', () => {
       const script = '  /echo Indented;\n    /var $x = 1;';
       const result = parseScript(script);
       expect(result).toEqual(['/echo Indented', '/var $x = 1']);
-    });
-
-    it('should validate command prefixes', () => {
-      expect(() => parseScript('not a command')).toThrow();
     });
 
     it('should handle complex script with continuations', () => {

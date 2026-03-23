@@ -46,13 +46,17 @@ export function createMockAgent() {
     infoMessage: vi.fn((msg: string) => infos.push(msg)),
     chatOutput: vi.fn((msg: string) => outputs.push(msg)),
     systemMessage: vi.fn((msg: string) => infos.push(msg)),
-    askQuestion: vi.fn(async () => {
+    askForApproval: vi.fn(async (opts: any) => {
+      return humanResponses.shift();
+    }),
+    askForText: vi.fn(async (opts: any) => {
       return humanResponses.shift();
     }),
     runCommand: vi.fn(async (cmd: string) => {
       // Simple mock - just track the command
       outputs.push(`[command: ${cmd}]`);
     }),
+    getAbortSignal: vi.fn(() => ({aborted: false})),
   };
 
   return {

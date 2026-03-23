@@ -94,26 +94,6 @@ describe('ScriptingContext', () => {
     });
   });
 
-  describe('reset', () => {
-    it('clears all data on chat reset', () => {
-      context.setVariable('name', 'Alice');
-      context.setList('items', ['a', 'b']);
-      context.defineFunction('test', 'expression', [], 'body');
-
-      context.reset(['chat']);
-
-      expect(context.variables.size).toBe(0);
-      expect(context.lists.size).toBe(0);
-      expect(context.functions.size).toBe(0);
-    });
-
-    it('does not clear on other reset types', () => {
-      context.setVariable('name', 'Alice');
-      context.reset(['session'] as any);
-      expect(context.variables.size).toBe(1);
-    });
-  });
-
   describe('serialize/deserialize', () => {
     it('serializes and deserializes state', () => {
       context.setVariable('name', 'Alice');

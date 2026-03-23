@@ -51,8 +51,7 @@ describe('extractBlock', () => {
     expect(() => extractBlock('{ unclosed')).toThrow('Unmatched braces');
   });
 
-  it('throws on extra closing brace', () => {
-    expect(() => extractBlock('{ closed } }')).not.toThrow();
+  it('handles extra closing brace', () => {
     const result = extractBlock('{ closed } }');
     expect(result).toEqual({content: ' closed ', endPos: 10});
   });
