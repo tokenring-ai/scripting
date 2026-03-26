@@ -1,7 +1,7 @@
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
-import {extractBlock, parseBlock} from "../utils/blockParser.js";
+import {extractBlock, parseBlock} from "../utils/blockParser.ts";
 import {executeBlock} from "../utils/executeBlock.ts";
 
 const inputSchema = {
