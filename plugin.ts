@@ -5,7 +5,7 @@ import {z} from "zod";
 
 import agentCommands from "./commands.ts";
 import contextHandlers from "./contextHandlers.ts";
-import packageJSON from './package.json' with {type: 'json'};
+import packageJSON from "./package.json" with {type: "json"};
 import {ScriptingServiceConfigSchema} from "./schema.ts";
 import ScriptingService, {ScriptingThis} from "./ScriptingService.ts";
 import tools from "./tools.ts";
