@@ -1,7 +1,7 @@
 {
   "name": "@tokenring-ai/scripting",
   "version": "0.2.0",
-  "description": "Scripting package for the TokenRing AI ecosystem.",
+  "description": "Custom workflow language for defining complex, reusable agent command sequences.",
   "type": "module",
   "main": "index.ts",
   "scripts": {
