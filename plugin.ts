@@ -38,10 +38,8 @@ export default {
           const res = await subAgentService.runSubAgent({
             agentType: agentType,
             headless: this.agent.headless,
-            input: {
-              from: "Scripting plugin runAgent",
-              message: `/work ${message}\n\nImportant Context:\n${context}`,
-            },
+            from: "Scripting plugin runAgent",
+            steps: [`${message}\n\nImportant Context:\n${context}`],
             parentAgent: this.agent
           });
 
