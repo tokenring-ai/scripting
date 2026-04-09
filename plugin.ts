@@ -1,4 +1,5 @@
 import {AgentCommandService, SubAgentService} from "@tokenring-ai/agent";
+import {SubAgentConfigSchema} from "@tokenring-ai/agent/schema";
 import {TokenRingPlugin} from "@tokenring-ai/app";
 import {ChatService} from "@tokenring-ai/chat";
 import {z} from "zod";
@@ -40,7 +41,8 @@ export default {
             headless: this.agent.headless,
             from: "Scripting plugin runAgent",
             steps: [`${message}\n\nImportant Context:\n${context}`],
-            parentAgent: this.agent
+            parentAgent: this.agent,
+            options: SubAgentConfigSchema.parse({}),
           });
 
           if (res.status === 'success') {
