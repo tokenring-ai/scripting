@@ -1,9 +1,13 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand,} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
-  remainder: {name: "expression", description: "Text or variable to display", required: true},
+  remainder: {
+    name: "expression",
+    description: "Text or variable to display",
+    required: true,
+  },
 } as const satisfies AgentCommandInputSchema;
 
 const description = "Display text or variable value";
@@ -19,7 +23,10 @@ export default {
   name: "echo",
   description,
   inputSchema,
-  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: ({
+              remainder,
+              agent,
+            }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
 
     return context.interpolate(remainder);

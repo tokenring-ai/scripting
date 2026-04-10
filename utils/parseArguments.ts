@@ -5,9 +5,9 @@ export function parseArguments(argsStr: string): string[] {
   if (!argsStr.trim()) return [];
 
   const args: string[] = [];
-  let current = '';
+  let current = "";
   let inString = false;
-  let stringChar = '';
+  let stringChar = "";
   let escapeNext = false;
   let depth = 0;
 
@@ -20,7 +20,7 @@ export function parseArguments(argsStr: string): string[] {
       continue;
     }
 
-    if (char === '\\') {
+    if (char === "\\") {
       current += char;
       escapeNext = true;
       continue;
@@ -32,7 +32,7 @@ export function parseArguments(argsStr: string): string[] {
         stringChar = char;
       } else if (char === stringChar) {
         inString = false;
-        stringChar = '';
+        stringChar = "";
       }
       current += char;
       continue;
@@ -43,13 +43,13 @@ export function parseArguments(argsStr: string): string[] {
       continue;
     }
 
-    if (char === '(' || char === '{' || char === '[') depth++;
-    if (char === ')' || char === '}' || char === ']') depth--;
+    if (char === "(" || char === "{" || char === "[") depth++;
+    if (char === ")" || char === "}" || char === "]") depth--;
 
-    if (char === ',' && depth === 0) {
+    if (char === "," && depth === 0) {
       const arg = current.trim();
       if (arg) args.push(arg);
-      current = '';
+      current = "";
       continue;
     }
 

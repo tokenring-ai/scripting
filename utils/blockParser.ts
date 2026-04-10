@@ -2,13 +2,16 @@
  * Extract a balanced block from input starting at startPos
  * Returns the content inside braces and the position after closing brace
  */
-export function extractBlock(input: string, startPos: number = 0): { content: string; endPos: number } | null {
-  const start = input.indexOf('{', startPos);
+export function extractBlock(
+  input: string,
+  startPos: number = 0,
+): { content: string; endPos: number } | null {
+  const start = input.indexOf("{", startPos);
   if (start === -1) return null;
 
   let depth = 0;
   let inString = false;
-  let stringChar = '';
+  let stringChar = "";
   let escapeNext = false;
 
   for (let i = start; i < input.length; i++) {
@@ -19,7 +22,7 @@ export function extractBlock(input: string, startPos: number = 0): { content: st
       continue;
     }
 
-    if (char === '\\') {
+    if (char === "\\") {
       escapeNext = true;
       continue;
     }
@@ -30,26 +33,26 @@ export function extractBlock(input: string, startPos: number = 0): { content: st
         stringChar = char;
       } else if (char === stringChar) {
         inString = false;
-        stringChar = '';
+        stringChar = "";
       }
       continue;
     }
 
     if (inString) continue;
 
-    if (char === '{') depth++;
-    if (char === '}') {
+    if (char === "{") depth++;
+    if (char === "}") {
       depth--;
       if (depth === 0) {
         return {
           content: input.slice(start + 1, i),
-          endPos: i + 1
+          endPos: i + 1,
         };
       }
     }
   }
 
-  throw new Error('Unmatched braces');
+  throw new Error("Unmatched braces");
 }
 
 /**
@@ -58,10 +61,10 @@ export function extractBlock(input: string, startPos: number = 0): { content: st
  */
 export function parseBlock(body: string): string[] {
   const commands: string[] = [];
-  let current = '';
+  let current = "";
   let depth = 0;
   let inString = false;
-  let stringChar = '';
+  let stringChar = "";
   let escapeNext = false;
 
   for (let i = 0; i < body.length; i++) {
@@ -73,7 +76,7 @@ export function parseBlock(body: string): string[] {
       continue;
     }
 
-    if (char === '\\') {
+    if (char === "\\") {
       current += char;
       escapeNext = true;
       continue;
@@ -85,7 +88,7 @@ export function parseBlock(body: string): string[] {
         stringChar = char;
       } else if (char === stringChar) {
         inString = false;
-        stringChar = '';
+        stringChar = "";
       }
       current += char;
       continue;
@@ -96,14 +99,14 @@ export function parseBlock(body: string): string[] {
       continue;
     }
 
-    if (char === '{') depth++;
-    if (char === '}') depth--;
+    if (char === "{") depth++;
+    if (char === "}") depth--;
 
     // Split on ; or \n only at depth 0
-    if (depth === 0 && (char === ';' || char === '\n')) {
+    if (depth === 0 && (char === ";" || char === "\n")) {
       const cmd = current.trim();
       if (cmd) commands.push(cmd);
-      current = '';
+      current = "";
       continue;
     }
 

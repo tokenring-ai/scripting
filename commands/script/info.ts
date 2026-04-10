@@ -1,15 +1,17 @@
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand,} from "@tokenring-ai/agent/types";
 import indent from "@tokenring-ai/utility/string/indent";
 import ScriptingService from "../../ScriptingService.ts";
 
 const inputSchema = {
   args: {},
-  positionals: [{
-    name: "scriptName",
-    description: "Script name",
-    required: true,
-  }]
+  positionals: [
+    {
+      name: "scriptName",
+      description: "Script name",
+      required: true,
+    },
+  ],
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -21,8 +23,12 @@ export default {
 
 /script info myScript`,
   inputSchema,
-  execute: async ({positionals: {scriptName}, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
+  execute: ({
+              positionals: {scriptName},
+              agent,
+            }: AgentCommandInputType<typeof inputSchema>): string => {
+    const scriptingService: ScriptingService =
+      agent.requireServiceByType(ScriptingService);
     const script = scriptingService.getScriptByName(scriptName);
     if (!script) {
       throw new CommandFailedError(`Script not found: ${scriptName}`);

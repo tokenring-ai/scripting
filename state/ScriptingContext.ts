@@ -1,20 +1,31 @@
 import {AgentStateSlice} from "@tokenring-ai/agent/types";
+import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {z} from "zod";
 
 const serializationSchema = z.object({
   variables: z.array(z.tuple([z.string(), z.string()])),
   lists: z.array(z.tuple([z.string(), z.array(z.string())])),
-  functions: z.array(z.tuple([z.string(), z.object({
-    type: z.enum(['expression', 'llm', 'js']),
-    params: z.array(z.string()),
-    body: z.string()
-  })]))
+  functions: z.array(
+    z.tuple([
+      z.string(),
+      z.object({
+        type: z.enum(["expression", "llm", "js"]),
+        params: z.array(z.string()),
+        body: z.string(),
+      }),
+    ]),
+  ),
 });
 
-export class ScriptingContext extends AgentStateSlice<typeof serializationSchema> {
+export class ScriptingContext extends AgentStateSlice<
+  typeof serializationSchema
+> {
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();
-  functions = new Map<string, { type: 'expression' | 'llm' | 'js', params: string[], body: string }>();
+  functions = new Map<
+    string,
+    { type: "expression" | "llm" | "js"; params: string[]; body: string }
+  >();
 
   constructor() {
     super("ScriptingContext", serializationSchema);
@@ -56,31 +67,40 @@ export class ScriptingContext extends AgentStateSlice<typeof serializationSchema
     return this.lists.get(name);
   }
 
-  defineFunction(name: string, type: 'expression' | 'llm' | 'js', params: string[], body: string): void {
+  defineFunction(
+    name: string,
+    type: "expression" | "llm" | "js",
+    params: string[],
+    body: string,
+  ): void {
     this.functions.set(name, {type, params, body});
   }
 
-  getFunction(name: string): { type: 'expression' | 'llm' | 'js', params: string[], body: string } | undefined {
+  getFunction(
+    name: string,
+  ):
+    | { type: "expression" | "llm" | "js"; params: string[]; body: string }
+    | undefined {
     return this.functions.get(name);
   }
 
   interpolate(text: string): string {
-    return text.replace(/(?<!\\)\$(\w+)/g, (_, varName) => {
-      return this.variables.get(varName) || "";
-    }).replace(/(?<!\\)@(\w+)/g, (_, listName) => {
-      const list = this.lists.get(listName);
-      return list ? list.join(", ") : "";
-    });
+    return text
+      .replace(/(?<!\\)\$(\w+)/g, (_, varName) => {
+        return this.variables.get(varName) || "";
+      })
+      .replace(/(?<!\\)@(\w+)/g, (_, listName) => {
+        const list = this.lists.get(listName);
+        return list ? list.join(", ") : "";
+      });
   }
 
-  show(): string[] {
-    return [
-      `Variables: ${this.variables.size}`,
-      ...Array.from(this.variables.entries()).map(([k, v]) => `  $${k} = ${v}`),
-      `Lists: ${this.lists.size}`,
-      ...Array.from(this.lists.entries()).map(([k, v]) => `  @${k} = [${v.join(", ")}]`),
-      `Functions: ${this.functions.size}`,
-      ...Array.from(this.functions.entries()).map(([k, v]) => `  ${k}(${v.params.join(", ")}) [${v.type}]`)
-    ];
+  show(): string {
+    return `Variables: ${this.variables.size}
+${markdownList(Array.from(this.variables.entries()).map(([k, v]) => `$${k} = ${v}`))}
+Lists: ${this.lists.size}
+${markdownList(Array.from(this.lists.entries()).map(([k, v]) => `@${k} = [${v.join(", ")}]`))}
+Functions: ${this.functions.size}
+${markdownList(Array.from(this.functions.entries()).map(([k, v]) => `${k}(${v.params.join(", ")}) [${v.type}]`))}`;
   }
 }

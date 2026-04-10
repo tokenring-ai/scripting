@@ -1,6 +1,7 @@
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import ScriptingService, {type ScriptFunction} from "../../ScriptingService.ts";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
+import type ScriptingService from "../../ScriptingService.ts";
+import type {ScriptFunction} from "../../ScriptingService.ts";
+import type {ScriptingContext} from "../../state/ScriptingContext.ts";
 
 export const RESERVED_NAMES = [
   "var",
@@ -51,7 +52,12 @@ export function formatFunctionDefinition(name: string, func: ScriptFunction) {
   return `${typePrefix}${name}(${func.params.map((param) => "$" + param).join(", ")})${separator}${body}${suffix}`;
 }
 
-export function resolveNamedFunction(name: string, context: ScriptingContext, scriptingService: ScriptingService, agent: any) {
+export function resolveNamedFunction(
+  name: string,
+  _context: ScriptingContext,
+  scriptingService: ScriptingService,
+  agent: any,
+) {
   const func = scriptingService.resolveFunction(name, agent);
   if (!func) {
     throw new CommandFailedError(`Function ${name} not defined`);

@@ -1,10 +1,14 @@
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import ScriptingService from "../../ScriptingService.ts";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
+import type {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {parseArguments} from "../../utils/parseArguments.ts";
 
-export async function evaluateExpression(expr: string, context: ScriptingContext, agent: any): Promise<string> {
+export async function evaluateExpression(
+  expr: string,
+  context: ScriptingContext,
+  agent: any,
+): Promise<string> {
   const llmMatch = expr.match(/^llm\(["'](.*)['"]\)$/s);
   if (llmMatch) {
     const prompt = context.interpolate(llmMatch[1]);
@@ -28,7 +32,11 @@ export async function evaluateExpression(expr: string, context: ScriptingContext
       return unquoted ? unquoted[1] : context.interpolate(arg);
     });
 
-    const result = await scriptingService.executeFunction(funcName, args, agent);
+    const result = await scriptingService.executeFunction(
+      funcName,
+      args,
+      agent,
+    );
     return Array.isArray(result) ? result.join("\n") : result;
   }
 

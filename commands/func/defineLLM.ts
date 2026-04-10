@@ -1,11 +1,15 @@
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand,} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {parseFunctionSignature} from "./_shared.ts";
 
 const inputSchema = {
   args: {},
-  remainder: {name: "definition", description: 'LLM function definition in the form name($param) => "prompt"', required: true}
+  remainder: {
+    name: "definition",
+    description: 'LLM function definition in the form name($param) => "prompt"',
+    required: true,
+  },
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -18,10 +22,15 @@ export default {
 
 /function define llm analyze($text) => "Analyze: $text"`,
   inputSchema,
-  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: ({
+              remainder,
+              agent,
+            }: AgentCommandInputType<typeof inputSchema>): string => {
     const match = remainder.match(/^(.+?)\s*=>\s*(.+)$/s);
     if (!match) {
-      throw new CommandFailedError('Invalid syntax. Use: /function define llm name($param) => "prompt"');
+      throw new CommandFailedError(
+        'Invalid syntax. Use: /function define llm name($param) => "prompt"',
+      );
     }
 
     const [, signature, body] = match;

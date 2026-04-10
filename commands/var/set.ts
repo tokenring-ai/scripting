@@ -1,11 +1,15 @@
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand,} from "@tokenring-ai/agent/types";
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {evaluateExpression} from "./_shared.ts";
 
 const inputSchema = {
   args: {},
-  remainder: {name: "assignment", description: "Variable assignment in the form $name = value", required: true}
+  remainder: {
+    name: "assignment",
+    description: "Variable assignment in the form $name = value",
+    required: true,
+  },
 } as const satisfies AgentCommandInputSchema;
 
 export default {
@@ -19,16 +23,23 @@ export default {
 /var set $greeting = llm("Say hello")
 /var set $result = process($input)`,
   inputSchema,
-  execute: async ({remainder, agent}: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({
+                    remainder,
+                    agent,
+                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
     const match = remainder.match(/^\$(\w+)\s*=\s*(.+)$/);
     if (!match) {
-      throw new CommandFailedError("Invalid syntax. Use: /var set $name = value");
+      throw new CommandFailedError(
+        "Invalid syntax. Use: /var set $name = value",
+      );
     }
 
     const [, varName, expression] = match;
     if (context.lists.has(varName)) {
-      throw new CommandFailedError(`Name '${varName}' already exists as a list (@${varName})`);
+      throw new CommandFailedError(
+        `Name '${varName}' already exists as a list (@${varName})`,
+      );
     }
 
     try {
@@ -36,7 +47,9 @@ export default {
       context.setVariable(varName, value);
       return `Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`;
     } catch (error) {
-      throw new CommandFailedError(error instanceof Error ? error.message : String(error));
+      throw new CommandFailedError(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;
