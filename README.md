@@ -34,6 +34,7 @@ bun add @tokenring-ai/scripting
 Manages and executes scripts, variables, functions, and scripting language features. Implements the `TokenRingService` interface.
 
 **Properties:**
+
 - `name: "ScriptingService"` - Service identifier
 - `description` - Service description
 - `scripts` - Registry of predefined scripts (KeyedRegistry)
@@ -68,6 +69,7 @@ const functions = scriptingService.listFunctions();
 ```
 
 **Function Types:**
+
 - `expression` - Returns fixed text with variable interpolation
 - `js` - JavaScript functions with access to agent context
 - `llm` - LLM-powered functions with prompts
@@ -103,6 +105,7 @@ export type ScriptFunction = {
 Manages state for scripting including variables, lists, and functions. Implements `AgentStateSlice` for persistence.
 
 **Properties:**
+
 - `name: "ScriptingContext"` - State slice identifier
 - `variables: Map<string, string>` - Variable storage
 - `lists: Map<string, string[]>` - List storage
@@ -379,6 +382,7 @@ export default {
 ```
 
 Scripts can be defined as:
+
 - Arrays of command strings
 - Single strings with commands separated by newlines or semicolons
 
@@ -499,6 +503,7 @@ context.reset();
 ### Checkpoint Generation
 
 State checkpoints are generated automatically during:
+
 - Chat session persistence
 - Agent state serialization
 - Checkpoint-based recovery
@@ -533,6 +538,7 @@ scriptingService.registerFunction("runAgent", {
 ```
 
 **Parameters:**
+
 - `agentType` (string) - The type of agent to run
 - `message` (string) - The message to send to the agent
 - `context` (string) - Additional context for the agent
@@ -544,6 +550,7 @@ scriptingService.registerFunction("runAgent", {
 ## Reserved Function Names
 
 The following names cannot be used for functions:
+
 - `var`, `vars`, `func`, `funcs`, `call`, `echo`, `sleep`, `prompt`, `confirm`, `list`, `lists`, `if`, `for`, `while`, `script`
 
 ## Error Handling
@@ -560,6 +567,7 @@ The scripting system provides comprehensive error handling:
 - **Unmatched braces**: Throws error for unbalanced block syntax
 
 **Error Types:**
+
 - `CommandFailedError` - For command syntax and execution errors
 - `Error` - For function execution and runtime errors
 
@@ -576,6 +584,7 @@ export function parseArguments(argsStr: string): string[] {
 ```
 
 **Examples:**
+
 ```typescript
 parseArguments('"hello", "world"') // ['hello', 'world']
 parseArguments('arg1, (nested), arg3') // ['arg1', '(nested)', 'arg3']
@@ -593,6 +602,7 @@ export function parseScript(script: string): string[] {
 ```
 
 **Examples:**
+
 ```typescript
 parseScript('/echo hello; /echo world') // ['/echo hello', '/echo world']
 parseScript('/echo hello\n/echo world') // ['/echo hello', '/echo world']
@@ -607,6 +617,7 @@ Provides block parsing utilities:
 - `parseBlock(body)` - Parses block content into individual commands
 
 **Examples:**
+
 ```typescript
 extractBlock('/if $cond { /echo true } else { /echo false }', 0)
 // { content: '/echo true } else { /echo false', endPos: 45 }

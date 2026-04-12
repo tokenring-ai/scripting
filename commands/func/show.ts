@@ -1,4 +1,4 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand,} from "@tokenring-ai/agent/types";
+import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
 import ScriptingService from "../../ScriptingService.ts";
 import {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {formatFunctionDefinition, resolveNamedFunction} from "./_shared.ts";

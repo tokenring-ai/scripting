@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolTextResult,} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
@@ -9,7 +9,7 @@ const displayName = "Scripting/runScript";
 async function execute(
   {scriptName}: z.output<typeof inputSchema>,
   agent: Agent,
-): Promise<TokenRingToolTextResult> {
+): Promise<TokenRingToolResult> {
   const scriptingService: ScriptingService =
     agent.requireServiceByType(ScriptingService);
 
