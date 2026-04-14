@@ -144,7 +144,7 @@ export default class ScriptingService implements TokenRingService {
         result = context.interpolate(unquoted ? unquoted[1] : func.body);
       }
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(
         `Function execution error: ${error instanceof Error ? error.message : String(error)}`,
       );
@@ -187,7 +187,7 @@ export default class ScriptingService implements TokenRingService {
         ok: true,
         output: `Script ${scriptName} completed successfully`,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       agent.infoMessage(`Script ${scriptName} failed: ${errorMessage}`);

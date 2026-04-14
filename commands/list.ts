@@ -58,7 +58,7 @@ export default {
 
         context.setList(listName, items);
         return `List @${listName} = [${items.length} items]`;
-      } catch (error) {
+      } catch (error: unknown) {
         throw new CommandFailedError(
           error instanceof Error ? error.message : String(error),
         );

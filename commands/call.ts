@@ -53,7 +53,7 @@ export default {
         agent,
       );
       return Array.isArray(result) ? result.join("\n") : result;
-    } catch (error) {
+    } catch (error: unknown) {
       throw new CommandFailedError(
         error instanceof Error ? error.message : String(error),
       );
