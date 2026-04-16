@@ -44,19 +44,19 @@ export default class ScriptingService implements TokenRingService {
   scripts = new KeyedRegistry<string[]>();
   functions = new KeyedRegistry<ScriptFunction>();
 
-  getScriptByName = this.scripts.getItemByName;
-  listScripts = this.scripts.getAllItemNames;
+  getScriptByName = this.scripts.get;
+  listScripts = this.scripts.keysArray;
 
-  registerFunction = this.functions.register;
-  getFunction = this.functions.getItemByName;
-  listFunctions = this.functions.getAllItemNames;
+  registerFunction = this.functions.set;
+  getFunction = this.functions.get;
+  listFunctions = this.functions.keysArray;
 
   constructor(scripts: ParsedScriptingServiceConfig) {
     for (let [name, script] of Object.entries(scripts)) {
       if (Array.isArray(script)) {
         script = script.join(";\n");
       }
-      this.scripts.register(name, parseScript(script));
+      this.scripts.set(name, parseScript(script));
     }
   }
 
@@ -69,7 +69,7 @@ export default class ScriptingService implements TokenRingService {
    */
   resolveFunction(name: string, agent: Agent): ScriptFunction | undefined {
     const context = agent.getState(ScriptingContext);
-    return context.getFunction(name) || this.functions.getItemByName(name);
+    return context.getFunction(name) || this.functions.get(name);
   }
 
   /**
@@ -163,7 +163,7 @@ export default class ScriptingService implements TokenRingService {
       throw new Error("Script name is required");
     }
 
-    const script = this.scripts.getItemByName(scriptName);
+    const script = this.scripts.get(scriptName);
 
     if (!script) {
       throw new Error(`Script not found: ${scriptName}`);
