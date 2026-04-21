@@ -1,5 +1,6 @@
 import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
 import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import {joinArrayable} from "@tokenring-ai/utility/array/arrayable";
 import ScriptingService from "../ScriptingService.ts";
 import {ScriptingContext} from "../state/ScriptingContext.ts";
 import {parseArguments} from "../utils/parseArguments.ts";
@@ -52,7 +53,7 @@ export default {
         args,
         agent,
       );
-      return Array.isArray(result) ? result.join("\n") : result;
+      return joinArrayable(result, "\n");
     } catch (error: unknown) {
       throw new CommandFailedError(
         error instanceof Error ? error.message : String(error),

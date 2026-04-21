@@ -3,6 +3,7 @@ import {AgentCommandService} from "@tokenring-ai/agent";
 import type {TokenRingService} from "@tokenring-ai/app/types";
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
+import {joinArrayable} from "@tokenring-ai/utility/array/arrayable";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
 import type {ParsedScriptingServiceConfig} from "./schema.ts";
 import {ScriptingContext} from "./state/ScriptingContext.ts";
@@ -53,10 +54,7 @@ export default class ScriptingService implements TokenRingService {
 
   constructor(scripts: ParsedScriptingServiceConfig) {
     for (let [name, script] of Object.entries(scripts)) {
-      if (Array.isArray(script)) {
-        script = script.join(";\n");
-      }
-      this.scripts.set(name, parseScript(script));
+      this.scripts.set(name, parseScript(joinArrayable(script, ";\n")));
     }
   }
 

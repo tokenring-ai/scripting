@@ -1,5 +1,6 @@
 import {ChatService} from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
+import {joinArrayable} from "@tokenring-ai/utility/array/arrayable";
 import ScriptingService from "../../ScriptingService.ts";
 import type {ScriptingContext} from "../../state/ScriptingContext.ts";
 import {parseArguments} from "../../utils/parseArguments.ts";
@@ -37,7 +38,7 @@ export async function evaluateExpression(
       args,
       agent,
     );
-    return Array.isArray(result) ? result.join("\n") : result;
+    return joinArrayable(result, "\n");
   }
 
   const unquoted = expr.match(/^["'](.*)['"']$/s);
