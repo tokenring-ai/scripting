@@ -1,6 +1,6 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
@@ -27,10 +27,7 @@ export default {
   name: "sleep",
   description,
   inputSchema,
-  execute: async ({
-                    positionals,
-                    agent,
-                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ positionals, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const interpolated = context.interpolate(positionals.seconds);
@@ -40,7 +37,7 @@ export default {
       throw new CommandFailedError(`Invalid sleep duration: ${interpolated}`);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+    await new Promise(resolve => setTimeout(resolve, seconds * 1000));
     return `Slept for ${seconds} seconds`;
   },
   help,

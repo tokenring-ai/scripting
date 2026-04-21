@@ -1,8 +1,8 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
-import {extractBlock, parseBlock} from "../utils/blockParser.ts";
-import {executeBlock} from "../utils/executeBlock.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
+import { extractBlock, parseBlock } from "../utils/blockParser.ts";
+import { executeBlock } from "../utils/executeBlock.ts";
 
 const inputSchema = {
   args: {},
@@ -25,17 +25,12 @@ export default {
   name: "while",
   description,
   inputSchema,
-  execute: async ({
-                    remainder,
-                    agent,
-                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const prefixMatch = remainder.match(/^\$(\w+)\s*/);
     if (!prefixMatch) {
-      throw new CommandFailedError(
-        "Invalid syntax. Use: /while $condition { commands }",
-      );
+      throw new CommandFailedError("Invalid syntax. Use: /while $condition { commands }");
     }
 
     const [prefix, conditionVar] = prefixMatch;
@@ -53,12 +48,7 @@ export default {
     while (iterations < maxIterations) {
       const conditionValue = context.getVariable(conditionVar);
 
-      if (
-        !conditionValue ||
-        conditionValue === "false" ||
-        conditionValue === "0" ||
-        conditionValue === "no"
-      ) {
+      if (!conditionValue || conditionValue === "false" || conditionValue === "0" || conditionValue === "no") {
         break;
       }
 
@@ -67,9 +57,7 @@ export default {
     }
 
     if (iterations >= maxIterations) {
-      throw new CommandFailedError(
-        `While loop exceeded maximum iterations (${maxIterations})`,
-      );
+      throw new CommandFailedError(`While loop exceeded maximum iterations (${maxIterations})`);
     }
 
     return `While loop completed ${iterations} iteration${iterations === 1 ? "" : "s"}`;

@@ -1,6 +1,6 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
@@ -33,18 +33,12 @@ export default {
   name: "confirm",
   description,
   inputSchema,
-  execute: async ({
-                    positionals,
-                    remainder,
-                    agent,
-                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ positionals, remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const match = positionals.varName.match(/^\$(\w+)$/);
     if (!match) {
-      throw new CommandFailedError(
-        "Invalid variable name. Use: /confirm $var message...",
-      );
+      throw new CommandFailedError("Invalid variable name. Use: /confirm $var message...");
     }
 
     const [, varName] = match;

@@ -1,25 +1,9 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
 import type ScriptingService from "../../ScriptingService.ts";
-import type {ScriptFunction} from "../../ScriptingService.ts";
-import type {ScriptingContext} from "../../state/ScriptingContext.ts";
+import type { ScriptFunction } from "../../ScriptingService.ts";
+import type { ScriptingContext } from "../../state/ScriptingContext.ts";
 
-export const RESERVED_NAMES = [
-  "var",
-  "vars",
-  "func",
-  "funcs",
-  "call",
-  "echo",
-  "sleep",
-  "prompt",
-  "confirm",
-  "list",
-  "lists",
-  "if",
-  "for",
-  "while",
-  "script",
-];
+export const RESERVED_NAMES = ["var", "vars", "func", "funcs", "call", "echo", "sleep", "prompt", "confirm", "list", "lists", "if", "for", "while", "script"];
 
 export function assertFunctionNameAvailable(funcName: string) {
   if (RESERVED_NAMES.includes(funcName)) {
@@ -36,12 +20,12 @@ export function parseFunctionSignature(definition: string) {
   const [, funcName, paramsStr] = match;
   const params = paramsStr
     .split(",")
-    .map((param) => param.trim().replace(/^\$/, ""))
+    .map(param => param.trim().replace(/^\$/, ""))
     .filter(Boolean);
 
   assertFunctionNameAvailable(funcName);
 
-  return {funcName, params};
+  return { funcName, params };
 }
 
 export function formatFunctionDefinition(name: string, func: ScriptFunction) {
@@ -49,15 +33,10 @@ export function formatFunctionDefinition(name: string, func: ScriptFunction) {
   const separator = func.type === "js" ? " {" : " => ";
   const suffix = func.type === "js" ? " }" : "";
   const body = func.type === "native" ? "...native function" : func.body;
-  return `${typePrefix}${name}(${func.params.map((param) => "$" + param).join(", ")})${separator}${body}${suffix}`;
+  return `${typePrefix}${name}(${func.params.map(param => "$" + param).join(", ")})${separator}${body}${suffix}`;
 }
 
-export function resolveNamedFunction(
-  name: string,
-  _context: ScriptingContext,
-  scriptingService: ScriptingService,
-  agent: any,
-) {
+export function resolveNamedFunction(name: string, _context: ScriptingContext, scriptingService: ScriptingService, agent: any) {
   const func = scriptingService.resolveFunction(name, agent);
   if (!func) {
     throw new CommandFailedError(`Function ${name} not defined`);

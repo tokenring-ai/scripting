@@ -1,8 +1,8 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../../ScriptingService.ts";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
-import {formatFunctionDefinition} from "./_shared.ts";
+import { ScriptingContext } from "../../state/ScriptingContext.ts";
+import { formatFunctionDefinition } from "./_shared.ts";
 
 const inputSchema = {} as const satisfies AgentCommandInputSchema;
 
@@ -16,9 +16,7 @@ export default {
 
 /functions list`,
   inputSchema,
-  execute: ({
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
     const scriptingService = agent.requireServiceByType(ScriptingService);
     const localFuncs = Array.from(context.functions.entries());
@@ -31,14 +29,7 @@ export default {
     const lines: string[] = [];
 
     if (localFuncs.length > 0) {
-      lines.push(
-        "Local functions:",
-        markdownList(
-          localFuncs.map(([name, func]) =>
-            formatFunctionDefinition(name, func),
-          ),
-        ),
-      );
+      lines.push("Local functions:", markdownList(localFuncs.map(([name, func]) => formatFunctionDefinition(name, func))));
     }
 
     if (globalFuncs.length > 0) {
@@ -46,7 +37,7 @@ export default {
         "Global functions:",
         markdownList(
           globalFuncs
-            .map((name) => {
+            .map(name => {
               const func = scriptingService?.getFunction(name);
               return func ? formatFunctionDefinition(name, func) : null;
             })

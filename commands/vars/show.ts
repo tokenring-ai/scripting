@@ -1,6 +1,6 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
@@ -22,10 +22,7 @@ export default {
 
 /vars show $name`,
   inputSchema,
-  execute: ({
-              positionals,
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ positionals, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const varName = positionals.varName.replace(/^\$/, "");
     const context = agent.getState(ScriptingContext);
     const value = context.getVariable(varName);

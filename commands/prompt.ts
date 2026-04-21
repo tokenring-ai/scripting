@@ -1,6 +1,6 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
@@ -31,11 +31,7 @@ export default {
   name: "prompt",
   description,
   inputSchema,
-  execute: async ({
-                    positionals,
-                    remainder: messageExpr,
-                    agent,
-                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ positionals, remainder: messageExpr, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const varName = positionals.varName.replace(/^\$/, "");

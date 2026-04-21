@@ -1,8 +1,8 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
-import {extractBlock, parseBlock} from "../utils/blockParser.ts";
-import {executeBlock} from "../utils/executeBlock.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
+import { extractBlock, parseBlock } from "../utils/blockParser.ts";
+import { executeBlock } from "../utils/executeBlock.ts";
 
 const inputSchema = {
   args: {},
@@ -26,17 +26,12 @@ export default {
   name: "for",
   description,
   inputSchema,
-  execute: async ({
-                    remainder,
-                    agent,
-                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
     const prefixMatch = remainder.match(/^\$(\w+)\s+in\s+@(\w+)\s*/);
     if (!prefixMatch) {
-      throw new CommandFailedError(
-        "Invalid syntax. Use: /for $item in @list { commands }",
-      );
+      throw new CommandFailedError("Invalid syntax. Use: /for $item in @list { commands }");
     }
 
     const [prefix, itemVar, listName] = prefixMatch;
@@ -64,9 +59,7 @@ export default {
         await executeBlock(commands, agent);
       }
     } catch (error: unknown) {
-      throw new CommandFailedError(
-        error instanceof Error ? error.message : String(error),
-      );
+      throw new CommandFailedError(error instanceof Error ? error.message : String(error));
     } finally {
       if (savedItem !== undefined) {
         context.setVariable(itemVar, savedItem);

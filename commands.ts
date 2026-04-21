@@ -1,4 +1,4 @@
-import type {TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type { TokenRingAgentCommand } from "@tokenring-ai/agent/types";
 import call from "./commands/call.ts";
 import confirm from "./commands/confirm.ts";
 import echo from "./commands/echo.ts";

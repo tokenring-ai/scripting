@@ -1,18 +1,18 @@
-import type {Agent} from "@tokenring-ai/agent";
-import {AgentCommandService} from "@tokenring-ai/agent";
-import type {TokenRingService} from "@tokenring-ai/app/types";
-import {ChatService} from "@tokenring-ai/chat";
+import type { Agent } from "@tokenring-ai/agent";
+import { AgentCommandService } from "@tokenring-ai/agent";
+import type { TokenRingService } from "@tokenring-ai/app/types";
+import { ChatService } from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
-import {joinArrayable} from "@tokenring-ai/utility/array/arrayable";
+import { joinArrayable } from "@tokenring-ai/utility/array/arrayable";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
-import type {ParsedScriptingServiceConfig} from "./schema.ts";
-import {ScriptingContext} from "./state/ScriptingContext.ts";
-import {parseScript} from "./utils/parseScript.ts";
+import type { ParsedScriptingServiceConfig } from "./schema.ts";
+import { ScriptingContext } from "./state/ScriptingContext.ts";
+import { parseScript } from "./utils/parseScript.ts";
 
 export type ScriptResult = {
   ok: boolean;
-  output?: string;
-  error?: string;
+  output?: string | undefined;
+  error?: string | undefined;
   nextScriptResult?: ScriptResult;
 };
 
@@ -22,25 +22,22 @@ export type ScriptingThis = {
 
 export type ScriptFunction =
   | {
-  type: "expression" | "llm" | "js";
-  params: string[];
-  body: string;
-}
+      type: "expression" | "llm" | "js";
+      params: string[];
+      body: string;
+    }
   | {
-  type: "native";
-  params: string[];
-  execute(
-    ...args: string[]
-  ): string | string[] | Promise<string | string[]>;
-};
+      type: "native";
+      params: string[];
+      execute(...args: string[]): string | string[] | Promise<string | string[]>;
+    };
 
 /**
  * Registry for chat command scripts and global functions
  */
 export default class ScriptingService implements TokenRingService {
   readonly name = "ScriptingService";
-  description =
-    "Provides a registry of chat command scripts and global functions";
+  description = "Provides a registry of chat command scripts and global functions";
 
   scripts = new KeyedRegistry<string[]>();
   functions = new KeyedRegistry<ScriptFunction>();
@@ -53,7 +50,7 @@ export default class ScriptingService implements TokenRingService {
   listFunctions = this.functions.keysArray;
 
   constructor(scripts: ParsedScriptingServiceConfig) {
-    for (let [name, script] of Object.entries(scripts)) {
+    for (const [name, script] of Object.entries(scripts)) {
       this.scripts.set(name, parseScript(joinArrayable(script, ";\n")));
     }
   }
@@ -73,11 +70,7 @@ export default class ScriptingService implements TokenRingService {
   /**
    * Execute a function with given arguments
    */
-  async executeFunction(
-    funcName: string,
-    args: string[],
-    agent: Agent,
-  ): Promise<string | string[]> {
+  async executeFunction(funcName: string, args: string[], agent: Agent): Promise<string | string[]> {
     const context = agent.getState(ScriptingContext);
     const func = this.resolveFunction(funcName, agent);
 
@@ -86,9 +79,7 @@ export default class ScriptingService implements TokenRingService {
     }
 
     if (args.length !== func.params.length) {
-      throw new Error(
-        `Function ${funcName} expects ${func.params.length} arguments, got ${args.length}`,
-      );
+      throw new Error(`Function ${funcName} expects ${func.params.length} arguments, got ${args.length}`);
     }
 
     const tempVars = new Map(context.variables);
@@ -99,22 +90,19 @@ export default class ScriptingService implements TokenRingService {
     try {
       let result: string | string[];
       if (func.type === "native") {
-        result = await func.execute.call({agent}, ...args);
+        result = await func.execute.call({ agent }, ...args);
       } else if (func.type === "js") {
         // TODO: This is the pattern recommended by the Mozilla docs, but seems odd
-        const AsyncFunction = (async () => {
-        }).constructor;
+        const AsyncFunction = (async () => {}).constructor;
 
         // @ts-expect-error
         const funcImpl = new AsyncFunction(...func.params, func.body);
-        result = await funcImpl.call({agent}, ...args);
+        result = await funcImpl.call({ agent }, ...args);
         if (Array.isArray(result)) {
           for (const item of result) {
             // noinspection SuspiciousTypeOfGuard
             if (typeof item !== "string") {
-              throw new Error(
-                `Function ${funcName} returned an array with non-string item`,
-              );
+              throw new Error(`Function ${funcName} returned an array with non-string item`);
             }
           }
           return result;
@@ -125,16 +113,12 @@ export default class ScriptingService implements TokenRingService {
         }
         return result;
       } else if (func.type === "llm") {
-        const prompt = context.interpolate(
-          func.body.match(/^["'](.*)["']$/s)?.[1] || func.body,
-        );
+        const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
         const chatService = agent.requireServiceByType(ChatService);
         const chatConfig = chatService.getChatConfig(agent);
-        const response = await runChat({input: prompt, chatConfig, agent});
+        const response = await runChat({ input: prompt, chatConfig, agent });
         if (!response.text) {
-          throw new Error(
-            `AI Chat did not produce any text for prompt: ${prompt}`,
-          );
+          throw new Error(`AI Chat did not produce any text for prompt: ${prompt}`);
         }
         result = response.text.trim();
       } else {
@@ -143,9 +127,7 @@ export default class ScriptingService implements TokenRingService {
       }
       return result;
     } catch (error: unknown) {
-      throw new Error(
-        `Function execution error: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      throw new Error(`Function execution error: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       context.variables = tempVars;
     }
@@ -154,9 +136,7 @@ export default class ScriptingService implements TokenRingService {
   /**
    * Run a script with the given input
    */
-  async runScript(scriptName: string,
-                  agent: Agent,
-  ): Promise<ScriptResult> {
+  async runScript(scriptName: string, agent: Agent): Promise<ScriptResult> {
     if (!scriptName) {
       throw new Error("Script name is required");
     }
@@ -168,12 +148,9 @@ export default class ScriptingService implements TokenRingService {
     }
 
     try {
-      agent.infoMessage(
-        `Running script: ${scriptName} with ${script.length} commands`,
-      );
+      agent.infoMessage(`Running script: ${scriptName} with ${script.length} commands`);
 
-      const agentCommandService =
-        agent.requireServiceByType(AgentCommandService);
+      const agentCommandService = agent.requireServiceByType(AgentCommandService);
       for (const command of script) {
         if (command.trim()) {
           agent.infoMessage(`Executing: ${command}`);
@@ -186,8 +163,7 @@ export default class ScriptingService implements TokenRingService {
         output: `Script ${scriptName} completed successfully`,
       };
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       agent.infoMessage(`Script ${scriptName} failed: ${errorMessage}`);
 
       return {

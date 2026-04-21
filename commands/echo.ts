@@ -1,5 +1,5 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
@@ -23,10 +23,7 @@ export default {
   name: "echo",
   description,
   inputSchema,
-  execute: ({
-              remainder,
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
 
     return context.interpolate(remainder);

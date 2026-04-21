@@ -2,10 +2,7 @@
  * Extract a balanced block from input starting at startPos
  * Returns the content inside braces and the position after closing brace
  */
-export function extractBlock(
-  input: string,
-  startPos: number = 0,
-): { content: string; endPos: number } | null {
+export function extractBlock(input: string, startPos: number = 0): { content: string; endPos: number } | null {
   const start = input.indexOf("{", startPos);
   if (start === -1) return null;
 

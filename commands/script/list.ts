@@ -1,4 +1,4 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import ScriptingService from "../../ScriptingService.ts";
 
@@ -9,11 +9,8 @@ export default {
   description: "List available scripts",
   help: `List all available predefined scripts.`,
   inputSchema,
-  execute: ({
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
-    const scriptingService: ScriptingService =
-      agent.requireServiceByType(ScriptingService);
+  execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
+    const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
     const scripts = scriptingService.listScripts();
 
     if (scripts.length === 0) {

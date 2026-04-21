@@ -1,6 +1,6 @@
-import {AgentStateSlice} from "@tokenring-ai/agent/types";
+import { AgentStateSlice } from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
-import {z} from "zod";
+import { z } from "zod";
 
 const serializationSchema = z.object({
   variables: z.array(z.tuple([z.string(), z.string()])),
@@ -17,15 +17,10 @@ const serializationSchema = z.object({
   ),
 });
 
-export class ScriptingContext extends AgentStateSlice<
-  typeof serializationSchema
-> {
+export class ScriptingContext extends AgentStateSlice<typeof serializationSchema> {
   variables = new Map<string, string>();
   lists = new Map<string, string[]>();
-  functions = new Map<
-    string,
-    { type: "expression" | "llm" | "js"; params: string[]; body: string }
-  >();
+  functions = new Map<string, { type: "expression" | "llm" | "js"; params: string[]; body: string }>();
 
   constructor() {
     super("ScriptingContext", serializationSchema);
@@ -67,20 +62,11 @@ export class ScriptingContext extends AgentStateSlice<
     return this.lists.get(name);
   }
 
-  defineFunction(
-    name: string,
-    type: "expression" | "llm" | "js",
-    params: string[],
-    body: string,
-  ): void {
-    this.functions.set(name, {type, params, body});
+  defineFunction(name: string, type: "expression" | "llm" | "js", params: string[], body: string): void {
+    this.functions.set(name, { type, params, body });
   }
 
-  getFunction(
-    name: string,
-  ):
-    | { type: "expression" | "llm" | "js"; params: string[]; body: string }
-    | undefined {
+  getFunction(name: string): { type: "expression" | "llm" | "js"; params: string[]; body: string } | undefined {
     return this.functions.get(name);
   }
 

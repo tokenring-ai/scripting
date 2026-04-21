@@ -1,7 +1,7 @@
-import {CommandFailedError} from "@tokenring-ai/agent/AgentError";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
-import {parseFunctionSignature} from "./_shared.ts";
+import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../../state/ScriptingContext.ts";
+import { parseFunctionSignature } from "./_shared.ts";
 
 const inputSchema = {
   args: {},
@@ -22,21 +22,16 @@ export default {
 
 /function define llm analyze($text) => "Analyze: $text"`,
   inputSchema,
-  execute: ({
-              remainder,
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const match = remainder.match(/^(.+?)\s*=>\s*(.+)$/s);
     if (!match) {
-      throw new CommandFailedError(
-        'Invalid syntax. Use: /function define llm name($param) => "prompt"',
-      );
+      throw new CommandFailedError('Invalid syntax. Use: /function define llm name($param) => "prompt"');
     }
 
     const [, signature, body] = match;
-    const {funcName, params} = parseFunctionSignature(signature.trim());
+    const { funcName, params } = parseFunctionSignature(signature.trim());
     const context = agent.getState(ScriptingContext);
     context.defineFunction(funcName, "llm", params, body.trim());
-    return `LLM function ${funcName}(${params.map((param) => "$" + param).join(", ")}) defined`;
+    return `LLM function ${funcName}(${params.map(param => "$" + param).join(", ")}) defined`;
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

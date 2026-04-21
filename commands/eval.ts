@@ -1,6 +1,6 @@
-import {AgentCommandService} from "@tokenring-ai/agent";
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../state/ScriptingContext.ts";
+import { AgentCommandService } from "@tokenring-ai/agent";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 const inputSchema = {
   args: {},
@@ -25,10 +25,7 @@ export default {
   name: "eval",
   description,
   inputSchema,
-  execute: async ({
-                    remainder,
-                    agent,
-                  }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
     const agentCommandService = agent.requireServiceByType(AgentCommandService);
 

@@ -1,6 +1,6 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
+import { ScriptingContext } from "../../state/ScriptingContext.ts";
 
 const inputSchema = {} as const satisfies AgentCommandInputSchema;
 
@@ -9,9 +9,7 @@ export default {
   description: "List all scripting variables",
   help: `List all variables in the current scripting context.`,
   inputSchema,
-  execute: ({
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
     const vars = Array.from(context.variables.entries());
     if (vars.length === 0) {
@@ -22,8 +20,7 @@ export default {
       "Defined variables:",
       markdownList(
         vars.map(([name, value]) => {
-          const preview =
-            value.length > 60 ? `${value.substring(0, 60)}...` : value;
+          const preview = value.length > 60 ? `${value.substring(0, 60)}...` : value;
           return `$${name} = ${preview}`;
         }),
       ),

@@ -1,5 +1,5 @@
-import type {AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand} from "@tokenring-ai/agent/types";
-import {ScriptingContext} from "../../state/ScriptingContext.ts";
+import type { AgentCommandInputSchema, AgentCommandInputType, TokenRingAgentCommand } from "@tokenring-ai/agent/types";
+import { ScriptingContext } from "../../state/ScriptingContext.ts";
 
 const inputSchema = {} as const satisfies AgentCommandInputSchema;
 
@@ -8,9 +8,7 @@ export default {
   description: "Clear all scripting variables",
   help: `Remove all variables from the current scripting context.`,
   inputSchema,
-  execute: ({
-              agent,
-            }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
     context.variables.clear();
     return "All variables cleared";
