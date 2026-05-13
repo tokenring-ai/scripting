@@ -9,7 +9,7 @@ const inputSchema = {} as const satisfies AgentCommandInputSchema;
 export default {
   name: "functions list",
   description: "List all scripting functions",
-  aliases: ["function list"],
+  alias: ["function list"],
   help: `List all local and global functions.
 
 ## Example

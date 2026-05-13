@@ -15,7 +15,7 @@ const inputSchema = {
 export default {
   name: "function define js",
   description: "Define a JavaScript scripting function",
-  aliases: ["function define javascript", "func define js", "func define javascript"],
+  alias: ["function define javascript", "func define js", "func define javascript"],
   help: `Define a JavaScript function with access to context variables.
 
 ## Example

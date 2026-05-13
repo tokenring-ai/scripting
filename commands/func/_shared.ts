@@ -1,6 +1,8 @@
 import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
+
 import type ScriptingService from "../../ScriptingService.ts";
 import type { ScriptFunction } from "../../ScriptingService.ts";
+
 import type { ScriptingContext } from "../../state/ScriptingContext.ts";
 
 export const RESERVED_NAMES = ["var", "vars", "func", "funcs", "call", "echo", "sleep", "prompt", "confirm", "list", "lists", "if", "for", "while", "script"];

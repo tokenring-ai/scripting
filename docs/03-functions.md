@@ -2,7 +2,8 @@
 
 ## Overview
 
-Functions are reusable templates that accept parameters. There are three types: expression text functions, LLM functions,
+Functions are reusable templates that accept parameters. There are three types: expression text functions, LLM
+functions,
 and JavaScript functions.
 
 ## Function Types

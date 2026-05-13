@@ -15,7 +15,7 @@ const inputSchema = {
 export default {
   name: "function define llm",
   description: "Define an LLM-backed scripting function",
-  aliases: ["func define llm"],
+  alias: ["func define llm"],
   help: `Define an LLM function that sends an interpolated prompt to the model.
 
 ## Example

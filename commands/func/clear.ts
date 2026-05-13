@@ -6,7 +6,7 @@ const inputSchema = {} as const satisfies AgentCommandInputSchema;
 export default {
   name: "functions clear",
   description: "Clear all local scripting functions",
-  aliases: ["function clear", "func clear"],
+  alias: ["function clear", "func clear"],
   help: `Remove all locally defined functions from the current scripting context.`,
   inputSchema,
   execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {

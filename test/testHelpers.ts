@@ -1,7 +1,7 @@
-import {AgentCommandService} from '@tokenring-ai/agent';
-import {vi} from 'vitest';
-import ScriptingService from '../ScriptingService.ts';
-import {ScriptingContext} from '../state/ScriptingContext.ts';
+import { AgentCommandService } from "@tokenring-ai/agent";
+import { vi } from "vitest";
+import ScriptingService from "../ScriptingService.ts";
+import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 export function createMockAgent() {
   const context = new ScriptingContext();
@@ -14,12 +14,12 @@ export function createMockAgent() {
     executeAgentCommand: vi.fn(async (agent: any, command: string) => {
       // Extract command name and args from command string (e.g., "/echo hello" -> "echo", "hello")
       const parts = command.trim().split(/\s+/);
-      const cmdName = parts[0].replace(/^\//, '');
-      const args = parts.slice(1).join(' ');
-      
+      const cmdName = parts[0].replace(/^\//, "");
+      const args = parts.slice(1).join(" ");
+
       // Handle common commands in tests
-      if (cmdName === 'echo') {
-        outputs.push(args || '');
+      if (cmdName === "echo") {
+        outputs.push(args || "");
       } else {
         outputs.push(`[command: ${command}]`);
       }
@@ -56,7 +56,7 @@ export function createMockAgent() {
       // Simple mock - just track the command
       outputs.push(`[command: ${cmd}]`);
     }),
-    getAbortSignal: vi.fn(() => ({aborted: false})),
+    getAbortSignal: vi.fn(() => ({ aborted: false })),
   };
 
   return {

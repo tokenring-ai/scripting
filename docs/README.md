@@ -10,79 +10,86 @@ agents and LLMs.
 ### User Guides
 
 1. **[Getting Started](01-getting-started.md)**
- - Overview and basic concepts
- - Your first script
- - Quick start guide
+
+- Overview and basic concepts
+- Your first script
+- Quick start guide
 
 1. **[Variables Guide](02-variables.md)**
- - Defining and using variables
- - Variable interpolation
- - Scope and lifecycle
- - Best practices
+
+- Defining and using variables
+- Variable interpolation
+- Scope and lifecycle
+- Best practices
 
 1. **[Functions Guide](03-functions.md)**
- - Static functions
- - LLM functions
- - JavaScript functions
- - Calling and managing functions
- - Global functions
+
+- Static functions
+- LLM functions
+- JavaScript functions
+- Calling and managing functions
+- Global functions
 
 1. **[Commands Reference](04-commands.md)**
- - Complete command documentation
- - Syntax and examples
- - Error handling
- - Tips and tricks
+
+- Complete command documentation
+- Syntax and examples
+- Error handling
+- Tips and tricks
 
 1. **[Examples](05-examples.md)**
- - Content generation
- - Research workflows
- - Data processing
- - Translation and localization
- - Quality assurance
+
+- Content generation
+- Research workflows
+- Data processing
+- Translation and localization
+- Quality assurance
 
 1. **[Advanced Topics](06-advanced.md)**
- - Complex workflows
- - Advanced patterns
- - Performance optimization
- - Integration patterns
- - Debugging techniques
+
+- Complex workflows
+- Advanced patterns
+- Performance optimization
+- Integration patterns
+- Debugging techniques
 
 ### Developer Guides
 
 1. **[Developer Guide](07-developer-guide.md)**
- - Creating global functions
- - Package integration
- - Best practices
- - Testing
- - Security considerations
+
+- Creating global functions
+- Package integration
+- Best practices
+- Testing
+- Security considerations
 
 ## Quick Reference
 
 ### Commands
 
-| Command                            | Description                |
-|------------------------------------|----------------------------|
-| `/var $name = value`               | Assign variable            |
-| `/var delete $name`                | Delete variable            |
-| `/vars`                            | List variables             |
-| `/vars clear`                      | Clear all variables        |
-| `/function define expr name($p) => "text"`  | Define expression function     |
-| `/function define llm name($p) => "prompt"`   | Define LLM function        |
-| `/function define js name($p) { code }`       | Define JavaScript function |
-| `/function delete name`                | Delete function            |
-| `/funcs`                           | List functions             |
-| `/funcs clear`                     | Clear local functions      |
-| `/call name("arg")`                | Call function              |
-| `/list @name = ["item1", "item2"]` | Define list                |
-| `/lists [@name]`                   | List all lists             |
-| `/echo $var`                       | Display text/variable      |
-| `/sleep seconds`                   | Pause execution            |
-| `/prompt $var "msg"`               | Prompt for input           |
-| `/confirm $var "msg"`              | Confirm yes/no             |
-| `/if $cond { cmds }`               | Conditional execution      |
-| `/for $item in @list { cmds }`     | Iterate over lists         |
-| `/while $cond { cmds }`            | Loop while truthy          |
-| `/script run name input`           | Run script                 |
+| Command                                     | Description                |
+|---------------------------------------------|----------------------------|
+| `/var $name = value`                        | Assign variable            |
+| `/var delete $name`                         | Delete variable            |
+| `/vars`                                     | List variables             |
+| `/vars clear`                               | Clear all variables        |
+| `/function define expr name($p) => "text"`  | Define expression function |
+| `/function define llm name($p) => "prompt"` | Define LLM function        |
+| `/function define js name($p) { code }`     | Define JavaScript function |
+| `/function delete name`                     | Delete function            |
+| `/funcs`                                    | List functions             |
+| `/funcs clear`                              | Clear local functions      |
+| `/call name("arg")`                         | Call function              |
+| `/list @name = ["item1", "item2"]`          | Define list                |
+| `/lists [@name]`                            | List all lists             |
+| `/echo $var`                                | Display text/variable      |
+| `/sleep seconds`                            | Pause execution            |
+| `/prompt $var "msg"`                        | Prompt for input           |
+| `/confirm $var "msg"`                       | Confirm yes/no             |
+| `/if $cond { cmds }`                        | Conditional execution      |
+| `/for $item in @list { cmds }`              | Iterate over lists         |
+| `/while $cond { cmds }`                     | Loop while truthy          |
+| `/script run name input`                    | Run script                 |
 
 ### Function Types
 

@@ -19,6 +19,7 @@ All commands follow a consistent syntax pattern:
 ```
 
 **Conventions:**
+
 - Commands start with `/` prefix
 - Parameters use `$` prefix for variables
 - Optional parameters have `?` suffix in documentation
@@ -29,28 +30,28 @@ All commands follow a consistent syntax pattern:
 
 Commands are organized into categories:
 
-| Category | Prefix | Description |
-|----------|--------|-------------|
-| Script Management | `/script` | Script persistence and loading |
-| Variable Management | `/var`, `/vars` | Variable operations |
-| Function Management | `/func`, `/funcs` | Function definitions |
-| List Operations | `/list`, `/lists` | List management |
-| Control Flow | `/if`, `/for`, `/while` | Flow control |
-| Data Operations | `/json*`, `/array*`, `/regex*` | Data manipulation |
-| File Operations | `/file*`, `/dir*`, `/path*` | Filesystem operations |
-| HTTP Operations | `/http*`, `/url*` | Network operations |
-| Utility | `/echo`, `/sleep`, `/prompt` | Utility commands |
+| Category            | Prefix                         | Description                    |
+|---------------------|--------------------------------|--------------------------------|
+| Script Management   | `/script`                      | Script persistence and loading |
+| Variable Management | `/var`, `/vars`                | Variable operations            |
+| Function Management | `/func`, `/funcs`              | Function definitions           |
+| List Operations     | `/list`, `/lists`              | List management                |
+| Control Flow        | `/if`, `/for`, `/while`        | Flow control                   |
+| Data Operations     | `/json*`, `/array*`, `/regex*` | Data manipulation              |
+| File Operations     | `/file*`, `/dir*`, `/path*`    | Filesystem operations          |
+| HTTP Operations     | `/http*`, `/url*`              | Network operations             |
+| Utility             | `/echo`, `/sleep`, `/prompt`   | Utility commands               |
 
 ### 1.3 Command Return Values
 
 Commands return values consistently:
 
-| Command Type | Return Type | Description |
-|--------------|-------------|-------------|
-| Query commands | Variable or value | Return computed result |
-| Action commands | Boolean | Return success status |
-| Transform commands | Transformed value | Return modified data |
-| Query-list commands | Array | Return list of items |
+| Command Type        | Return Type       | Description            |
+|---------------------|-------------------|------------------------|
+| Query commands      | Variable or value | Return computed result |
+| Action commands     | Boolean           | Return success status  |
+| Transform commands  | Transformed value | Return modified data   |
+| Query-list commands | Array             | Return list of items   |
 
 ### 1.4 Error Handling Pattern
 
@@ -62,10 +63,10 @@ async function executeCommand(args): Promise<Result> {
   try {
     // Validate arguments
     validateArgs(args);
-    
+
     // Execute operation
     const result = performOperation(args);
-    
+
     // Return result
     return success(result);
   } catch (error) {
@@ -90,12 +91,12 @@ async function executeCommand(args): Promise<Result> {
 
 Functions support multiple types:
 
-| Type | Prefix | Description |
-|------|--------|-------------|
-| Static | `@name` | Text template with interpolation |
-| LLM | `#name` | AI-powered generation |
-| JavaScript | `$name` | JavaScript computation |
-| Native | `!name` | Built-in operations |
+| Type       | Prefix  | Description                      |
+|------------|---------|----------------------------------|
+| Static     | `@name` | Text template with interpolation |
+| LLM        | `#name` | AI-powered generation            |
+| JavaScript | `$name` | JavaScript computation           |
+| Native     | `!name` | Built-in operations              |
 
 ### 2.2 Function Definition Pattern
 
@@ -103,25 +104,43 @@ Functions support multiple types:
 // Static function pattern
 {
   name: "greet",
-  type: "expression",
-  parameters: ["name"],
-  template: "Hello, ${name}! Welcome to our service."
+    type
+:
+  "expression",
+    parameters
+:
+  ["name"],
+    template
+:
+  "Hello, ${name}! Welcome to our service."
 }
 
 // LLM function pattern
 {
   name: "summarize",
-  type: "llm",
-  parameters: ["text", "length"],
-  prompt: "Summarize the following text in ${length} sentences:\n\n${text}"
+    type
+:
+  "llm",
+    parameters
+:
+  ["text", "length"],
+    prompt
+:
+  "Summarize the following text in ${length} sentences:\n\n${text}"
 }
 
 // JavaScript function pattern
 {
   name: "calculateTotal",
-  type: "javascript",
-  parameters: ["items", "taxRate"],
-  code: `
+    type
+:
+  "javascript",
+    parameters
+:
+  ["items", "taxRate"],
+    code
+:
+  `
     return items.reduce((sum, item) => sum + item.price, 0) * (1 + taxRate);
   `
 }
@@ -132,7 +151,7 @@ Functions support multiple types:
 ```typescript
 async function executeFunction(name: string, args: Record<string, any>): Promise<any> {
   const func = getFunction(name);
-  
+
   switch (func.type) {
     case "expression":
       return executeStaticFunction(func, args);
@@ -212,13 +231,13 @@ class ScriptingParser implements CommandParser {
   parse(text: string): ParsedCommand {
     // Tokenize
     const tokens = this.tokenize(text);
-    
+
     // Parse command structure
     const command = this.parseCommand(tokens);
-    
+
     // Parse arguments
     command.args = this.parseArguments(tokens);
-    
+
     return command;
   }
 }
@@ -236,7 +255,7 @@ class ScriptingBlockParser implements BlockParser {
   parseBlock(text: string): Block {
     // Identify block type
     const type = this.identifyBlockType(text);
-    
+
     // Parse content based on type
     switch (type) {
       case "if":
@@ -271,12 +290,12 @@ class ScriptingExpressionParser implements ExpressionParser {
     if (text.includes("==")) {
       return this.parseEquality(text);
     }
-    
+
     // Handle variable reference
     if (text.startsWith("$")) {
       return this.parseVariable(text);
     }
-    
+
     // Handle literal
     return this.parseLiteral(text);
   }
@@ -336,7 +355,7 @@ try {
       field: error.field
     };
   }
-  
+
   if (error instanceof ParseError) {
     return {
       status: "error",
@@ -346,7 +365,7 @@ try {
       column: error.column
     };
   }
-  
+
   // Handle runtime errors
   return {
     status: "error",
@@ -367,7 +386,7 @@ class TryCatchHandler {
     finallyBlock: Block | null
   ): Promise<Result> {
     let result;
-    
+
     try {
       result = await this.executeBlock(tryBlock);
     } catch (error) {
@@ -383,7 +402,7 @@ class TryCatchHandler {
         await this.executeBlock(finallyBlock);
       }
     }
-    
+
     return result;
   }
 }
@@ -399,17 +418,17 @@ class TryCatchHandler {
 // Command result caching
 class CommandCache {
   private cache: Map<string, { value: any; expires: number }> = new Map();
-  
+
   async get<T>(key: string, fn: () => Promise<T>): Promise<T> {
     const cached = this.cache.get(key);
-    
+
     if (cached && cached.expires > Date.now()) {
       return cached.value;
     }
-    
+
     const value = await fn();
     this.cache.set(key, { value, expires: Date.now() + 60000 });
-    
+
     return value;
   }
 }
@@ -422,11 +441,11 @@ class CommandCache {
 class LazyValue<T> {
   private value: T | null = null;
   private factory: () => T;
-  
+
   constructor(factory: () => T) {
     this.factory = factory;
   }
-  
+
   get(): T {
     if (this.value === null) {
       this.value = this.factory();
@@ -446,7 +465,7 @@ async function batchProcess<T, R>(
   batchSize: number = 100
 ): Promise<R[]> {
   const results: R[] = [];
-  
+
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
     const batchResults = await Promise.all(
@@ -454,7 +473,7 @@ async function batchProcess<T, R>(
     );
     results.push(...batchResults);
   }
-  
+
   return results;
 }
 ```
@@ -470,11 +489,11 @@ describe("Command Parser", () => {
   it("should parse simple command", () => {
     const parser = new ScriptingParser();
     const result = parser.parse('/echo "Hello"');
-    
+
     expect(result.command).toBe("echo");
     expect(result.args).toEqual(["Hello"]);
   });
-  
+
   it("should handle nested blocks", () => {
     const parser = new ScriptingParser();
     const result = parser.parse(`
@@ -482,7 +501,7 @@ describe("Command Parser", () => {
         /echo "true"
       }
     `);
-    
+
     expect(result.blocks).toHaveLength(1);
   });
 });
@@ -498,10 +517,10 @@ describe("Script Execution", () => {
       /var $greeting = "Hello, $name!"
       /echo $greeting
     `;
-    
+
     const executor = new ScriptingExecutor();
     const result = await executor.execute(script);
-    
+
     expect(result.output).toContain("Hello, World!");
     expect(result.variables.get("greeting")).toBe("Hello, World!");
   });
@@ -521,7 +540,7 @@ class TestHelpers {
       interpolations: new Map()
     };
   }
-  
+
   expression expectCommand(text: string) {
     return {
       toParse: (parser: CommandParser) => {
@@ -545,12 +564,12 @@ class TestHelpers {
 function sanitizeInput(input: string): string {
   // Remove dangerous characters
   let sanitized = input.replace(/[<>\"\'`]/g, "");
-  
+
   // Limit length
   if (sanitized.length > MAX_INPUT_LENGTH) {
     sanitized = sanitized.substring(0, MAX_INPUT_LENGTH);
   }
-  
+
   return sanitized;
 }
 ```
@@ -565,21 +584,21 @@ class PermissionChecker {
     if (!context.permissions.has(permission)) {
       throw new PermissionDeniedError(permission);
     }
-    
+
     return true;
   }
-  
+
   checkFileAccess(context: ExecutionContext, path: string): boolean {
     // Resolve and validate path
     const resolved = this.resolvePath(path);
-    
+
     // Check against allowed paths
     for (const allowed of context.permissions.allowedPaths) {
       if (resolved.startsWith(allowed)) {
         return true;
       }
     }
-    
+
     return false;
   }
 }
@@ -593,17 +612,17 @@ class ScriptSandbox {
   execute(script: string, permissions: PermissionSet): Promise<Result> {
     // Create isolated context
     const context = this.createIsolatedContext(permissions);
-    
+
     // Parse in sandbox
     const parsed = this.sandboxParser.parse(script);
-    
+
     // Validate parsed script
     this.validateScript(parsed, permissions);
-    
+
     // Execute with monitoring
     return this.monitoredExecute(parsed, context);
   }
-  
+
   private createIsolatedContext(permissions: PermissionSet): ScriptingContext {
     return {
       variables: new Map(),
@@ -656,7 +675,9 @@ Parse a JSON string into script variables.
 
 ### Syntax
 ```
+
 /var $parsed = /jsonParse($jsonString)
+
 ```
 
 ### Parameters
@@ -675,10 +696,12 @@ Parse a JSON string into script variables.
 ```
 
 **Parse a JSON array:**
+
 ```bash
 /var $data = '[1, 2, 3, 4, 5]'
 /var $parsed = /jsonParse($data)
 ```
+
 ```
 
 ---
@@ -692,7 +715,7 @@ Parse a JSON string into script variables.
 class VersionMigrator {
   migrate(script: string, fromVersion: string, toVersion: string): string {
     let migrated = script;
-    
+
     // Apply migrations in order
     if (fromVersion === "1.0" && toVersion === "2.0") {
       migrated = this.migrateV1ToV2(migrated);
@@ -700,10 +723,10 @@ class VersionMigrator {
     if (fromVersion === "2.0" && toVersion === "3.0") {
       migrated = this.migrateV2ToV3(migrated);
     }
-    
+
     return migrated;
   }
-  
+
   private migrateV1ToV2(script: string): string {
     // Replace deprecated syntax
     return script
@@ -723,10 +746,10 @@ class DeprecationHandler {
       "oldCommand": "newCommand",
       "deprecatedVar": "currentVar"
     };
-    
+
     return replacements[command] || command;
   }
-  
+
   warnDeprecation(command: string, replacement: string): void {
     console.warn(
       `Warning: '${command}' is deprecated. Use '${replacement}' instead.`

@@ -16,7 +16,7 @@ const inputSchema = {
 export default {
   name: "function delete",
   description: "Delete a scripting function",
-  aliases: ["func delete"],
+  alias: ["func delete"],
   help: `Delete a previously defined local function.
 
 ## Example

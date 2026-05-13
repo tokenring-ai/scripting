@@ -1,10 +1,14 @@
 # @tokenring-ai/scripting
 
-Comprehensive scripting language with variables, functions, and LLM integration for automating workflows and chat command sequences.
+Comprehensive scripting language with variables, functions, and LLM integration for automating workflows and chat
+command sequences.
 
 ## Overview
 
-The TokenRing AI Scripting package provides a powerful scripting language for automating workflows, managing variables, defining functions, and integrating with AI models. It supports script execution, control flow (conditionals, loops), variables, lists, and dynamic function execution with support for expression, JavaScript, LLM-powered, and native functions.
+The TokenRing AI Scripting package provides a powerful scripting language for automating workflows, managing variables,
+defining functions, and integrating with AI models. It supports script execution, control flow (conditionals, loops),
+variables, lists, and dynamic function execution with support for expression, JavaScript, LLM-powered, and native
+functions.
 
 ## Installation
 
@@ -31,7 +35,8 @@ bun add @tokenring-ai/scripting
 
 ### ScriptingService
 
-Manages and executes scripts, variables, functions, and scripting language features. Implements the `TokenRingService` interface.
+Manages and executes scripts, variables, functions, and scripting language features. Implements the `TokenRingService`
+interface.
 
 **Properties:**
 
@@ -53,7 +58,7 @@ const func = scriptingService.resolveFunction(name, agent);
 const result = await scriptingService.executeFunction(funcName, args, agent);
 
 // Run a script with input
-const result = await scriptingService.runScript({scriptName, input}, agent);
+const result = await scriptingService.runScript({ scriptName, input }, agent);
 
 // Get script by name
 const script = scriptingService.getScriptByName(name);
@@ -431,9 +436,9 @@ chatService.addTools([
       scriptName: z.string(),
       input: z.string()
     }),
-    execute: async ({scriptName, input}, agent) => {
+    execute: async ({ scriptName, input }, agent) => {
       const scriptingService = agent.requireServiceByType(ScriptingService);
-      return await scriptingService.runScript({scriptName, input}, agent);
+      return await scriptingService.runScript({ scriptName, input }, agent);
     }
   }
 ]);
@@ -512,7 +517,8 @@ State checkpoints are generated automatically during:
 
 ### runAgent
 
-The scripting package provides a built-in `runAgent` function for running subagents. This is registered globally by the plugin and is not available as a local function.
+The scripting package provides a built-in `runAgent` function for running subagents. This is registered globally by the
+plugin and is not available as a local function.
 
 ```typescript
 scriptingService.registerFunction("runAgent", {
@@ -551,7 +557,8 @@ scriptingService.registerFunction("runAgent", {
 
 The following names cannot be used for functions:
 
-- `var`, `vars`, `func`, `funcs`, `call`, `echo`, `sleep`, `prompt`, `confirm`, `list`, `lists`, `if`, `for`, `while`, `script`
+- `var`, `vars`, `func`, `funcs`, `call`, `echo`, `sleep`, `prompt`, `confirm`, `list`, `lists`, `if`, `for`, `while`,
+  `script`
 
 ## Error Handling
 

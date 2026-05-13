@@ -16,8 +16,8 @@ local functions, allowing users to override them if needed.
 In your package's service `attach()` method:
 
 ```typescript
-import {Agent} from "@tokenring-ai/agent";
-import {ScriptingService, ScriptFunction} from "@tokenring-ai/scripting";
+import { Agent } from "@tokenring-ai/agent";
+import { ScriptingService, ScriptFunction } from "@tokenring-ai/scripting";
 
 export class MyService {
   async attach(agent: Agent): Promise<void> {
@@ -109,9 +109,9 @@ Usage:
 ### File System Package
 
 ```typescript
-import {Agent} from "@tokenring-ai/agent";
-import {TokenRingService} from "@tokenring-ai/agent/types";
-import {ScriptingService} from "@tokenring-ai/scripting";
+import { Agent } from "@tokenring-ai/agent";
+import { TokenRingService } from "@tokenring-ai/agent/types";
+import { ScriptingService } from "@tokenring-ai/scripting";
 import * as fs from "fs";
 
 export class FileSystemService implements TokenRingService {
@@ -348,8 +348,8 @@ describe("Global Functions", () => {
 Test in actual scripting context:
 
 ```typescript
-import {Agent} from "@tokenring-ai/agent";
-import {ScriptingService} from "@tokenring-ai/scripting";
+import { Agent } from "@tokenring-ai/agent";
+import { ScriptingService } from "@tokenring-ai/scripting";
 
 const agent = new Agent(/* config */);
 const scriptingService = agent.requireServiceByType(ScriptingService);
@@ -540,7 +540,7 @@ export const utilityFunctions = [
 ];
 
 // MyService.ts
-import {utilityFunctions} from "./functions/utility.ts";
+import { utilityFunctions } from "./functions/utility.ts";
 
 export class MyService {
   async attach(agent: Agent): Promise<void> {

@@ -15,7 +15,7 @@ const inputSchema = {
 export default {
   name: "function define expr",
   description: "Define a function that evaluates an expression",
-  aliases: ["function define expression", "func define expr", "func define expression"],
+  alias: ["function define expression", "func define expr", "func define expression"],
   help: `Define a function that evaluates an expression and returns text with variable interpolation.
 
 ## Example
