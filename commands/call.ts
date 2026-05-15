@@ -46,7 +46,7 @@ export default {
       const result = await scriptingService.executeFunction(funcName, args, agent);
       return joinArrayable(result, "\n");
     } catch (error: unknown) {
-      throw new CommandFailedError(error instanceof Error ? error.message : String(error));
+      throw new CommandFailedError(Error.isError(error) ? error.message : String(error));
     }
   },
   help,

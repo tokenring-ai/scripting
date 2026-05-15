@@ -40,7 +40,7 @@ export default {
       context.setVariable(varName, value);
       return `Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`;
     } catch (error: unknown) {
-      throw new CommandFailedError(error instanceof Error ? error.message : String(error));
+      throw new CommandFailedError(Error.isError(error) ? error.message : String(error));
     }
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;
