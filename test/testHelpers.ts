@@ -11,7 +11,7 @@ export function createMockAgent() {
   const humanResponses: any[] = [];
 
   const mockAgentCommandService = {
-    executeAgentCommand: vi.fn(async (agent: any, command: string) => {
+    executeAgentCommand: vi.fn(async (agent: Agent, command: string) => {
       // Extract command name and args from command string (e.g., "/echo hello" -> "echo", "hello")
       const parts = command.trim().split(/\s+/);
       const cmdName = parts[0].replace(/^\//, "");

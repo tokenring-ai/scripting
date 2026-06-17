@@ -14,7 +14,7 @@ import ScriptingService from "../ScriptingService.ts";
 import { createMockAgent } from "./testHelpers.ts";
 
 describe("Command Integration Tests", () => {
-  let agent: any;
+  let agent: Agent;
   let context: any;
 
   beforeEach(() => {

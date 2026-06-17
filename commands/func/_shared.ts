@@ -1,3 +1,4 @@
+import { Agent } from "@tokenring-ai/agent";
 import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
 
 import type ScriptingService from "../../ScriptingService.ts";
@@ -38,7 +39,7 @@ export function formatFunctionDefinition(name: string, func: ScriptFunction) {
   return `${typePrefix}${name}(${func.params.map(param => "$" + param).join(", ")})${separator}${body}${suffix}`;
 }
 
-export function resolveNamedFunction(name: string, _context: ScriptingContext, scriptingService: ScriptingService, agent: any) {
+export function resolveNamedFunction(name: string, _context: ScriptingContext, scriptingService: ScriptingService, agent: Agent) {
   const func = scriptingService.resolveFunction(name, agent);
   if (!func) {
     throw new CommandFailedError(`Function ${name} not defined`);

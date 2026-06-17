@@ -7,7 +7,7 @@ import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 describe("ScriptingService", () => {
   let service: ScriptingService;
-  let agent: any;
+  let agent: Agent;
   let context: ScriptingContext;
   let agentCommandService: AgentCommandService;
 
