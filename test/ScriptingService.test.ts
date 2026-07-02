@@ -1,6 +1,6 @@
 import { AgentCommandService } from "@tokenring-ai/agent";
-import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent";
-import createTestingApp from "@tokenring-ai/app/test/createTestingApp";
+import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent.test";
+import createTestingApp from "@tokenring-ai/app/test/createTestingApp.test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ScriptingService from "../ScriptingService.ts";
 import { ScriptingContext } from "../state/ScriptingContext.ts";
