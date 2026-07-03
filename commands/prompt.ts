@@ -37,7 +37,7 @@ export default {
     const varName = positionals.varName.replace(/^\$/, "");
     if (!varName) throw new CommandFailedError('Usage: /prompt $var "message"');
 
-    const unquoted = messageExpr.match(/^["'](.*)['"']$/s);
+    const unquoted = messageExpr.match(/^["'](.*)['"']$/s) as [string, string] | undefined;
     const message = context.interpolate(unquoted ? unquoted[1] : messageExpr);
 
     const input = await agent.askForText({

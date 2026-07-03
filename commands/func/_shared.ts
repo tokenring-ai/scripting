@@ -20,7 +20,7 @@ export function parseFunctionSignature(definition: string) {
     throw new CommandFailedError("Invalid function signature.");
   }
 
-  const [, funcName, paramsStr] = match;
+  const [, funcName, paramsStr] = match as [string, string, string];
   const params = paramsStr
     .split(",")
     .map(param => param.trim().replace(/^\$/, ""))

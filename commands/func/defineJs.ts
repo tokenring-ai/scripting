@@ -23,7 +23,7 @@ export default {
 /function define js wordCount($text) { return $text.split(/\\s+/).length; }`,
   inputSchema,
   execute: ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): string => {
-    const match = remainder.match(/^(.+?)\s*\{(.+)\}$/s);
+    const match = remainder.match(/^(.+?)\s*\{(.+)\}$/s) as [string, string, string] | undefined;
     if (!match) {
       throw new CommandFailedError("Invalid syntax. Use: /function define js name($param) { return result; }");
     }

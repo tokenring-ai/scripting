@@ -23,7 +23,7 @@ export default {
 /function define expr greet($name) => "Hello, $name!"`,
   inputSchema,
   execute: ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): string => {
-    const match = remainder.match(/^(.+?)\s*=>\s*(.+)$/s);
+    const match = remainder.match(/^(.+?)\s*=>\s*(.+)$/s) as [string, string, string] | undefined;
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /function define expr name($param) => "text"');
     }

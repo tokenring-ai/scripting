@@ -7,7 +7,7 @@ import type { ScriptingContext } from "../../state/ScriptingContext.ts";
 import { parseArguments } from "../../utils/parseArguments.ts";
 
 export async function evaluateExpression(expr: string, context: ScriptingContext, agent: Agent): Promise<string> {
-  const llmMatch = expr.match(/^llm\(["'](.*)['"]\)$/s);
+  const llmMatch = expr.match(/^llm\(["'](.*)['"]\)$/s) as [string, string] | undefined;
   if (llmMatch) {
     const prompt = context.interpolate(llmMatch[1]);
     const chatService = agent.requireServiceByType(ChatService);
@@ -20,13 +20,13 @@ export async function evaluateExpression(expr: string, context: ScriptingContext
     return response.text.trim();
   }
 
-  const funcMatch = expr.match(/^(\w+)\((.*)\)$/);
+  const funcMatch = expr.match(/^(\w+)\((.*)\)$/) as [string, string, string] | undefined;
   if (funcMatch) {
     const [, funcName, argsStr] = funcMatch;
     const scriptingService = agent.requireServiceByType(ScriptingService);
 
     const args = parseArguments(argsStr).map(arg => {
-      const unquoted = arg.match(/^["'](.*)['"']$/);
+      const unquoted = arg.match(/^["'](.*)['"']$/) as [string, string] | undefined;
       return unquoted ? unquoted[1] : context.interpolate(arg);
     });
 
@@ -34,6 +34,6 @@ export async function evaluateExpression(expr: string, context: ScriptingContext
     return joinArrayable(result, "\n");
   }
 
-  const unquoted = expr.match(/^["'](.*)['"']$/s);
+  const unquoted = expr.match(/^["'](.*)['"']$/s) as [string, string] | undefined;
   return context.interpolate(unquoted ? unquoted[1] : expr);
 }

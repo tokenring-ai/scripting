@@ -25,7 +25,7 @@ export default {
   inputSchema,
   execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
-    const match = remainder.match(/^\$(\w+)\s*=\s*(.+)$/);
+    const match = remainder.match(/^\$(\w+)\s*=\s*(.+)$/) as [string, string, string] | undefined;
     if (!match) {
       throw new CommandFailedError("Invalid syntax. Use: /var set $name = value");
     }

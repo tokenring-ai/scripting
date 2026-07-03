@@ -41,7 +41,7 @@ export default {
       throw new CommandFailedError("Missing then block { commands }");
     }
 
-    const conditionValue = context.getVariable(conditionVar);
+    const conditionValue = context.getVariable(conditionVar!);
     const isTruthy = conditionValue && conditionValue !== "false" && conditionValue !== "0" && conditionValue !== "no";
 
     let body: string;

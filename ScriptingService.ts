@@ -84,7 +84,7 @@ export default class ScriptingService implements TokenRingService {
 
     const tempVars = new Map(context.variables);
     func.params.forEach((param, i) => {
-      context.variables.set(param, args[i]);
+      context.variables.set(param, args[i]!);
     });
 
     try {
@@ -122,7 +122,7 @@ export default class ScriptingService implements TokenRingService {
         }
         result = response.text.trim();
       } else {
-        const unquoted = func.body.match(/^["'](.*)["']$/s);
+        const unquoted = func.body.match(/^["'](.*)["']$/s) as [string, string] | undefined;
         result = context.interpolate(unquoted ? unquoted[1] : func.body);
       }
       return result;

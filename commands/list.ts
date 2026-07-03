@@ -35,20 +35,20 @@ export default {
       const [, listName, funcName, argsStr] = funcMatch;
       const scriptingService = agent.requireServiceByType(ScriptingService);
 
-      const args = parseArguments(argsStr).map(a => {
+      const args = parseArguments(argsStr!).map(a => {
         const unquoted = a.match(/^["'](.*)['"']$/);
-        return unquoted ? unquoted[1] : context.interpolate(a);
+        return unquoted ? unquoted[1]! : context.interpolate(a);
       });
 
       try {
-        const result = await scriptingService.executeFunction(funcName, args, agent);
+        const result = await scriptingService.executeFunction(funcName!, args, agent);
         const items = arrayableToArray(result);
 
-        if (context.variables.has(listName)) {
+        if (context.variables.has(listName!)) {
           throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
         }
 
-        context.setList(listName, items);
+        context.setList(listName!, items);
         return `List @${listName} = [${items.length} items]`;
       } catch (error: unknown) {
         throw new CommandFailedError(Error.isError(error) ? error.message : String(error));
@@ -62,16 +62,16 @@ export default {
 
     const [, listName, itemsStr] = match;
 
-    if (context.variables.has(listName)) {
+    if (context.variables.has(listName!)) {
       throw new CommandFailedError(`Name '${listName}' already exists as a variable ($${listName})`);
     }
 
-    const items = parseArguments(itemsStr).map(item => {
+    const items = parseArguments(itemsStr!).map(item => {
       const unquoted = item.match(/^["'](.*)['"']$/);
-      return unquoted ? unquoted[1] : context.interpolate(item);
+      return unquoted ? unquoted[1]! : context.interpolate(item);
     });
 
-    context.setList(listName, items);
+    context.setList(listName!, items);
     return `List @${listName} = [${items.length} items]`;
   },
   help,

@@ -36,7 +36,7 @@ export default {
   execute: async ({ positionals, remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const match = positionals.varName.match(/^\$(\w+)$/);
+    const match = positionals.varName.match(/^\$(\w+)$/) as [string, string] | undefined;
     if (!match) {
       throw new CommandFailedError("Invalid variable name. Use: /confirm $var message...");
     }

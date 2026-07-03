@@ -29,7 +29,7 @@ export default {
   execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const match = remainder.match(/^(\w+)\((.*)\)$/);
+    const match = remainder.match(/^(\w+)\((.*)\)$/) as [string, string, string] | undefined;
     if (!match) {
       throw new CommandFailedError('Invalid syntax. Use: /call functionName("arg1", "arg2")');
     }
@@ -38,7 +38,7 @@ export default {
     const scriptingService = agent.requireServiceByType(ScriptingService);
 
     const args = parseArguments(argsStr).map(a => {
-      const unquoted = a.match(/^["'](.*)['"']$/);
+      const unquoted = a.match(/^["'](.*)['"]$/) as [string, string] | undefined;
       return unquoted ? unquoted[1] : context.interpolate(a);
     });
 

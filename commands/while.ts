@@ -28,7 +28,7 @@ export default {
   execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const prefixMatch = remainder.match(/^\$(\w+)\s*/);
+    const prefixMatch = remainder.match(/^\$(\w+)\s*/) as [string, string] | undefined;
     if (!prefixMatch) {
       throw new CommandFailedError("Invalid syntax. Use: /while $condition { commands }");
     }

@@ -29,9 +29,9 @@ export default {
     }
 
     const [, signature, body] = match;
-    const { funcName, params } = parseFunctionSignature(signature.trim());
+    const { funcName, params } = parseFunctionSignature(signature!.trim());
     const context = agent.getState(ScriptingContext);
-    context.defineFunction(funcName, "llm", params, body.trim());
+    context.defineFunction(funcName, "llm", params, body!.trim());
     return `LLM function ${funcName}(${params.map(param => "$" + param).join(", ")}) defined`;
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;
