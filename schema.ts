@@ -1,12 +1,12 @@
 import z from "zod";
 
-export const ScriptionFunctionShema = z.object({
+export const ScriptingFunctionSchema = z.object({
   type: z.enum(["expression", "llm", "js"]),
   params: z.array(z.string()),
   body: z.string(),
 });
 
-export type ScriptionFunction = z.infer<typeof ScriptionFunctionShema>;
+export type ScriptionFunction = z.infer<typeof ScriptingFunctionSchema>;
 
 export const ScriptSchema = z.union([z.string(), z.array(z.string())]);
 export type Script = z.infer<typeof ScriptSchema>;

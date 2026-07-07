@@ -96,8 +96,8 @@ export default class ScriptingService implements TokenRingService {
         // TODO: This is the pattern recommended by the Mozilla docs, but seems odd
         const AsyncFunction = (async () => {}).constructor;
 
-        // @ts-expect-error
-        const funcImpl = new AsyncFunction(...func.params, func.body);
+        // @ts-expect-error AsyncFunction is not constructable in TypeScript's lib types
+        const funcImpl = new AsyncFunction(...func.params, func.body) as (this: { agent: typeof agent }, ...args: unknown[]) => Promise<string | string[]>;
         result = await funcImpl.call({ agent }, ...args);
         if (Array.isArray(result)) {
           for (const item of result) {

@@ -58,7 +58,7 @@ const func = scriptingService.resolveFunction(name, agent);
 const result = await scriptingService.executeFunction(funcName, args, agent);
 
 // Run a script with input
-const result = await scriptingService.runScript({ scriptName, input }, agent);
+const result = await scriptingService.runScript(scriptName, agent);
 
 // Get script by name
 const script = scriptingService.getScriptByName(name);
@@ -94,15 +94,17 @@ export type ScriptingThis = {
   agent: Agent;
 }
 
-export type ScriptFunction = {
-  type: 'expression' | 'llm' | 'js';
-  params: string[];
-  body: string;
-} | {
-  type: 'native';
-  params: string[];
-  execute(...args: string[]): string | string[] | Promise<string | string[]>;
-};
+export type ScriptFunction =
+  | {
+      type: 'expression' | 'llm' | 'js';
+      params: string[];
+      body: string;
+    }
+  | {
+      type: 'native';
+      params: string[];
+      execute(...args: string[]): string | string[] | Promise<string | string[]>;
+    };
 ```
 
 ### ScriptingContext
@@ -160,53 +162,71 @@ const serializationSchema = z.object({
 
 ### Script Management
 
-- `/script list` - Lists all available scripts
-- `/script run <scriptName> [input]` - Runs the specified script with optional input
-- `/script info <scriptName>` - Shows information about a script
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/script list` | Lists all available scripts | `/script list` |
+| `/script run <scriptName> [input]` | Runs the specified script with optional input | `/script run setupProject "MyProject"` |
+| `/script info <scriptName>` | Shows information about a script | `/script info setupProject` |
 
 ### Variable Commands
 
-- `/var set $name = value` - Define or update a variable
-- `/var delete $name` - Delete a variable
-- `/vars [$name]` - List all variables or show specific
-- `/vars clear` - Clear all variables
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/var set $name = value` | Define or update a variable | `/var set $name = "Alice"` |
+| `/var delete $name` | Delete a variable | `/var delete $temp` |
+| `/vars` | List all variables | `/vars` |
+| `/vars show [$name]` | Show specific variable | `/vars show $name` |
+| `/vars clear` | Clear all variables | `/vars clear` |
 
 ### Function Commands
 
-- `/func define expr name($param1) => "text"` - Define expression function
-- `/func define llm name($param1) => "prompt"` - Define LLM function
-- `/func define js name($param1) { code }` - Define JavaScript function
-- `/func delete name` - Delete a function
-- `/funcs [name]` - List all functions (local and global)
-- `/funcs clear` - Clear all local functions
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/func define expr name($param1) => "text"` | Define expression function | `/func define expr greet($name) => "Hello, $name!"` |
+| `/func define llm name($param1) => "prompt"` | Define LLM function | `/func define llm analyze($text) => "Analyze: $text"` |
+| `/func define js name($param1) { code }` | Define JavaScript function | `/func define js wordCount($text) { return $text.split(/\s+/).length; }` |
+| `/func delete name` | Delete a function | `/func delete greet` |
+| `/funcs` | List all functions (local and global) | `/funcs` |
+| `/funcs [name]` | Show specific function | `/funcs show greet` |
+| `/funcs clear` | Clear all local functions | `/funcs clear` |
 
 ### Function Execution
 
-- `/call functionName("arg1", "arg2")` - Call a function with arguments and display output
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/call functionName("arg1", "arg2")` | Call a function with arguments and display output | `/call greet("World")` |
 
 ### List Commands
 
-- `/list @name = ["item1", "item2"]` - Define a static list
-- `/list @name = [$var1, $var2]` - Define list from variables
-- `/list @name = functionName("arg")` - Define list from function results
-- `/lists [@name]` - List all lists or show specific contents
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/list @name = ["item1", "item2"]` | Define a static list | `/list @files = ["file1.txt", "file2.txt"]` |
+| `/list @name = [$var1, $var2]` | Define list from variables | `/list @items = [$item1, $item2]` |
+| `/list @name = functionName("arg")` | Define list from function results | `/list @results = searchResults("query")` |
+| `/lists [@name]` | List all lists or show specific contents | `/lists` or `/lists @files` |
 
 ### Output and Control
 
-- `/echo <text|$var>` - Display text or variable value without LLM processing
-- `/sleep <seconds|$var>` - Sleep for specified seconds
-- `/prompt $var "message"` - Prompt user for text input
-- `/confirm $var "message"` - Prompt for yes/no confirmation
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/echo <text|$var>` | Display text or variable value without LLM processing | `/echo Hello, $name!` |
+| `/sleep <seconds|$var>` | Sleep for specified seconds | `/sleep 5` |
+| `/prompt $var "message"` | Prompt user for text input | `/prompt $name "Enter your name:"` |
+| `/confirm $var "message"` | Prompt for yes/no confirmation | `/confirm $proceed "Continue?"` |
 
 ### Control Flow
 
-- `/if $condition { commands } [else { commands }]` - Conditional execution
-- `/for $item in @list { commands }` - Iterate over lists
-- `/while $condition { commands }` - Execute while condition is truthy
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/if $condition { commands } [else { commands }]` | Conditional execution | `/if $proceed { /echo Yes } else { /echo No }` |
+| `/for $item in @list { commands }` | Iterate over lists | `/for $file in @files { /echo Processing $file }` |
+| `/while $condition { commands }` | Execute while condition is truthy | `/while $continue { /echo Running... }` |
 
 ### Evaluation
 
-- `/eval <command with $vars>` - Interpolates variables in the command string and then executes it
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/eval <command with $vars>` | Interpolates variables in the command string and then executes it | `/eval /$cmd Hello World` |
 
 ### Context Handlers
 
@@ -227,11 +247,7 @@ const serializationSchema = z.object({
 /func define js currentDate() { return new Date().toISOString() }
 
 # Use functions
-/var set $greeting = greet($name)
-/var set $summary = summary($topic)
-
-# Display results
-/echo $name says: $summary
+/call greet($name)
 /echo Current date: $currentDate
 ```
 
@@ -282,8 +298,7 @@ const serializationSchema = z.object({
 /func define llm analyze($text) => "Analyze the sentiment of this text: $text"
 
 # Use LLM functions
-/var set $sentiment = analyze("I love this product!")
-
+/var set $sentiment = llm("I love this product!")
 /echo Analysis: $sentiment
 ```
 
@@ -297,7 +312,6 @@ const serializationSchema = z.object({
 
 # Use JavaScript functions
 /var set $count = wordCount("Hello world from TokenRing")
-
 /echo Word count: $count
 ```
 
@@ -367,7 +381,8 @@ const serializationSchema = z.object({
 Scripts are configured in your application config file:
 
 ```typescript
-import {ScriptingServiceConfigSchema} from "@tokenring-ai/scripting";
+import { ScriptingServiceConfigSchema } from "@tokenring-ai/scripting/schema";
+import { z } from "zod";
 
 export default {
   scripting: {
@@ -438,7 +453,7 @@ chatService.addTools([
     }),
     execute: async ({ scriptName, input }, agent) => {
       const scriptingService = agent.requireServiceByType(ScriptingService);
-      return await scriptingService.runScript({ scriptName, input }, agent);
+      return await scriptingService.runScript(scriptName, agent);
     }
   }
 ]);
@@ -525,16 +540,17 @@ scriptingService.registerFunction("runAgent", {
   type: 'native',
   params: ['agentType', 'message', 'context'],
   async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
-    const res = await runSubAgent({
+    const subAgentService = this.agent.requireServiceByType(SubAgentService);
+    const res = await subAgentService.runSubAgent({
       agentType: agentType,
       headless: this.agent.headless,
-      input: {
-        from: "Scripting plugin runAgent",
-        message: `/work ${message}\n\nImportant Context:\n${context}`
-      }
-    }, this.agent, true);
+      from: "Scripting plugin runAgent",
+      steps: [`${message}\n\nImportant Context:\n${context}`],
+      parentAgent: this.agent,
+      options: SubAgentConfigSchema.parse({}),
+    });
 
-    if (res.status === 'success') {
+    if (res.status === "success") {
       return res.response;
     } else {
       throw new Error(res.response);
@@ -713,18 +729,15 @@ pkg/scripting/
 │   │   ├── _shared.ts     # Shared utilities
 │   │   ├── set.ts         # Variable setting
 │   │   └── delete.ts      # Variable deletion
-│   │   ├── list.ts        # Variable listing
-│   │   └── show.ts        # Variable display
-│   │   └── clear.ts       # Variable clearing
 │   ├── func/              # Function commands
 │   │   ├── _shared.ts     # Shared utilities
+│   │   ├── defineExpression.ts # Expression function definition
 │   │   ├── defineJs.ts    # JavaScript function definition
 │   │   ├── defineLLM.ts   # LLM function definition
-│   │   ├── defineExpression.ts # Expression function definition
 │   │   ├── delete.ts      # Function deletion
-│   │   ├── clear.ts       # Function clearing
 │   │   ├── list.ts        # Function listing
-│   │   └── show.ts        # Function display
+│   │   ├── show.ts        # Function display
+│   │   └── clear.ts       # Function clearing
 │   ├── script/            # Script commands
 │   │   ├── list.ts        # Script listing
 │   │   ├── run.ts         # Script execution
@@ -757,11 +770,11 @@ pkg/scripting/
 
 ### Production Dependencies
 
-- `@tokenring-ai/app` (0.2.0) - Application framework
-- `@tokenring-ai/chat` (0.2.0) - Chat service
-- `@tokenring-ai/agent` (0.2.0) - Agent system
-- `@tokenring-ai/utility` (0.2.0) - Utility functions
-- `zod` (^4.3.6) - Schema validation
+- `@tokenring-ai/app` (workspace:*) - Application framework
+- `@tokenring-ai/chat` (workspace:*) - Chat service
+- `@tokenring-ai/agent` (workspace:*) - Agent system
+- `@tokenring-ai/utility` (workspace:*) - Utility functions
+- `zod` (^4.4.3) - Schema validation
 
 ### Development Dependencies
 
