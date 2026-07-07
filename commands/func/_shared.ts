@@ -1,4 +1,4 @@
-import { Agent } from "@tokenring-ai/agent";
+import type { Agent } from "@tokenring-ai/agent";
 import { CommandFailedError } from "@tokenring-ai/agent/AgentError";
 
 import type ScriptingService from "../../ScriptingService.ts";

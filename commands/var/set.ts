@@ -39,8 +39,8 @@ export default {
       const value = await evaluateExpression(expression.trim(), context, agent);
       context.setVariable(varName, value);
       return `Variable $${varName} = ${value.substring(0, 100)}${value.length > 100 ? "..." : ""}`;
-    } catch (error: unknown) {
-      throw new CommandFailedError(Error.isError(error) ? error.message : String(error));
+    } catch (err) {
+      throw new CommandFailedError(`Error during variable assignment`, { cause: err });
     }
   },
 } satisfies TokenRingAgentCommand<typeof inputSchema>;

@@ -1,6 +1,7 @@
 import type { Agent } from "@tokenring-ai/agent";
 import { AgentCommandService } from "@tokenring-ai/agent";
 import type { TokenRingService } from "@tokenring-ai/app/types";
+import { ConfigurationError } from "@tokenring-ai/app/types";
 import { ChatService } from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import { joinArrayable } from "@tokenring-ai/utility/array/arrayable";
@@ -75,7 +76,7 @@ export default class ScriptingService implements TokenRingService {
     const func = this.resolveFunction(funcName, agent);
 
     if (!func) {
-      throw new Error(`Function ${funcName} not defined`);
+      throw new ConfigurationError(this.name, `Function ${funcName} not defined`);
     }
 
     if (args.length !== func.params.length) {

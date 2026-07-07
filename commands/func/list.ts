@@ -20,7 +20,7 @@ export default {
     const context = agent.getState(ScriptingContext);
     const scriptingService = agent.requireServiceByType(ScriptingService);
     const localFuncs = Array.from(context.functions.entries());
-    const globalFuncs = scriptingService?.listFunctions() || [];
+    const globalFuncs = scriptingService.listFunctions();
 
     if (localFuncs.length === 0 && globalFuncs.length === 0) {
       return "No functions defined";
@@ -38,7 +38,7 @@ export default {
         markdownList(
           globalFuncs
             .map(name => {
-              const func = scriptingService?.getFunction(name);
+              const func = scriptingService.getFunction(name);
               return func ? formatFunctionDefinition(name, func) : null;
             })
             .filter(Boolean) as string[],

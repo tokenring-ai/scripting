@@ -1,4 +1,4 @@
-import { Agent } from "@tokenring-ai/agent";
+import type { Agent } from "@tokenring-ai/agent";
 import { ChatService } from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import { joinArrayable } from "@tokenring-ai/utility/array/arrayable";

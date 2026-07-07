@@ -45,8 +45,8 @@ export default {
     try {
       const result = await scriptingService.executeFunction(funcName, args, agent);
       return joinArrayable(result, "\n");
-    } catch (error: unknown) {
-      throw new CommandFailedError(Error.isError(error) ? error.message : String(error));
+    } catch (err) {
+      throw new CommandFailedError(`Error during function call`, { cause: err });
     }
   },
   help,

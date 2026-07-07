@@ -1,5 +1,6 @@
 import type Agent from "@tokenring-ai/agent/Agent";
 import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { ToolCallError } from "@tokenring-ai/chat/util/tokenRingTool";
 import { z } from "zod";
 import ScriptingService from "../ScriptingService.ts";
 
@@ -14,7 +15,7 @@ async function execute({ scriptName }: z.output<typeof inputSchema>, agent: Agen
   const result = await scriptingService.runScript(scriptName, agent);
 
   if (!result.ok) {
-    throw new Error(result.error || "Script execution failed");
+    throw new ToolCallError(name, "Script execution failed", { cause: result.error });
   }
 
   return result.output || "";
