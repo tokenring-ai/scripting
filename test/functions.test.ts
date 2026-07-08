@@ -6,7 +6,7 @@ import funcDefineLlm from "../commands/func/defineLLM.ts";
 import funcDelete from "../commands/func/delete.ts";
 import funcList from "../commands/func/list.ts";
 import funcShow from "../commands/func/show.ts";
-import { createMockAgent } from "./testHelpers.ts";
+import { createMockAgent } from "./testHelpers.test";
 
 describe("func define expression command", () => {
   it("defines expression function", async () => {

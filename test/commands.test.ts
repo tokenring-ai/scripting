@@ -10,7 +10,7 @@ import sleepCmd from "../commands/sleep.ts";
 import varSetCmd from "../commands/var/set.ts";
 import varsListCmd from "../commands/vars/list.ts";
 import whileCmd from "../commands/while.ts";
-import { createMockAgent } from "./testHelpers.ts";
+import { createMockAgent } from "./testHelpers.test";
 
 describe("echo command", () => {
   it("displays text", async () => {

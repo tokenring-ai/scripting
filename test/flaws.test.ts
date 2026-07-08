@@ -9,7 +9,7 @@ import listCmd from "../commands/list.ts";
 import promptCmd from "../commands/prompt.ts";
 import varSetCmd from "../commands/var/set.ts";
 import ScriptingService from "../ScriptingService.ts";
-import { createMockAgent } from "./testHelpers.ts";
+import { createMockAgent } from "./testHelpers.test";
 
 describe("FLAW: Argument parsing with commas in strings", () => {
   it("call command handles commas inside quoted arguments", async () => {

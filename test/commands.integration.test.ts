@@ -11,7 +11,7 @@ import ifCmd from "../commands/if.ts";
 import listCmd from "../commands/list.ts";
 import varSetCmd from "../commands/var/set.ts";
 import ScriptingService from "../ScriptingService.ts";
-import { createMockAgent } from "./testHelpers.ts";
+import { createMockAgent } from "./testHelpers.test";
 
 describe("Command Integration Tests", () => {
   let agent: Agent;
