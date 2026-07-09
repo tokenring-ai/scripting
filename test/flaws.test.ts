@@ -27,7 +27,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
-      return {};
+      return null;
     });
 
     const result = await callCmd.execute({ remainder: "test(\"a, b\", \"c\")", agent } as any);
@@ -55,7 +55,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
-      return {};
+      return null;
     });
 
     const result = await callCmd.execute({ remainder: "test(\"func(a, b)\")", agent } as any);
@@ -76,7 +76,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
-      return {};
+      return null;
     });
 
     const result = await callCmd.execute({ remainder: "test()", agent } as any);
@@ -314,7 +314,7 @@ describe("NO FLAW: List command function call with array result", () => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
-      return context;
+      return null;
     });
 
     await listCmd.execute({ remainder: "@items = getString()", agent } as any);

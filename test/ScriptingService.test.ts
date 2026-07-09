@@ -1,4 +1,4 @@
-import { AgentCommandService } from "@tokenring-ai/agent";
+import { AgentCommandService, type Agent } from "@tokenring-ai/agent";
 import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent.test";
 import createTestingApp from "@tokenring-ai/app/test/createTestingApp.test";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -28,11 +28,11 @@ describe("ScriptingService", () => {
     app.addServices(service);
     service.attach(agent);
 
-    agentCommandService = new AgentCommandService();
+    agentCommandService = new AgentCommandService(app);
     app.addServices(agentCommandService);
 
     // Mock the executeAgentCommand to avoid actual command execution
-    vi.spyOn(agentCommandService, "executeAgentCommand").mockResolvedValue(undefined);
+    vi.spyOn(agentCommandService, "executeAgentCommand").mockResolvedValue({ message: "" });
   });
 
   describe("constructor and initialization", () => {
@@ -73,7 +73,7 @@ describe("ScriptingService", () => {
 
     it("should list all registered functions", () => {
       const mockFunction = {
-        type: "expression",
+        type: "expression" as const,
         params: ["x"],
         body: "test body"
       };
@@ -111,7 +111,7 @@ describe("ScriptingService", () => {
 
     it("should resolve functions from global registry if not in local context", () => {
       const mockGlobalFunc = {
-        type: "llm",
+        type: "llm" as const,
         params: ["text"],
         body: "global prompt"
       };
@@ -144,7 +144,7 @@ describe("ScriptingService", () => {
 
     it("should execute JavaScript functions correctly", async () => {
       const mockJsFunc = {
-        type: "js",
+        type: "js" as const,
         params: ["x", "y"],
         body: "return x.toString() + y.toString();"
       };
@@ -157,7 +157,7 @@ describe("ScriptingService", () => {
 
     it("should execute expression functions correctly", async () => {
       const mockStaticFunc = {
-        type: "expression",
+        type: "expression" as const,
         params: ["name"],
         body: "Hello, $name!"
       };
@@ -176,7 +176,7 @@ describe("ScriptingService", () => {
 
     it("should throw error for argument count mismatch", async () => {
       const mockFunc = {
-        type: "expression",
+        type: "expression" as const,
         params: ["param1", "param2"],
         body: "test"
       };
@@ -207,10 +207,7 @@ describe("ScriptingService", () => {
 
   describe("script execution", () => {
     it("should execute scripts successfully", async () => {
-      const result = await service.runScript({
-        scriptName: "testScript",
-        input: "test input"
-      }, agent);
+      const result = await service.runScript("testScript", agent);
 
       expect(result.ok).toBe(true);
       expect(result.output).toContain("completed successfully");
@@ -220,10 +217,7 @@ describe("ScriptingService", () => {
       // Mock executeAgentCommand to throw
       vi.spyOn(agentCommandService, "executeAgentCommand").mockRejectedValue(new Error("Script error"));
 
-      const result = await service.runScript({
-        scriptName: "testScript",
-        input: "test input"
-      }, agent);
+      const result = await service.runScript("testScript", agent);
 
       expect(result.ok).toBe(false);
       expect(result.error).toContain("Script error");
@@ -231,21 +225,18 @@ describe("ScriptingService", () => {
 
     it("should throw error for missing script names", async () => {
       await expect(
-        service.runScript({ scriptName: "", input: "" }, agent)
+        service.runScript("", agent)
       ).rejects.toThrow("Script name is required");
     });
 
     it("should throw error for non-existent scripts", async () => {
       await expect(
-        service.runScript({ scriptName: "nonExistent", input: "" }, agent)
+        service.runScript("nonExistent", agent)
       ).rejects.toThrow("Script not found: nonExistent");
     });
 
     it("should handle empty command lines", async () => {
-      const result = await service.runScript({
-        scriptName: "testScript",
-        input: "test input"
-      }, agent);
+      const result = await service.runScript("testScript", agent);
 
       expect(result.ok).toBe(true);
     });

@@ -1,4 +1,4 @@
-import { AgentCommandService } from "@tokenring-ai/agent";
+import { AgentCommandService, type Agent } from "@tokenring-ai/agent";
 import { vi } from "vitest";
 import ScriptingService from "../ScriptingService.ts";
 import { ScriptingContext } from "../state/ScriptingContext.ts";
@@ -14,7 +14,7 @@ export function createMockAgent() {
     executeAgentCommand: vi.fn(async (agent: Agent, command: string) => {
       // Extract command name and args from command string (e.g., "/echo hello" -> "echo", "hello")
       const parts = command.trim().split(/\s+/);
-      const cmdName = parts[0].replace(/^\//, "");
+      const cmdName = (parts[0]?.replace(/^\//, "") ?? "");
       const args = parts.slice(1).join(" ");
 
       // Handle common commands in tests
