@@ -20,7 +20,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
     service.registerFunction("test", {
       type: "native",
       params: ["arg1", "arg2"],
-      execute: (arg1: string, arg2: string) => `[${arg1}] [${arg2}]`,
+      execute: (arg1: string, arg2: string) => `[${arg1}] [${arg2}]`
     });
 
     agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
@@ -30,13 +30,13 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       return null;
     });
 
-    const result = await callCmd.execute({ remainder: 'test("a, b", "c")', agent } as any);
+    const result = await callCmd.execute({ remainder: "test(\"a, b\", \"c\")", agent } as any);
     expect(result).toBe("[a, b] [c]");
   });
 
   it("list command handles commas inside quoted items", async () => {
     const { agent, context } = createMockAgent();
-    await listCmd.execute({ remainder: '@items = ["a, b", "c, d"]', agent } as any);
+    await listCmd.execute({ remainder: "@items = [\"a, b\", \"c, d\"]", agent } as any);
     const list = context.getList("items");
     expect(list).toEqual(["a, b", "c, d"]);
   });
@@ -48,7 +48,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
     service.registerFunction("test", {
       type: "native",
       params: ["arg"],
-      execute: (arg: string) => arg,
+      execute: (arg: string) => arg
     });
 
     agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
@@ -58,7 +58,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       return null;
     });
 
-    const result = await callCmd.execute({ remainder: 'test("func(a, b)")', agent } as any);
+    const result = await callCmd.execute({ remainder: "test(\"func(a, b)\")", agent } as any);
     expect(result).toBe("func(a, b)");
   });
 
@@ -69,7 +69,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
     service.registerFunction("test", {
       type: "native",
       params: [],
-      execute: () => "no args",
+      execute: () => "no args"
     });
 
     agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
@@ -87,7 +87,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
 describe("FLAW: JS function body with nested braces", () => {
   it("func command handles nested braces in js function", async () => {
     const { agent, context } = createMockAgent();
-    const _result = funcDefineExpr.execute({ remainder: 'test($x) => "test"', agent } as any);
+    const result = await funcDefineExpr.execute({ remainder: "test($x) => \"test\"", agent } as any);
 
     const func = context.getFunction("test");
     expect(func).toBeDefined();
@@ -96,16 +96,16 @@ describe("FLAW: JS function body with nested braces", () => {
 
   it("func command handles multiple nested blocks", async () => {
     const { agent, context } = createMockAgent();
-    funcDefineExpr.execute({ remainder: 'test($x) => "test"', agent } as any);
+    await funcDefineExpr.execute({ remainder: "test($x) => \"test\"", agent } as any);
 
     const func = context.getFunction("test");
-    expect(func?.body).toBe('"test"');
+    expect(func?.body).toBe("\"test\"");
   });
 
   it("func command handles object literals in js function", async () => {
     const { agent, context } = createMockAgent();
     // Note: The js command expects format: name($param) { body }
-    funcDefineJs.execute({ remainder: "test($x) { return { a: 1, b: { c: 2 } }; }", agent } as any);
+    await funcDefineJs.execute({ remainder: "test($x) { return { a: 1, b: { c: 2 } }; }", agent } as any);
 
     const func = context.getFunction("test");
     expect(func?.body).toContain("{ a: 1, b: { c: 2 } }");
@@ -115,7 +115,7 @@ describe("FLAW: JS function body with nested braces", () => {
 describe("FLAW: Error handling consistency", () => {
   it("for command uses error throwing", async () => {
     const { agent } = createMockAgent();
-    expect(forCmd.execute({ remainder: "$item in @missing { /echo $item }", agent } as any)).rejects.toThrow("not found");
+    await expect(forCmd.execute({ remainder: "$item in @missing { /echo $item }", agent } as any)).rejects.toThrow("not found");
   });
 });
 
@@ -150,17 +150,17 @@ describe("FLAW: Null service checks", () => {
     const { agent } = createMockAgent();
     agent.requireServiceByType.mockReturnValue(null);
 
-    expect(callCmd.execute({ remainder: 'test("arg")', agent } as any)).rejects.toThrow();
+    await expect(callCmd.execute({ remainder: "test(\"arg\")", agent } as any)).rejects.toThrow();
   });
 });
 
 describe("FLAW: Unquoted regex matching", () => {
   it("greedy regex incorrectly matches quoted strings with content between", () => {
-    const testStr = '"foo" + "bar"';
+    const testStr = "\"foo\" + \"bar\"";
     const match = testStr.match(/^["'](.*)['"]$/);
 
     expect(match).not.toBeNull();
-    expect(match![1]).toBe('foo" + "bar');
+    expect(match![1]).toBe("foo\" + \"bar");
   });
 });
 
@@ -172,9 +172,9 @@ describe("FLAW: Variable name validation", () => {
     // But there's no validation against reserved words
 
     // These should potentially be rejected but aren't:
-    await varSetCmd.execute({ remainder: '$if = "value"', agent } as any);
-    await varSetCmd.execute({ remainder: '$for = "value"', agent } as any);
-    await varSetCmd.execute({ remainder: '$while = "value"', agent } as any);
+    await varSetCmd.execute({ remainder: "$if = \"value\"", agent } as any);
+    await varSetCmd.execute({ remainder: "$for = \"value\"", agent } as any);
+    await varSetCmd.execute({ remainder: "$while = \"value\"", agent } as any);
 
     // No errors are thrown - variables can shadow command names
     expect(context.getVariable("if")).toBe("value");
@@ -190,7 +190,7 @@ describe("FLAW: Echo command no escape for variables", () => {
     context.setVariable("name", "Alice");
 
     // User wants to display "Price is $50" but $50 gets interpolated
-    const result = echoCmd.execute({ remainder: "Price is $50", agent } as any);
+    const result = await echoCmd.execute({ remainder: "Price is $50", agent } as any);
 
     // $50 is treated as variable reference, returns empty string
     expect(result).toBe("Price is ");
@@ -206,7 +206,7 @@ describe("FLAW: Func command JS body extraction with nested braces", () => {
     // Note: The js command expects format: name($param) { body }
     const complexFunc = "complex($x) { const obj = { a: { b: { c: 1 } } }; return obj; }";
 
-    funcDefineJs.execute({ remainder: complexFunc, agent } as any);
+    await funcDefineJs.execute({ remainder: complexFunc, agent } as any);
 
     const func = context.getFunction("complex");
     // Should capture the entire body correctly
@@ -216,41 +216,41 @@ describe("FLAW: Func command JS body extraction with nested braces", () => {
   it("should handle function containing closing brace in string", async () => {
     const { agent, context } = createMockAgent();
 
-    const funcWithString = 'test($x) { return "}"; }';
+    const funcWithString = "test($x) { return \"}\"; }";
 
-    funcDefineJs.execute({ remainder: funcWithString, agent } as any);
+    await funcDefineJs.execute({ remainder: funcWithString, agent } as any);
 
     const func = context.getFunction("test");
     // Should correctly extract body, not stop at } inside string
-    expect(func?.body).toBe('return "}";');
+    expect(func?.body).toBe("return \"}\";");
   });
 });
 
 describe("FLAW: Prompt and confirm message parsing with greedy regex", () => {
   it("prompt command should handle quotes inside messages", async () => {
-    const { agent } = createMockAgent();
+    const { agent, context } = createMockAgent();
     (agent.askForText as any).mockResolvedValue("test");
 
-    await promptCmd.execute({ positionals: { varName: "$name" }, remainder: 'Enter \\"name\\" here:', agent } as any);
+    await promptCmd.execute({ positionals: { varName: "$name" }, remainder: "Enter \\\"name\\\" here:", agent } as any);
 
     // Should pass the message with escaped quotes correctly
     expect(agent.askForText).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining("name"),
-      }),
+        message: expect.stringContaining("name")
+      })
     );
   });
 
   it("confirm command should handle quotes inside messages", async () => {
-    const { agent } = createMockAgent();
+    const { agent, context } = createMockAgent();
     (agent.askForApproval as any).mockResolvedValue(true);
 
-    await confirmCmd.execute({ positionals: { varName: "$ok" }, remainder: 'Are you \\"sure\\"', agent } as any);
+    await confirmCmd.execute({ positionals: { varName: "$ok" }, remainder: "Are you \\\"sure\\\"", agent } as any);
 
     expect(agent.askForApproval).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining("sure"),
-      }),
+        message: expect.stringContaining("sure")
+      })
     );
   });
 });
@@ -260,37 +260,37 @@ describe("FLAW: No validation for list/variable name conflicts", () => {
     const { agent, context } = createMockAgent();
 
     // Create variable $data
-    await varSetCmd.execute({ remainder: '$data = "variable"', agent } as any);
+    await varSetCmd.execute({ remainder: "$data = \"variable\"", agent } as any);
     expect(context.getVariable("data")).toBe("variable");
 
     // Create list @data - should warn!
-    expect(listCmd.execute({ remainder: '@data = ["item1", "item2"]', agent } as any)).rejects.toThrow("already exists as a variable");
+    await expect(listCmd.execute({ remainder: "@data = [\"item1\", \"item2\"]", agent } as any)).rejects.toThrow("already exists as a variable");
   });
 
   it("should warn when creating variable with same name as list", async () => {
     const { agent, context } = createMockAgent();
 
     // Create list @name
-    await listCmd.execute({ remainder: '@name = ["Bob", "Charlie"]', agent } as any);
+    await listCmd.execute({ remainder: "@name = [\"Bob\", \"Charlie\"]", agent } as any);
     expect(context.getList("name")).toEqual(["Bob", "Charlie"]);
 
     // Create variable $name - should warn!
-    expect(varSetCmd.execute({ remainder: '$name = "Alice"', agent } as any)).rejects.toThrow("already exists as a list");
+    await expect(varSetCmd.execute({ remainder: "$name = \"Alice\"", agent } as any)).rejects.toThrow("already exists as a list");
   });
 });
 
-describe("NO FLAW: Function name validation rejects reserved names", () => {
+describe("FLAW: Function name validation missing", () => {
   it("should reject function names that shadow commands", async () => {
     const { agent } = createMockAgent();
 
-    expect(() => funcDefineExpr.execute({ remainder: 'if($x) => "value"', agent } as any)).toThrow("reserved");
+    await expect(funcDefineExpr.execute({ remainder: "if($x) => \"value\"", agent } as any)).rejects.toThrow("reserved");
   });
 
   it("should allow valid function names with underscores and numbers", async () => {
     const { agent, context } = createMockAgent();
 
-    funcDefineExpr.execute({ remainder: '_private($x) => "value"', agent } as any);
-    funcDefineExpr.execute({ remainder: 'func123($x) => "value"', agent } as any);
+    await funcDefineExpr.execute({ remainder: "_private($x) => \"value\"", agent } as any);
+    await funcDefineExpr.execute({ remainder: "func123($x) => \"value\"", agent } as any);
 
     // These should be allowed
     expect(context.getFunction("_private")).toBeDefined();
@@ -307,7 +307,7 @@ describe("NO FLAW: List command function call with array result", () => {
     service.registerFunction("getString", {
       type: "native",
       params: [],
-      execute: () => "single string",
+      execute: () => "single string"
     });
 
     agent.requireServiceByType.mockImplementation((ServiceClass: any) => {

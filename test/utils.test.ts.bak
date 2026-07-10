@@ -6,12 +6,12 @@ import { parseScript } from "../utils/parseScript.ts";
 describe("Utility Functions", () => {
   describe("parseArguments", () => {
     it("should parse simple arguments", () => {
-      const result = parseArguments('"arg1", "arg2", "arg3"');
-      expect(result).toEqual(['"arg1"', '"arg2"', '"arg3"']);
+      const result = parseArguments("\"arg1\", \"arg2\", \"arg3\"");
+      expect(result).toEqual(["\"arg1\"", "\"arg2\"", "\"arg3\""]);
     });
 
     it("should handle nested parentheses", () => {
-      const result = parseArguments('"text with (nested) brackets", "arg2"');
+      const result = parseArguments("\"text with (nested) brackets\", \"arg2\"");
       expect(result).toHaveLength(2);
       expect(result[0]).toContain("text with (nested) brackets");
     });
@@ -22,34 +22,34 @@ describe("Utility Functions", () => {
     });
 
     it("should handle single argument", () => {
-      const result = parseArguments('"single"');
-      expect(result).toEqual(['"single"']);
+      const result = parseArguments("\"single\"");
+      expect(result).toEqual(["\"single\""]);
     });
 
     it("should handle quoted strings with commas", () => {
-      const result = parseArguments('"arg, with comma", "arg2"');
-      expect(result).toEqual(['"arg, with comma"', '"arg2"']);
+      const result = parseArguments("\"arg, with comma\", \"arg2\"");
+      expect(result).toEqual(["\"arg, with comma\"", "\"arg2\""]);
     });
 
     it("should handle escaped quotes", () => {
-      const result = parseArguments('"arg with \\"quote\\"", "arg2"');
-      expect(result).toEqual(['"arg with \\"quote\\""', '"arg2"']);
+      const result = parseArguments("\"arg with \\\"quote\\\"\", \"arg2\"");
+      expect(result).toEqual(["\"arg with \\\"quote\\\"\"", "\"arg2\""]);
     });
 
     it("should handle mixed quote types", () => {
-      const result = parseArguments('"double", \'single\', "mixed"');
-      expect(result).toEqual(['"double"', "'single'", '"mixed"']);
+      const result = parseArguments("\"double\", 'single', \"mixed\"");
+      expect(result).toEqual(["\"double\"", "'single'", "\"mixed\""]);
     });
 
     it("should handle function calls with variables", () => {
-      const result = parseArguments('$var1, "arg2", $var3');
-      expect(result).toEqual(["$var1", '"arg2"', "$var3"]);
+      const result = parseArguments("$var1, \"arg2\", $var3");
+      expect(result).toEqual(["$var1", "\"arg2\"", "$var3"]);
     });
 
     it("should handle function call syntax", () => {
-      const result = parseArguments('func("arg"), $var, "normal"');
+      const result = parseArguments("func(\"arg\"), $var, \"normal\"");
       expect(result).toHaveLength(3);
-      expect(result[0]).toContain('func("arg")');
+      expect(result[0]).toContain("func(\"arg\")");
     });
   });
 
@@ -75,8 +75,8 @@ describe("Utility Functions", () => {
     });
 
     it("should ignore braces in strings", () => {
-      const result = extractBlock('{ "text { with } braces" }');
-      expect(result).toEqual({ content: ' "text { with } braces" ', endPos: 26 });
+      const result = extractBlock("{ \"text { with } braces\" }");
+      expect(result).toEqual({ content: " \"text { with } braces\" ", endPos: 26 });
     });
 
     it("should ignore braces in single quotes", () => {
@@ -85,8 +85,8 @@ describe("Utility Functions", () => {
     });
 
     it("should handle escaped quotes", () => {
-      const result = extractBlock('{ "escaped \\" quote" }');
-      expect(result).toEqual({ content: ' "escaped \\" quote" ', endPos: 22 });
+      const result = extractBlock("{ \"escaped \\\" quote\" }");
+      expect(result).toEqual({ content: " \"escaped \\\" quote\" ", endPos: 22 });
     });
 
     it("should handle mixed quotes", () => {
@@ -156,18 +156,18 @@ describe("Utility Functions", () => {
     });
 
     it("should ignore semicolons in strings", () => {
-      const result = parseBlock('/echo "text; with; semicolons"; /echo next');
-      expect(result).toEqual(['/echo "text; with; semicolons"', "/echo next"]);
+      const result = parseBlock("/echo \"text; with; semicolons\"; /echo next");
+      expect(result).toEqual(["/echo \"text; with; semicolons\"", "/echo next"]);
     });
 
     it("should ignore newlines in strings", () => {
-      const result = parseBlock('/echo "text\nwith\nnewlines"; /echo next');
-      expect(result).toEqual(['/echo "text\nwith\nnewlines"', "/echo next"]);
+      const result = parseBlock("/echo \"text\nwith\nnewlines\"; /echo next");
+      expect(result).toEqual(["/echo \"text\nwith\nnewlines\"", "/echo next"]);
     });
 
     it("should handle escaped quotes", () => {
-      const result = parseBlock('/echo "escaped \\" quote"; /echo next');
-      expect(result).toEqual(['/echo "escaped \\" quote"', "/echo next"]);
+      const result = parseBlock("/echo \"escaped \\\" quote\"; /echo next");
+      expect(result).toEqual(["/echo \"escaped \\\" quote\"", "/echo next"]);
     });
 
     it("should handle complex nested scenario", () => {
@@ -199,8 +199,8 @@ describe("Utility Functions", () => {
 
   describe("parseScript", () => {
     it("should parse simple script with proper endings", () => {
-      const result = parseScript('/echo Hello;\n/var $name = "World";');
-      expect(result).toEqual(["/echo Hello", '/var $name = "World"']);
+      const result = parseScript("/echo Hello;\n/var $name = \"World\";");
+      expect(result).toEqual(["/echo Hello", "/var $name = \"World\""]);
     });
 
     it("should handle line continuations with backslashes", () => {
@@ -210,9 +210,9 @@ describe("Utility Functions", () => {
     });
 
     it("should handle line continuations with semicolons", () => {
-      const script = '/echo Hello;\n/var $name = "World";';
+      const script = "/echo Hello;\n/var $name = \"World\";";
       const result = parseScript(script);
-      expect(result).toEqual(["/echo Hello", '/var $name = "World"']);
+      expect(result).toEqual(["/echo Hello", "/var $name = \"World\""]);
     });
 
     it("should handle mixed line endings with proper endings", () => {
@@ -234,9 +234,9 @@ describe("Utility Functions", () => {
     });
 
     it("should handle complex script with continuations", () => {
-      const script = '/var $long = "This is \\\na very long \\\nstring";';
+      const script = "/var $long = \"This is \\\na very long \\\nstring\";";
       const result = parseScript(script);
-      expect(result).toEqual(['/var $long = "This is a very long string"']);
+      expect(result).toEqual(["/var $long = \"This is a very long string\""]);
     });
 
     it("should handle script with multiple continuations", () => {
@@ -264,7 +264,7 @@ describe("Utility Functions", () => {
     });
 
     it("should handle complex argument parsing in script context", () => {
-      const script = '/call func("arg with (brackets)", $variable, "normal");';
+      const script = "/call func(\"arg with (brackets)\", $variable, \"normal\");";
       const result = parseScript(script);
 
       expect(result).toHaveLength(1);

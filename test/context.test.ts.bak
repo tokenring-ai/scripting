@@ -38,11 +38,11 @@ describe("ScriptingContext", () => {
 
   describe("functions", () => {
     it("defines and gets functions", () => {
-      context.defineFunction("greet", "expression", ["name"], '"Hello"');
+      context.defineFunction("greet", "expression", ["name"], "\"Hello\"");
       const func = context.getFunction("greet");
       expect(func?.type).toBe("expression");
       expect(func?.params).toEqual(["name"]);
-      expect(func?.body).toBe('"Hello"');
+      expect(func?.body).toBe("\"Hello\"");
     });
 
     it("returns undefined for missing function", () => {

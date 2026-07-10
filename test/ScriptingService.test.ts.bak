@@ -1,14 +1,14 @@
-import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
-import { type Agent, AgentCommandService } from "@tokenring-ai/agent";
+import { AgentCommandService, type Agent } from "@tokenring-ai/agent";
 import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent.test";
 import createTestingApp from "@tokenring-ai/app/test/createTestingApp.test";
+import { beforeEach,describe,expect,it,mock,spyOn } from "bun:test";
 import ScriptingService from "../ScriptingService.ts";
 import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 describe("ScriptingService", () => {
   let service: ScriptingService;
   let agent: Agent;
-  let _context: ScriptingContext;
+  let context: ScriptingContext;
   let agentCommandService: AgentCommandService;
 
   beforeEach(() => {
@@ -16,12 +16,12 @@ describe("ScriptingService", () => {
     const app = createTestingApp();
     agent = createTestingAgent(app);
 
-    _context = new ScriptingContext();
+    context = new ScriptingContext();
 
     // Mock scripts configuration
     const mockScripts = {
-      testScript: "/echo Hello World",
-      multiCommand: ["/echo Line 1", "/echo Line 2", '/var $result = "completed"'],
+      "testScript": "/echo Hello World",
+      "multiCommand": ["/echo Line 1", "/echo Line 2", "/var $result = \"completed\""]
     };
 
     service = new ScriptingService(mockScripts);
@@ -43,7 +43,7 @@ describe("ScriptingService", () => {
 
     it("should parse string scripts into arrays", () => {
       const serviceWithString = new ScriptingService({
-        stringScript: "/echo test; /echo another",
+        "stringScript": "/echo test; /echo another"
       });
 
       expect(serviceWithString).toBeDefined();
@@ -60,7 +60,7 @@ describe("ScriptingService", () => {
       const mockFunction = {
         type: "native",
         params: ["param1", "param2"],
-        execute: mock().mockReturnValue("test result"),
+        execute: mock().mockReturnValue("test result")
       };
 
       service.registerFunction("testFunc", mockFunction as any);
@@ -75,7 +75,7 @@ describe("ScriptingService", () => {
       const mockFunction = {
         type: "expression" as const,
         params: ["x"],
-        body: "test body",
+        body: "test body"
       };
 
       service.registerFunction("testFunc", mockFunction);
@@ -113,7 +113,7 @@ describe("ScriptingService", () => {
       const mockGlobalFunc = {
         type: "llm" as const,
         params: ["text"],
-        body: "global prompt",
+        body: "global prompt"
       };
 
       service.registerFunction("globalFunc", mockGlobalFunc);
@@ -133,7 +133,7 @@ describe("ScriptingService", () => {
       const mockNativeFunc = {
         type: "native",
         params: ["arg1", "arg2"],
-        execute: mock().mockReturnValue("native result"),
+        execute: mock().mockReturnValue("native result")
       };
 
       service.registerFunction("nativeFunc", mockNativeFunc as any);
@@ -146,7 +146,7 @@ describe("ScriptingService", () => {
       const mockJsFunc = {
         type: "js" as const,
         params: ["x", "y"],
-        body: "return x.toString() + y.toString();",
+        body: "return x.toString() + y.toString();"
       };
 
       service.registerFunction("jsFunc", mockJsFunc);
@@ -159,7 +159,7 @@ describe("ScriptingService", () => {
       const mockStaticFunc = {
         type: "expression" as const,
         params: ["name"],
-        body: "Hello, $name!",
+        body: "Hello, $name!"
       };
 
       service.registerFunction("expressionFunc", mockStaticFunc);
@@ -169,19 +169,23 @@ describe("ScriptingService", () => {
     });
 
     it("should throw error for missing functions", async () => {
-      expect(service.executeFunction("nonExistent", [], agent)).rejects.toThrow("Function nonExistent not defined");
+      await expect(
+        service.executeFunction("nonExistent", [], agent)
+      ).rejects.toThrow("Function nonExistent not defined");
     });
 
     it("should throw error for argument count mismatch", async () => {
       const mockFunc = {
         type: "expression" as const,
         params: ["param1", "param2"],
-        body: "test",
+        body: "test"
       };
 
       service.registerFunction("mismatchFunc", mockFunc);
 
-      expect(service.executeFunction("mismatchFunc", ["arg1"], agent)).rejects.toThrow("expects 2 arguments, got 1");
+      await expect(
+        service.executeFunction("mismatchFunc", ["arg1"], agent)
+      ).rejects.toThrow("expects 2 arguments, got 1");
     });
 
     it("should handle function execution errors gracefully", async () => {
@@ -190,12 +194,14 @@ describe("ScriptingService", () => {
         params: [],
         execute: mock().mockImplementation(() => {
           throw new Error("Execution failed");
-        }),
+        })
       };
 
       service.registerFunction("failingFunc", mockFunc as any);
 
-      expect(service.executeFunction("failingFunc", [], agent)).rejects.toThrow("Function execution error: Execution failed");
+      await expect(
+        service.executeFunction("failingFunc", [], agent)
+      ).rejects.toThrow("Function execution error: Execution failed");
     });
   });
 
@@ -218,11 +224,15 @@ describe("ScriptingService", () => {
     });
 
     it("should throw error for missing script names", async () => {
-      expect(service.runScript("", agent)).rejects.toThrow("Script name is required");
+      await expect(
+        service.runScript("", agent)
+      ).rejects.toThrow("Script name is required");
     });
 
     it("should throw error for non-existent scripts", async () => {
-      expect(service.runScript("nonExistent", agent)).rejects.toThrow("Script not found: nonExistent");
+      await expect(
+        service.runScript("nonExistent", agent)
+      ).rejects.toThrow("Script not found: nonExistent");
     });
 
     it("should handle empty command lines", async () => {
@@ -231,4 +241,5 @@ describe("ScriptingService", () => {
       expect(result.ok).toBe(true);
     });
   });
+
 });

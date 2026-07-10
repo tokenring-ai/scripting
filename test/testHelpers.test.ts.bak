@@ -1,5 +1,5 @@
+import { AgentCommandService, type Agent } from "@tokenring-ai/agent";
 import { mock } from "bun:test";
-import { type Agent, AgentCommandService } from "@tokenring-ai/agent";
 import ScriptingService from "../ScriptingService.ts";
 import { ScriptingContext } from "../state/ScriptingContext.ts";
 
@@ -11,10 +11,10 @@ export function createMockAgent() {
   const humanResponses: any[] = [];
 
   const mockAgentCommandService = {
-    executeAgentCommand: mock(async (_agent: Agent, command: string) => {
+    executeAgentCommand: mock(async (agent: Agent, command: string) => {
       // Extract command name and args from command string (e.g., "/echo hello" -> "echo", "hello")
       const parts = command.trim().split(/\s+/);
-      const cmdName = parts[0]?.replace(/^\//, "") ?? "";
+      const cmdName = (parts[0]?.replace(/^\//, "") ?? "");
       const args = parts.slice(1).join(" ");
 
       // Handle common commands in tests
@@ -23,17 +23,17 @@ export function createMockAgent() {
       } else {
         outputs.push(`[command: ${command}]`);
       }
-    }),
+    })
   };
 
   const agent = {
-    getState: mock(StateClass => {
+    getState: mock((StateClass) => {
       if (StateClass === ScriptingContext) {
         return context;
       }
       return context;
     }),
-    requireServiceByType: mock(ServiceClass => {
+    requireServiceByType: mock((ServiceClass) => {
       if (ServiceClass === ScriptingService) {
         return new ScriptingService({});
       }
@@ -46,10 +46,10 @@ export function createMockAgent() {
     infoMessage: mock((msg: string) => infos.push(msg)),
     chatOutput: mock((msg: string) => outputs.push(msg)),
     systemMessage: mock((msg: string) => infos.push(msg)),
-    askForApproval: mock(async (_opts: any) => {
+    askForApproval: mock(async (opts: any) => {
       return humanResponses.shift();
     }),
-    askForText: mock(async (_opts: any) => {
+    askForText: mock(async (opts: any) => {
       return humanResponses.shift();
     }),
     runCommand: mock(async (cmd: string) => {

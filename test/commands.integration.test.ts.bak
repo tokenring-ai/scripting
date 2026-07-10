@@ -27,19 +27,19 @@ describe("Command Integration Tests", () => {
     it("should display interpolated text", async () => {
       context.setVariable("name", "Alice");
 
-      const result = echoCmd.execute({ remainder: "Hello $name", agent } as any);
+      const result = await echoCmd.execute({ remainder: "Hello $name", agent } as any);
 
       expect(result).toBe("Hello Alice");
     });
 
     it("should handle missing variables gracefully", async () => {
-      const result = echoCmd.execute({ remainder: "Hello $missing", agent } as any);
+      const result = await echoCmd.execute({ remainder: "Hello $missing", agent } as any);
 
       expect(result).toBe("Hello ");
     });
 
     it("should handle empty input", async () => {
-      const result = echoCmd.execute({ remainder: "", agent } as any);
+      const result = await echoCmd.execute({ remainder: "", agent } as any);
 
       expect(result).toBe("");
     });
@@ -47,7 +47,7 @@ describe("Command Integration Tests", () => {
 
   describe("var command integration", () => {
     it("should create variables with expression values", async () => {
-      const result = await varSetCmd.execute({ remainder: '$name = "Alice"', agent } as any);
+      const result = await varSetCmd.execute({ remainder: "$name = \"Alice\"", agent } as any);
 
       expect(context.getVariable("name")).toBe("Alice");
       expect(result).toContain("Alice");
@@ -56,7 +56,7 @@ describe("Command Integration Tests", () => {
     it("should interpolate variables in values", async () => {
       context.setVariable("first", "Alice");
 
-      const _result = await varSetCmd.execute({ remainder: '$full = "Hello $first"', agent } as any);
+      const result = await varSetCmd.execute({ remainder: "$full = \"Hello $first\"", agent } as any);
 
       expect(context.getVariable("full")).toBe("Hello Alice");
     });
@@ -64,7 +64,7 @@ describe("Command Integration Tests", () => {
     it("should handle function calls in var assignments", async () => {
       context.defineFunction("testFunc", "expression", ["arg"], "test result");
 
-      const _result = await varSetCmd.execute({ remainder: '$result = testFunc("test")', agent } as any);
+      const result = await varSetCmd.execute({ remainder: "$result = testFunc(\"test\")", agent } as any);
 
       expect(context.getVariable("result")).toBeDefined();
     });
@@ -72,13 +72,13 @@ describe("Command Integration Tests", () => {
     it("should prevent name conflicts with lists", async () => {
       context.setList("conflict", ["item"]);
 
-      expect(varSetCmd.execute({ remainder: '$conflict = "value"', agent } as any)).rejects.toThrow("already exists as a list");
+      await expect(varSetCmd.execute({ remainder: "$conflict = \"value\"", agent } as any)).rejects.toThrow("already exists as a list");
     });
   });
 
   describe("func command integration", () => {
     it("should define expression functions", async () => {
-      const result = funcDefineExpr.execute({ remainder: 'greet($name) => "Hello, $name"', agent } as any);
+      const result = await funcDefineExpr.execute({ remainder: "greet($name) => \"Hello, $name\"", agent } as any);
 
       const func = context.getFunction("greet");
       expect(func).toBeDefined();
@@ -87,7 +87,7 @@ describe("Command Integration Tests", () => {
     });
 
     it("should define LLM functions", async () => {
-      const result = funcDefineLlm.execute({ remainder: 'analyze($text) => "Analyze: $text"', agent } as any);
+      const result = await funcDefineLlm.execute({ remainder: "analyze($text) => \"Analyze: $text\"", agent } as any);
 
       const func = context.getFunction("analyze");
       expect(func).toBeDefined();
@@ -96,7 +96,7 @@ describe("Command Integration Tests", () => {
     });
 
     it("should define JavaScript functions", async () => {
-      const result = funcDefineJs.execute({ remainder: "double($x) { return $x * 2; }", agent } as any);
+      const result = await funcDefineJs.execute({ remainder: "double($x) { return $x * 2; }", agent } as any);
 
       const func = context.getFunction("double");
       expect(func).toBeDefined();
@@ -105,29 +105,29 @@ describe("Command Integration Tests", () => {
     });
 
     it("should prevent reserved function names", async () => {
-      expect(() => funcDefineExpr.execute({ remainder: 'if($x) => "value"', agent } as any)).toThrow("reserved");
+      await expect(funcDefineExpr.execute({ remainder: "if($x) => \"value\"", agent } as any)).rejects.toThrow("reserved");
     });
 
     it("should delete functions", async () => {
       context.defineFunction("testFunc", "expression", [], "test");
 
-      const result = funcDelete.execute({ positionals: { funcName: "testFunc" }, agent } as any);
+      const result = await funcDelete.execute({ positionals: { funcName: "testFunc" }, agent } as any);
 
       expect(context.getFunction("testFunc")).toBeUndefined();
       expect(result).toContain("deleted");
     });
 
     it("should handle invalid syntax", async () => {
-      expect(() => funcDefineExpr.execute({ remainder: "invalid syntax", agent } as any)).toThrow("Invalid syntax");
+      await expect(funcDefineExpr.execute({ remainder: "invalid syntax", agent } as any)).rejects.toThrow("Invalid syntax");
     });
   });
 
   describe("func list command integration", () => {
     it("should list all functions", async () => {
-      context.defineFunction("greet", "expression", ["name"], '"Hello"');
-      context.defineFunction("analyze", "llm", ["text"], '"Analyze"');
+      context.defineFunction("greet", "expression", ["name"], "\"Hello\"");
+      context.defineFunction("analyze", "llm", ["text"], "\"Analyze\"");
 
-      const result = funcList.execute({ agent } as any);
+      const result = await funcList.execute({ agent } as any);
 
       expect(result).toContain("greet");
       expect(result).toContain("analyze");
@@ -136,7 +136,7 @@ describe("Command Integration Tests", () => {
 
   describe("list command integration", () => {
     it("should create lists from arrays", async () => {
-      const result = await listCmd.execute({ remainder: '@names = ["Alice", "Bob"]', agent } as any);
+      const result = await listCmd.execute({ remainder: "@names = [\"Alice\", \"Bob\"]", agent } as any);
 
       expect(context.getList("names")).toEqual(["Alice", "Bob"]);
       expect(result).toContain("[2 items]");
@@ -146,7 +146,7 @@ describe("Command Integration Tests", () => {
       context.setVariable("name1", "Alice");
       context.setVariable("name2", "Bob");
 
-      const _result = await listCmd.execute({ remainder: "@names = [$name1, $name2]", agent } as any);
+      const result = await listCmd.execute({ remainder: "@names = [$name1, $name2]", agent } as any);
 
       expect(context.getList("names")).toEqual(["Alice", "Bob"]);
     });
@@ -154,7 +154,7 @@ describe("Command Integration Tests", () => {
     it("should prevent name conflicts with variables", async () => {
       context.setVariable("conflict", "value");
 
-      expect(listCmd.execute({ remainder: '@conflict = ["item"]', agent } as any)).rejects.toThrow("already exists as a variable");
+      await expect(listCmd.execute({ remainder: "@conflict = [\"item\"]", agent } as any)).rejects.toThrow("already exists as a variable");
     });
   });
 
@@ -164,7 +164,7 @@ describe("Command Integration Tests", () => {
       service.registerFunction("testFunc", {
         type: "expression",
         params: ["arg1", "arg2"],
-        body: '"result"',
+        body: "\"result\""
       });
       agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
         if (ServiceClass === ScriptingService) {
@@ -173,13 +173,13 @@ describe("Command Integration Tests", () => {
         return context;
       });
 
-      const result = await callCmd.execute({ remainder: 'testFunc("arg1", "arg2")', agent } as any);
+      const result = await callCmd.execute({ remainder: "testFunc(\"arg1\", \"arg2\")", agent } as any);
 
       expect(result).toBe("result");
     });
 
     it("should handle function call errors", async () => {
-      await expect(callCmd.execute({ remainder: "nonExistentFunc()", agent } as any)).rejects.toThrow("Error during function call");
+      await expect(callCmd.execute({ remainder: "nonExistentFunc()", agent } as any)).rejects.toThrow("not defined");
     });
   });
 
@@ -231,7 +231,7 @@ describe("Command Integration Tests", () => {
     });
 
     it("should handle missing lists", async () => {
-      expect(forCmd.execute({ remainder: "$item in @missing { /echo $item }", agent } as any)).rejects.toThrow("not found");
+      await expect(forCmd.execute({ remainder: "$item in @missing { /echo $item }", agent } as any)).rejects.toThrow("not found");
     });
 
     it("should clean up loop variables", async () => {
@@ -245,27 +245,27 @@ describe("Command Integration Tests", () => {
 
   describe("Complex integration scenarios", () => {
     it("should handle variable interpolation across commands", async () => {
-      await varSetCmd.execute({ remainder: '$name = "Alice"', agent } as any);
-      const result = echoCmd.execute({ remainder: "Hello $name", agent } as any);
+      await varSetCmd.execute({ remainder: "$name = \"Alice\"", agent } as any);
+      const result = await echoCmd.execute({ remainder: "Hello $name", agent } as any);
 
       expect(result).toBe("Hello Alice");
     });
 
     it("should handle list operations with variables", async () => {
-      await listCmd.execute({ remainder: '@names = ["Alice", "Bob"]', agent } as any);
+      await listCmd.execute({ remainder: "@names = [\"Alice\", \"Bob\"]", agent } as any);
       await forCmd.execute({ remainder: "$name in @names { /echo $name }", agent } as any);
 
       // Test passes if no errors
     });
 
     it("should handle function definitions and calls", async () => {
-      funcDefineExpr.execute({ remainder: 'process($text) => "Processed: $text"', agent } as any);
+      await funcDefineExpr.execute({ remainder: "process($text) => \"Processed: $text\"", agent } as any);
 
       const service = new ScriptingService({});
       service.registerFunction("process", {
         type: "expression",
         params: ["text"],
-        body: '"Processed: $text"',
+        body: "\"Processed: $text\""
       });
       agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
         if (ServiceClass === ScriptingService) {
@@ -274,7 +274,7 @@ describe("Command Integration Tests", () => {
         return context;
       });
 
-      const result = await callCmd.execute({ remainder: 'process("hello")', agent } as any);
+      const result = await callCmd.execute({ remainder: "process(\"hello\")", agent } as any);
       expect(result).toBe("Processed: hello");
     });
 

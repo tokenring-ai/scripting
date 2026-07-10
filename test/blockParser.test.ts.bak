@@ -23,8 +23,8 @@ describe("extractBlock", () => {
   });
 
   it("ignores braces in strings", () => {
-    const result = extractBlock('{ "text { with } braces" }');
-    expect(result).toEqual({ content: ' "text { with } braces" ', endPos: 26 });
+    const result = extractBlock("{ \"text { with } braces\" }");
+    expect(result).toEqual({ content: " \"text { with } braces\" ", endPos: 26 });
   });
 
   it("ignores braces in single quotes", () => {
@@ -33,8 +33,8 @@ describe("extractBlock", () => {
   });
 
   it("handles escaped quotes", () => {
-    const result = extractBlock('{ "escaped \\" quote" }');
-    expect(result).toEqual({ content: ' "escaped \\" quote" ', endPos: 22 });
+    const result = extractBlock("{ \"escaped \\\" quote\" }");
+    expect(result).toEqual({ content: " \"escaped \\\" quote\" ", endPos: 22 });
   });
 
   it("handles mixed quotes", () => {
@@ -104,18 +104,18 @@ describe("parseBlock", () => {
   });
 
   it("ignores semicolons in strings", () => {
-    const result = parseBlock('/echo "text; with; semicolons"; /echo next');
-    expect(result).toEqual(['/echo "text; with; semicolons"', "/echo next"]);
+    const result = parseBlock("/echo \"text; with; semicolons\"; /echo next");
+    expect(result).toEqual(["/echo \"text; with; semicolons\"", "/echo next"]);
   });
 
   it("ignores newlines in strings", () => {
-    const result = parseBlock('/echo "text\nwith\nnewlines"; /echo next');
-    expect(result).toEqual(['/echo "text\nwith\nnewlines"', "/echo next"]);
+    const result = parseBlock("/echo \"text\nwith\nnewlines\"; /echo next");
+    expect(result).toEqual(["/echo \"text\nwith\nnewlines\"", "/echo next"]);
   });
 
   it("handles escaped quotes", () => {
-    const result = parseBlock('/echo "escaped \\" quote"; /echo next');
-    expect(result).toEqual(['/echo "escaped \\" quote"', "/echo next"]);
+    const result = parseBlock("/echo \"escaped \\\" quote\"; /echo next");
+    expect(result).toEqual(["/echo \"escaped \\\" quote\"", "/echo next"]);
   });
 
   it("handles complex nested scenario", () => {

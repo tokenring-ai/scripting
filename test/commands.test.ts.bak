@@ -1,4 +1,4 @@
-import { describe, expect, it, mock } from "bun:test";
+import { describe,expect,it,mock } from "bun:test";
 import confirmCmd from "../commands/confirm.ts";
 import echoCmd from "../commands/echo.ts";
 import forCmd from "../commands/for.ts";
@@ -15,20 +15,20 @@ import { createMockAgent } from "./testHelpers.test";
 describe("echo command", () => {
   it("displays text", async () => {
     const { agent } = createMockAgent();
-    const result = echoCmd.execute({ remainder: "Hello World", agent } as any);
+    const result = await echoCmd.execute({ remainder: "Hello World", agent } as any);
     expect(result).toBe("Hello World");
   });
 
   it("interpolates variables", async () => {
     const { agent, context } = createMockAgent();
     context.setVariable("name", "Alice");
-    const result = echoCmd.execute({ remainder: "Hello $name", agent } as any);
+    const result = await echoCmd.execute({ remainder: "Hello $name", agent } as any);
     expect(result).toBe("Hello Alice");
   });
 
   it("returns empty string for empty input", async () => {
     const { agent } = createMockAgent();
-    const result = echoCmd.execute({ remainder: "", agent } as any);
+    const result = await echoCmd.execute({ remainder: "", agent } as any);
     expect(result).toBe("");
   });
 });
@@ -36,7 +36,7 @@ describe("echo command", () => {
 describe("var set command", () => {
   it("assigns expression value", async () => {
     const { agent, context } = createMockAgent();
-    const result = await varSetCmd.execute({ remainder: '$name = "Alice"', agent } as any);
+    const result = await varSetCmd.execute({ remainder: "$name = \"Alice\"", agent } as any);
     expect(context.getVariable("name")).toBe("Alice");
     expect(result).toContain("$name = Alice");
   });
@@ -44,13 +44,13 @@ describe("var set command", () => {
   it("interpolates variables in value", async () => {
     const { agent, context } = createMockAgent();
     context.setVariable("first", "Alice");
-    const _result = await varSetCmd.execute({ remainder: '$full = "Hello $first"', agent } as any);
+    const result = await varSetCmd.execute({ remainder: "$full = \"Hello $first\"", agent } as any);
     expect(context.getVariable("full")).toBe("Hello Alice");
   });
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(varSetCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
+    await expect(varSetCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
   });
 });
 
@@ -59,7 +59,7 @@ describe("vars list command", () => {
     const { agent, context } = createMockAgent();
     context.setVariable("name", "Alice");
     context.setVariable("age", "30");
-    const result = varsListCmd.execute({ agent } as any);
+    const result = await varsListCmd.execute({ agent } as any);
     expect(result).toContain("$name");
     expect(result).toContain("$age");
   });
@@ -68,14 +68,14 @@ describe("vars list command", () => {
     const { agent, context } = createMockAgent();
     context.setVariable("name", "Alice");
     // vars list doesn't take positional args - it just lists all vars
-    const result = varsListCmd.execute({ agent } as any);
+    const result = await varsListCmd.execute({ agent } as any);
     expect(result).toContain("$name");
   });
 
   it("clears all variables", async () => {
     const { agent, context } = createMockAgent();
     context.setVariable("name", "Alice");
-    const _result = varsListCmd.execute({ agent } as any);
+    const result = await varsListCmd.execute({ agent } as any);
     expect(context.variables.size).toBe(1); // Note: vars list doesn't clear, that's vars clear
   });
 });
@@ -83,7 +83,7 @@ describe("vars list command", () => {
 describe("list command", () => {
   it("creates list from array literal", async () => {
     const { agent, context } = createMockAgent();
-    const result = await listCmd.execute({ remainder: '@names = ["Alice", "Bob"]', agent } as any);
+    const result = await listCmd.execute({ remainder: "@names = [\"Alice\", \"Bob\"]", agent } as any);
     expect(context.getList("names")).toEqual(["Alice", "Bob"]);
     expect(result).toContain("@names = [2 items]");
   });
@@ -92,13 +92,13 @@ describe("list command", () => {
     const { agent, context } = createMockAgent();
     context.setVariable("name1", "Alice");
     context.setVariable("name2", "Bob");
-    const _result = await listCmd.execute({ remainder: "@names = [$name1, $name2]", agent } as any);
+    const result = await listCmd.execute({ remainder: "@names = [$name1, $name2]", agent } as any);
     expect(context.getList("names")).toEqual(["Alice", "Bob"]);
   });
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(listCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
+    await expect(listCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
   });
 });
 
@@ -107,7 +107,7 @@ describe("lists command", () => {
     const { agent, context } = createMockAgent();
     context.setList("names", ["Alice", "Bob"]);
     context.setList("numbers", ["1", "2", "3"]);
-    const result = listsCmd.execute({ positionals: {}, agent } as any);
+    const result = await listsCmd.execute({ positionals: {}, agent } as any);
     expect(result).toContain("@names");
     expect(result).toContain("@numbers");
   });
@@ -115,9 +115,9 @@ describe("lists command", () => {
   it("shows specific list", async () => {
     const { agent, context } = createMockAgent();
     context.setList("names", ["Alice", "Bob"]);
-    const result = listsCmd.execute({ positionals: { listName: "names" }, agent } as any);
-    expect(result).toContain('"Alice"');
-    expect(result).toContain('"Bob"');
+    const result = await listsCmd.execute({ positionals: { listName: "names" }, agent } as any);
+    expect(result).toContain("\"Alice\"");
+    expect(result).toContain("\"Bob\"");
   });
 });
 
@@ -138,17 +138,17 @@ describe("for command", () => {
 
   it("shows error on missing list", async () => {
     const { agent } = createMockAgent();
-    expect(forCmd.execute({ remainder: "$item in @missing { /echo $item }", agent } as any)).rejects.toThrow("not found");
+    await expect(forCmd.execute({ remainder: "$item in @missing { /echo $item }", agent } as any)).rejects.toThrow("not found");
   });
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(forCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
+    await expect(forCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
   });
 
   it("shows error on missing block", async () => {
     const { agent } = createMockAgent();
-    expect(forCmd.execute({ remainder: "$item in @list", agent } as any)).rejects.toThrow("Missing");
+    await expect(forCmd.execute({ remainder: "$item in @list", agent } as any)).rejects.toThrow("Missing");
   });
 });
 
@@ -195,7 +195,7 @@ describe("if command", () => {
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(ifCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
+    await expect(ifCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
   });
 });
 
@@ -217,13 +217,13 @@ describe("while command", () => {
     (agent.requireServiceByType as any).mockImplementation((ServiceClass: any) => {
       if (ServiceClass.name === "AgentCommandService" || ServiceClass === require("@tokenring-ai/agent").AgentCommandService) {
         return {
-          executeAgentCommand: mockExecute,
+          executeAgentCommand: mockExecute
         };
       }
       return context;
     });
 
-    const _result = await whileCmd.execute({ remainder: "$count { /echo loop }", agent } as any);
+    const result = await whileCmd.execute({ remainder: "$count { /echo loop }", agent } as any);
     expect(iterations).toBeGreaterThan(0);
   });
 
@@ -236,7 +236,7 @@ describe("while command", () => {
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(whileCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
+    await expect(whileCmd.execute({ remainder: "invalid", agent } as any)).rejects.toThrow("Invalid syntax");
   });
 });
 
@@ -252,7 +252,7 @@ describe("confirm command", () => {
   it("stores no on rejection", async () => {
     const { agent, context } = createMockAgent();
     (agent.askForApproval as any).mockResolvedValue(false);
-    const _result = await confirmCmd.execute({ positionals: { varName: "$result" }, remainder: "Continue?", agent } as any);
+    const result = await confirmCmd.execute({ positionals: { varName: "$result" }, remainder: "Continue?", agent } as any);
     expect(context.getVariable("result")).toBe("no");
   });
 
@@ -264,14 +264,14 @@ describe("confirm command", () => {
     // Note: The confirm command does NOT interpolate the message - it passes it as-is
     expect(agent.askForApproval).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: "Confirm $action?",
-      }),
+        message: "Confirm $action?"
+      })
     );
   });
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(confirmCmd.execute({ positionals: { varName: "invalid" }, remainder: "test", agent } as any)).rejects.toThrow("Invalid variable");
+    await expect(confirmCmd.execute({ positionals: { varName: "invalid" }, remainder: "test", agent } as any)).rejects.toThrow("Invalid variable");
   });
 });
 
@@ -291,14 +291,14 @@ describe("prompt command", () => {
     await promptCmd.execute({ positionals: { varName: "$value" }, remainder: "Enter $field:", agent } as any);
     expect(agent.askForText).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: "Enter username:",
-      }),
+        message: "Enter username:"
+      })
     );
   });
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(promptCmd.execute({ positionals: { varName: "" }, remainder: "test", agent } as any)).rejects.toThrow("Usage");
+    await expect(promptCmd.execute({ positionals: { varName: "" }, remainder: "test", agent } as any)).rejects.toThrow("Usage");
   });
 });
 
@@ -321,11 +321,11 @@ describe("sleep command", () => {
 
   it("shows error on invalid duration", async () => {
     const { agent } = createMockAgent();
-    expect(sleepCmd.execute({ positionals: { seconds: "invalid" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
+    await expect(sleepCmd.execute({ positionals: { seconds: "invalid" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
   });
 
   it("shows error on negative duration", async () => {
     const { agent } = createMockAgent();
-    expect(sleepCmd.execute({ positionals: { seconds: "-1" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
+    await expect(sleepCmd.execute({ positionals: { seconds: "-1" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
   });
 });
