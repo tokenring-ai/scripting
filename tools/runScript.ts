@@ -18,7 +18,10 @@ async function execute({ scriptName }: z.output<typeof inputSchema>, agent: Agen
     throw new ToolCallError(name, "Script execution failed", { cause: result.error });
   }
 
-  return result.output || "";
+  return {
+    message: `**Script** Ran script ${scriptName}`,
+    result: result.output || "",
+  };
 }
 
 const description = "Run a script with the given input. Scripts are predefined sequences of chat commands.";
