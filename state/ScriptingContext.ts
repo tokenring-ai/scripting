@@ -1,4 +1,5 @@
 import { AgentStateSlice } from "@tokenring-ai/agent/types";
+import EnhancedMap from "@tokenring-ai/utility/map/enhancedMap";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import { z } from "zod";
 
@@ -18,9 +19,9 @@ const serializationSchema = z.object({
 });
 
 export class ScriptingContext extends AgentStateSlice<typeof serializationSchema> {
-  variables = new Map<string, string>();
-  lists = new Map<string, string[]>();
-  functions = new Map<string, { type: "expression" | "llm" | "js"; params: string[]; body: string }>();
+  variables = new EnhancedMap<string, string>();
+  lists = new EnhancedMap<string, string[]>();
+  functions = new EnhancedMap<string, { type: "expression" | "llm" | "js"; params: string[]; body: string }>();
 
   constructor() {
     super("ScriptingContext", serializationSchema);
@@ -34,16 +35,16 @@ export class ScriptingContext extends AgentStateSlice<typeof serializationSchema
 
   serialize(): z.output<typeof serializationSchema> {
     return {
-      variables: Array.from(this.variables.entries()),
-      lists: Array.from(this.lists.entries()),
-      functions: Array.from(this.functions.entries()),
+      variables: this.variables.entriesArray(),
+      lists: this.lists.entriesArray(),
+      functions: this.functions.entriesArray(),
     };
   }
 
   deserialize(data: z.output<typeof serializationSchema>): void {
-    this.variables = new Map(data.variables);
-    this.lists = new Map(data.lists);
-    this.functions = new Map(data.functions);
+    this.variables = new EnhancedMap(data.variables);
+    this.lists = new EnhancedMap(data.lists);
+    this.functions = new EnhancedMap(data.functions);
   }
 
   setVariable(name: string, value: string): void {
@@ -83,10 +84,10 @@ export class ScriptingContext extends AgentStateSlice<typeof serializationSchema
 
   show(): string {
     return `Variables: ${this.variables.size}
-${markdownList(Array.from(this.variables.entries()).map(([k, v]) => `$${k} = ${v}`))}
+${markdownList(this.variables.mapEntries(([k, v]) => `$${k} = ${v}`))}
 Lists: ${this.lists.size}
-${markdownList(Array.from(this.lists.entries()).map(([k, v]) => `@${k} = [${v.join(", ")}]`))}
+${markdownList(this.lists.mapEntries(([k, v]) => `@${k} = [${v.join(", ")}]`))}
 Functions: ${this.functions.size}
-${markdownList(Array.from(this.functions.entries()).map(([k, v]) => `${k}(${v.params.join(", ")}) [${v.type}]`))}`;
+${markdownList(this.functions.mapEntries(([k, v]) => `${k}(${v.params.join(", ")}) [${v.type}]`))}`;
   }
 }

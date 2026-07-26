@@ -5,6 +5,7 @@ import { ConfigurationError } from "@tokenring-ai/app/types";
 import { ChatService } from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
 import { joinArrayable } from "@tokenring-ai/utility/array/arrayable";
+import EnhancedMap from "@tokenring-ai/utility/map/enhancedMap";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
 import type { ParsedScriptingServiceConfig } from "./schema.ts";
 import { ScriptingContext } from "./state/ScriptingContext.ts";
@@ -83,7 +84,7 @@ export default class ScriptingService implements TokenRingService {
       throw new Error(`Function ${funcName} expects ${func.params.length} arguments, got ${args.length}`);
     }
 
-    const tempVars = new Map(context.variables);
+    const tempVars = new EnhancedMap(context.variables);
     func.params.forEach((param, i) => {
       context.variables.set(param, args[i]!);
     });

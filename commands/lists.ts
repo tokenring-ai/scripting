@@ -41,7 +41,7 @@ export default {
       }
     }
 
-    const lists = Array.from(context.lists.entries());
+    const lists = context.lists.entriesArray();
     if (lists.length === 0) {
       return "No lists defined";
     }

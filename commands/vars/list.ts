@@ -11,7 +11,7 @@ export default {
   inputSchema,
   execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
-    const vars = Array.from(context.variables.entries());
+    const vars = context.variables.entriesArray();
     if (vars.length === 0) {
       return "No variables defined";
     }
