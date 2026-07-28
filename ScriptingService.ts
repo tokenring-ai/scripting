@@ -4,6 +4,7 @@ import type { TokenRingService } from "@tokenring-ai/app/types";
 import { ConfigurationError } from "@tokenring-ai/app/types";
 import { ChatService } from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
+import { deepEqual } from "@tokenring-ai/one-frontend/src/lib/utils";
 import { joinArrayable } from "@tokenring-ai/utility/array/arrayable";
 import EnhancedMap from "@tokenring-ai/utility/map/enhancedMap";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
@@ -51,10 +52,18 @@ export default class ScriptingService implements TokenRingService {
   getFunction = this.functions.get;
   listFunctions = this.functions.keysArray;
 
-  constructor(scripts: ParsedScriptingServiceConfig) {
-    for (const [name, script] of Object.entries(scripts)) {
-      this.scripts.set(name, parseScript(joinArrayable(script, ";\n")));
-    }
+  config: ParsedScriptingServiceConfig = {};
+
+  reconfigure(config: ParsedScriptingServiceConfig): void {
+    this.scripts.reconcileAgainst(config, {
+      creating: (_name, script) => parseScript(joinArrayable(script, ";\n")),
+      deleting: () => {},
+      updating: (name, existing, script) => {
+        if (deepEqual(this.config[name], script)) return existing;
+        return parseScript(joinArrayable(script, ";\n"));
+      },
+    });
+    this.config = config;
   }
 
   attach(agent: Agent): void {

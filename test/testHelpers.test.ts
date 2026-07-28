@@ -35,7 +35,7 @@ export function createMockAgent() {
     }),
     requireServiceByType: mock(ServiceClass => {
       if (ServiceClass === ScriptingService) {
-        return new ScriptingService({});
+        return new ScriptingService();
       }
       if (ServiceClass === AgentCommandService) {
         return mockAgentCommandService;

@@ -20,13 +20,13 @@ export default {
   displayName: "Scripting Engine",
   version: packageJSON.version,
   description: packageJSON.description,
-  install(app, config) {
+  install(app) {
     app.waitForService(ChatService, chatService => {
       chatService.addTools(...tools);
       chatService.registerContextHandlers(contextHandlers);
     });
     app.waitForService(AgentCommandService, agentCommandService => agentCommandService.addAgentCommands([...agentCommands]));
-    const scriptingService = new ScriptingService(config.scripting);
+    const scriptingService = new ScriptingService();
     app.addServices(scriptingService);
 
     scriptingService.registerFunction("runAgent", {
@@ -50,6 +50,9 @@ export default {
         }
       },
     });
+  },
+  reconfigure(app, config) {
+    app.requireService(ScriptingService).reconfigure(config.scripting);
   },
   configSchema: packageConfigSchema,
 } satisfies TokenRingPlugin<typeof packageConfigSchema>;

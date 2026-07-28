@@ -160,7 +160,7 @@ describe("Command Integration Tests", () => {
 
   describe("call command integration", () => {
     it("should call functions with arguments", async () => {
-      const service = new ScriptingService({});
+      const service = new ScriptingService();
       service.registerFunction("testFunc", {
         type: "expression",
         params: ["arg1", "arg2"],
@@ -261,7 +261,7 @@ describe("Command Integration Tests", () => {
     it("should handle function definitions and calls", async () => {
       funcDefineExpr.execute({ remainder: 'process($text) => "Processed: $text"', agent } as any);
 
-      const service = new ScriptingService({});
+      const service = new ScriptingService();
       service.registerFunction("process", {
         type: "expression",
         params: ["text"],

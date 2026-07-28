@@ -24,7 +24,8 @@ describe("ScriptingService", () => {
       multiCommand: ["/echo Line 1", "/echo Line 2", '/var $result = "completed"'],
     };
 
-    service = new ScriptingService(mockScripts);
+    service = new ScriptingService();
+    service.reconfigure(mockScripts);
     app.addServices(service);
     service.attach(agent);
 
@@ -37,12 +38,13 @@ describe("ScriptingService", () => {
 
   describe("constructor and initialization", () => {
     it("should initialize with empty scripts", () => {
-      const emptyService = new ScriptingService({});
+      const emptyService = new ScriptingService();
       expect(emptyService).toBeDefined();
     });
 
     it("should parse string scripts into arrays", () => {
-      const serviceWithString = new ScriptingService({
+      const serviceWithString = new ScriptingService();
+      serviceWithString.reconfigure({
         stringScript: "/echo test; /echo another",
       });
 

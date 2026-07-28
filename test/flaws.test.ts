@@ -14,7 +14,7 @@ import { createMockAgent } from "./testHelpers.test";
 describe("FLAW: Argument parsing with commas in strings", () => {
   it("call command handles commas inside quoted arguments", async () => {
     const { agent } = createMockAgent();
-    const service = new ScriptingService({});
+    const service = new ScriptingService();
 
     // Register a test function that returns its arguments
     service.registerFunction("test", {
@@ -43,7 +43,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
 
   it("call command handles nested parentheses", async () => {
     const { agent } = createMockAgent();
-    const service = new ScriptingService({});
+    const service = new ScriptingService();
 
     service.registerFunction("test", {
       type: "native",
@@ -64,7 +64,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
 
   it("call command handles empty arguments", async () => {
     const { agent } = createMockAgent();
-    const service = new ScriptingService({});
+    const service = new ScriptingService();
 
     service.registerFunction("test", {
       type: "native",
@@ -301,7 +301,7 @@ describe("NO FLAW: Function name validation rejects reserved names", () => {
 describe("NO FLAW: List command function call with array result", () => {
   it("correctly handles function returning string by wrapping in array", async () => {
     const { agent, context } = createMockAgent();
-    const service = new ScriptingService({});
+    const service = new ScriptingService();
 
     // Register function that returns a string, not array
     service.registerFunction("getString", {
