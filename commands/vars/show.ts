@@ -22,8 +22,8 @@ export default {
 
 /vars show $name`,
   inputSchema,
-  execute: ({ positionals, agent }: AgentCommandInputType<typeof inputSchema>): string => {
-    const varName = positionals.varName.replace(/^\$/, "");
+  execute: ({ args, agent }: AgentCommandInputType<typeof inputSchema>): string => {
+    const varName = args.varName.replace(/^\$/, "");
     const context = agent.getState(ScriptingContext);
     const value = context.getVariable(varName);
     if (value === undefined) {

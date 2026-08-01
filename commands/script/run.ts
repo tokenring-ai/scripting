@@ -16,7 +16,7 @@ export default {
 /script run myScript`,
   inputSchema,
   execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
-    const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptingService: ScriptingService = agent.requireService(ScriptingService);
     await scriptingService.runScript(remainder, agent);
     return "Script executed";
   },

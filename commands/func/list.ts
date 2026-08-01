@@ -18,7 +18,7 @@ export default {
   inputSchema,
   execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
-    const scriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptingService = agent.requireService(ScriptingService);
     const localFuncs = context.functions.entriesArray();
     const globalFuncs = scriptingService.listFunctions();
 

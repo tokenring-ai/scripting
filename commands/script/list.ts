@@ -10,7 +10,7 @@ export default {
   help: `List all available predefined scripts.`,
   inputSchema,
   execute: ({ agent }: AgentCommandInputType<typeof inputSchema>): string => {
-    const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptingService: ScriptingService = agent.requireService(ScriptingService);
     const scripts = scriptingService.listScripts();
 
     if (scripts.length === 0) {

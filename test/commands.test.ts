@@ -107,7 +107,7 @@ describe("lists command", () => {
     const { agent, context } = createMockAgent();
     context.setList("names", ["Alice", "Bob"]);
     context.setList("numbers", ["1", "2", "3"]);
-    const result = listsCmd.execute({ positionals: {}, agent } as any);
+    const result = listsCmd.execute({ args: {}, agent } as any);
     expect(result).toContain("@names");
     expect(result).toContain("@numbers");
   });
@@ -115,7 +115,7 @@ describe("lists command", () => {
   it("shows specific list", async () => {
     const { agent, context } = createMockAgent();
     context.setList("names", ["Alice", "Bob"]);
-    const result = listsCmd.execute({ positionals: { listName: "names" }, agent } as any);
+    const result = listsCmd.execute({ args: { listName: "names" }, agent } as any);
     expect(result).toContain('"Alice"');
     expect(result).toContain('"Bob"');
   });
@@ -214,7 +214,7 @@ describe("while command", () => {
     });
 
     // Replace the executeAgentCommand mock
-    (agent.requireServiceByType as any).mockImplementation((ServiceClass: any) => {
+    (agent.requireService as any).mockImplementation((ServiceClass: any) => {
       if (ServiceClass.name === "AgentCommandService" || ServiceClass === require("@tokenring-ai/agent").AgentCommandService) {
         return {
           executeAgentCommand: mockExecute,
@@ -244,7 +244,7 @@ describe("confirm command", () => {
   it("stores yes on confirmation", async () => {
     const { agent, context } = createMockAgent();
     (agent.askForApproval as any).mockResolvedValue(true);
-    const result = await confirmCmd.execute({ positionals: { varName: "$result" }, remainder: "Continue?", agent } as any);
+    const result = await confirmCmd.execute({ args: { varName: "$result" }, remainder: "Continue?", agent } as any);
     expect(context.getVariable("result")).toBe("yes");
     expect(result).toContain("$result = yes");
   });
@@ -252,7 +252,7 @@ describe("confirm command", () => {
   it("stores no on rejection", async () => {
     const { agent, context } = createMockAgent();
     (agent.askForApproval as any).mockResolvedValue(false);
-    const _result = await confirmCmd.execute({ positionals: { varName: "$result" }, remainder: "Continue?", agent } as any);
+    const _result = await confirmCmd.execute({ args: { varName: "$result" }, remainder: "Continue?", agent } as any);
     expect(context.getVariable("result")).toBe("no");
   });
 
@@ -260,7 +260,7 @@ describe("confirm command", () => {
     const { agent, context } = createMockAgent();
     context.setVariable("action", "delete");
     (agent.askForApproval as any).mockResolvedValue(true);
-    await confirmCmd.execute({ positionals: { varName: "$result" }, remainder: "Confirm $action?", agent } as any);
+    await confirmCmd.execute({ args: { varName: "$result" }, remainder: "Confirm $action?", agent } as any);
     // Note: The confirm command does NOT interpolate the message - it passes it as-is
     expect(agent.askForApproval).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -271,7 +271,7 @@ describe("confirm command", () => {
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(confirmCmd.execute({ positionals: { varName: "invalid" }, remainder: "test", agent } as any)).rejects.toThrow("Invalid variable");
+    expect(confirmCmd.execute({ args: { varName: "invalid" }, remainder: "test", agent } as any)).rejects.toThrow("Invalid variable");
   });
 });
 
@@ -279,7 +279,7 @@ describe("prompt command", () => {
   it("stores user input", async () => {
     const { agent, context } = createMockAgent();
     (agent.askForText as any).mockResolvedValue("Alice");
-    const result = await promptCmd.execute({ positionals: { varName: "$name" }, remainder: "Enter name:", agent } as any);
+    const result = await promptCmd.execute({ args: { varName: "$name" }, remainder: "Enter name:", agent } as any);
     expect(context.getVariable("name")).toBe("Alice");
     expect(result).toContain("$name = Alice");
   });
@@ -288,7 +288,7 @@ describe("prompt command", () => {
     const { agent, context } = createMockAgent();
     context.setVariable("field", "username");
     (agent.askForText as any).mockResolvedValue("test");
-    await promptCmd.execute({ positionals: { varName: "$value" }, remainder: "Enter $field:", agent } as any);
+    await promptCmd.execute({ args: { varName: "$value" }, remainder: "Enter $field:", agent } as any);
     expect(agent.askForText).toHaveBeenCalledWith(
       expect.objectContaining({
         message: "Enter username:",
@@ -298,7 +298,7 @@ describe("prompt command", () => {
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(promptCmd.execute({ positionals: { varName: "" }, remainder: "test", agent } as any)).rejects.toThrow("Usage");
+    expect(promptCmd.execute({ args: { varName: "" }, remainder: "test", agent } as any)).rejects.toThrow("Usage");
   });
 });
 
@@ -306,7 +306,7 @@ describe("sleep command", () => {
   it("sleeps for specified seconds", async () => {
     const { agent } = createMockAgent();
     const start = Date.now();
-    const result = await sleepCmd.execute({ positionals: { seconds: "0.01" }, agent } as any);
+    const result = await sleepCmd.execute({ args: { seconds: "0.01" }, agent } as any);
     const elapsed = Date.now() - start;
     expect(elapsed).toBeGreaterThanOrEqual(8);
     expect(result).toContain("Slept for 0.01");
@@ -315,17 +315,17 @@ describe("sleep command", () => {
   it("interpolates variable", async () => {
     const { agent, context } = createMockAgent();
     context.setVariable("delay", "0.01");
-    const result = await sleepCmd.execute({ positionals: { seconds: "$delay" }, agent } as any);
+    const result = await sleepCmd.execute({ args: { seconds: "$delay" }, agent } as any);
     expect(result).toContain("0.01");
   });
 
   it("shows error on invalid duration", async () => {
     const { agent } = createMockAgent();
-    expect(sleepCmd.execute({ positionals: { seconds: "invalid" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
+    expect(sleepCmd.execute({ args: { seconds: "invalid" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
   });
 
   it("shows error on negative duration", async () => {
     const { agent } = createMockAgent();
-    expect(sleepCmd.execute({ positionals: { seconds: "-1" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
+    expect(sleepCmd.execute({ args: { seconds: "-1" }, agent } as any)).rejects.toThrow("Invalid sleep duration");
   });
 });

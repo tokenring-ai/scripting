@@ -10,7 +10,7 @@ export async function evaluateExpression(expr: string, context: ScriptingContext
   const llmMatch = expr.match(/^llm\(["'](.*)['"]\)$/s) as [string, string] | undefined;
   if (llmMatch) {
     const prompt = context.interpolate(llmMatch[1]);
-    const chatService = agent.requireServiceByType(ChatService);
+    const chatService = agent.requireService(ChatService);
     const chatConfig = chatService.getChatConfig(agent);
 
     const response = await runChat({ input: prompt, chatConfig, agent });
@@ -23,7 +23,7 @@ export async function evaluateExpression(expr: string, context: ScriptingContext
   const funcMatch = expr.match(/^(\w+)\((.*)\)$/) as [string, string, string] | undefined;
   if (funcMatch) {
     const [, funcName, argsStr] = funcMatch;
-    const scriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptingService = agent.requireService(ScriptingService);
 
     const args = parseArguments(argsStr).map(arg => {
       const unquoted = arg.match(/^["'](.*)['"']$/) as [string, string] | undefined;

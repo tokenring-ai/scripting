@@ -27,7 +27,7 @@ export default {
   inputSchema,
   execute: async ({ remainder, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
-    const agentCommandService = agent.requireServiceByType(AgentCommandService);
+    const agentCommandService = agent.requireService(AgentCommandService);
 
     const interpolatedCommand = context.interpolate(remainder);
     await agentCommandService.executeAgentCommand(agent, interpolatedCommand);

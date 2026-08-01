@@ -23,7 +23,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       execute: (arg1: string, arg2: string) => `[${arg1}] [${arg2}]`,
     });
 
-    agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
+    agent.requireService.mockImplementation((ServiceClass: any) => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
@@ -51,7 +51,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       execute: (arg: string) => arg,
     });
 
-    agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
+    agent.requireService.mockImplementation((ServiceClass: any) => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
@@ -72,7 +72,7 @@ describe("FLAW: Argument parsing with commas in strings", () => {
       execute: () => "no args",
     });
 
-    agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
+    agent.requireService.mockImplementation((ServiceClass: any) => {
       if (ServiceClass === ScriptingService) {
         return service;
       }
@@ -148,7 +148,7 @@ describe("FLAW: For loop variable restoration", () => {
 describe("FLAW: Null service checks", () => {
   it("call command handles null ScriptingService gracefully", async () => {
     const { agent } = createMockAgent();
-    agent.requireServiceByType.mockReturnValue(null);
+    agent.requireService.mockReturnValue(null);
 
     expect(callCmd.execute({ remainder: 'test("arg")', agent } as any)).rejects.toThrow();
   });
@@ -231,7 +231,7 @@ describe("FLAW: Prompt and confirm message parsing with greedy regex", () => {
     const { agent } = createMockAgent();
     (agent.askForText as any).mockResolvedValue("test");
 
-    await promptCmd.execute({ positionals: { varName: "$name" }, remainder: 'Enter \\"name\\" here:', agent } as any);
+    await promptCmd.execute({ args: { varName: "$name" }, remainder: 'Enter \\"name\\" here:', agent } as any);
 
     // Should pass the message with escaped quotes correctly
     expect(agent.askForText).toHaveBeenCalledWith(
@@ -245,7 +245,7 @@ describe("FLAW: Prompt and confirm message parsing with greedy regex", () => {
     const { agent } = createMockAgent();
     (agent.askForApproval as any).mockResolvedValue(true);
 
-    await confirmCmd.execute({ positionals: { varName: "$ok" }, remainder: 'Are you \\"sure\\"', agent } as any);
+    await confirmCmd.execute({ args: { varName: "$ok" }, remainder: 'Are you \\"sure\\"', agent } as any);
 
     expect(agent.askForApproval).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -310,7 +310,7 @@ describe("NO FLAW: List command function call with array result", () => {
       execute: () => "single string",
     });
 
-    agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
+    agent.requireService.mockImplementation((ServiceClass: any) => {
       if (ServiceClass === ScriptingService) {
         return service;
       }

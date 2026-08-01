@@ -26,11 +26,11 @@ describe("ScriptingService", () => {
 
     service = new ScriptingService();
     service.reconfigure(mockScripts);
-    app.addServices(service);
+    app.addService(service);
     service.attach(agent);
 
-    agentCommandService = new AgentCommandService(app);
-    app.addServices(agentCommandService);
+    agentCommandService = new AgentCommandService();
+    app.addService(agentCommandService);
 
     // Mock the executeAgentCommand to avoid actual command execution
     spyOn(agentCommandService, "executeAgentCommand").mockResolvedValue({ message: "" });

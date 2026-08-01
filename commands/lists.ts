@@ -27,10 +27,10 @@ export default {
   name: "lists",
   description,
   inputSchema,
-  execute: ({ positionals, agent }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ args, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
 
-    const listName = positionals.listName?.replace(/^@/, "");
+    const listName = args.listName?.replace(/^@/, "");
 
     if (listName) {
       const list = context.getList(listName);

@@ -4,7 +4,7 @@ import { ScriptingContext } from "../state/ScriptingContext.ts";
 
 export async function executeBlock(commands: string[], agent: Agent): Promise<void> {
   const context = agent.getState(ScriptingContext);
-  const agentCommandService = agent.requireServiceByType(AgentCommandService);
+  const agentCommandService = agent.requireService(AgentCommandService);
   for (const command of commands) {
     if (command.startsWith("/")) {
       await agentCommandService.executeAgentCommand(agent, command);

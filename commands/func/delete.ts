@@ -23,7 +23,7 @@ export default {
 
 /function delete greet`,
   inputSchema,
-  execute: ({ positionals: { funcName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ args: { funcName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     if (!/^\w+$/.test(funcName)) {
       throw new CommandFailedError("Invalid syntax. Use: /function delete <name>");
     }

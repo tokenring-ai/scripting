@@ -8,7 +8,7 @@ const name = "script_run";
 const displayName = "Scripting/runScript";
 
 async function execute({ scriptName }: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolResult> {
-  const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
+  const scriptingService: ScriptingService = agent.requireService(ScriptingService);
 
   agent.infoMessage(`[${name}] Running script: ${scriptName}`);
 

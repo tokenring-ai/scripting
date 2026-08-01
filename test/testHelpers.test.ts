@@ -33,7 +33,7 @@ export function createMockAgent() {
       }
       return context;
     }),
-    requireServiceByType: mock(ServiceClass => {
+    requireService: mock(ServiceClass => {
       if (ServiceClass === ScriptingService) {
         return new ScriptingService();
       }

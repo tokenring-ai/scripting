@@ -27,10 +27,10 @@ export default {
   name: "sleep",
   description,
   inputSchema,
-  execute: async ({ positionals, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ args, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const interpolated = context.interpolate(positionals.seconds);
+    const interpolated = context.interpolate(args.seconds);
     const seconds = parseFloat(interpolated);
 
     if (Number.isNaN(seconds) || seconds < 0) {

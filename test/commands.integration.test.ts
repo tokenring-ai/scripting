@@ -111,7 +111,7 @@ describe("Command Integration Tests", () => {
     it("should delete functions", async () => {
       context.defineFunction("testFunc", "expression", [], "test");
 
-      const result = funcDelete.execute({ positionals: { funcName: "testFunc" }, agent } as any);
+      const result = funcDelete.execute({ args: { funcName: "testFunc" }, agent } as any);
 
       expect(context.getFunction("testFunc")).toBeUndefined();
       expect(result).toContain("deleted");
@@ -166,7 +166,7 @@ describe("Command Integration Tests", () => {
         params: ["arg1", "arg2"],
         body: '"result"',
       });
-      agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
+      agent.requireService.mockImplementation((ServiceClass: any) => {
         if (ServiceClass === ScriptingService) {
           return service;
         }
@@ -267,7 +267,7 @@ describe("Command Integration Tests", () => {
         params: ["text"],
         body: '"Processed: $text"',
       });
-      agent.requireServiceByType.mockImplementation((ServiceClass: any) => {
+      agent.requireService.mockImplementation((ServiceClass: any) => {
         if (ServiceClass === ScriptingService) {
           return service;
         }

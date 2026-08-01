@@ -51,19 +51,19 @@ describe("func delete command", () => {
   it("deletes function", async () => {
     const { agent, context } = createMockAgent();
     context.defineFunction("test", "expression", [], "body");
-    const result = funcDelete.execute({ positionals: { funcName: "test" }, agent } as any);
+    const result = funcDelete.execute({ args: { funcName: "test" }, agent } as any);
     expect(context.getFunction("test")).toBeUndefined();
     expect(result).toContain("deleted");
   });
 
   it("shows error when deleting non-existent function", async () => {
     const { agent } = createMockAgent();
-    expect(() => funcDelete.execute({ positionals: { funcName: "missing" }, agent } as any)).toThrow("not defined");
+    expect(() => funcDelete.execute({ args: { funcName: "missing" }, agent } as any)).toThrow("not defined");
   });
 
   it("shows error on invalid syntax", async () => {
     const { agent } = createMockAgent();
-    expect(() => funcDelete.execute({ positionals: { funcName: "invalid name with spaces" }, agent } as any)).toThrow("Invalid syntax");
+    expect(() => funcDelete.execute({ args: { funcName: "invalid name with spaces" }, agent } as any)).toThrow("Invalid syntax");
   });
 });
 
@@ -88,7 +88,7 @@ describe("func show command", () => {
   it("shows specific function", async () => {
     const { agent, context } = createMockAgent();
     context.defineFunction("greet", "expression", ["name"], '"Hello, $name"');
-    const result = funcShow.execute({ positionals: { funcName: "greet" }, agent } as any);
+    const result = funcShow.execute({ args: { funcName: "greet" }, agent } as any);
     expect(result).toContain("greet($name)");
     expect(result).toContain('"Hello, $name"');
   });
@@ -96,14 +96,14 @@ describe("func show command", () => {
   it("shows llm function with prefix", async () => {
     const { agent, context } = createMockAgent();
     context.defineFunction("analyze", "llm", ["text"], '"Analyze"');
-    const result = funcShow.execute({ positionals: { funcName: "analyze" }, agent } as any);
+    const result = funcShow.execute({ args: { funcName: "analyze" }, agent } as any);
     expect(result).toContain("llm analyze");
   });
 
   it("shows js function with braces", async () => {
     const { agent, context } = createMockAgent();
     context.defineFunction("double", "js", ["x"], "return $x * 2;");
-    const result = funcShow.execute({ positionals: { funcName: "double" }, agent } as any);
+    const result = funcShow.execute({ args: { funcName: "double" }, agent } as any);
     expect(result).toContain("js double");
     expect(result).toContain("{");
     expect(result).toContain("}");
@@ -111,7 +111,7 @@ describe("func show command", () => {
 
   it("shows error for non-existent function", async () => {
     const { agent } = createMockAgent();
-    expect(() => funcShow.execute({ positionals: { funcName: "missing" }, agent } as any)).toThrow("not defined");
+    expect(() => funcShow.execute({ args: { funcName: "missing" }, agent } as any)).toThrow("not defined");
   });
 });
 

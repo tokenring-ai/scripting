@@ -31,10 +31,10 @@ export default {
   name: "prompt",
   description,
   inputSchema,
-  execute: async ({ positionals, remainder: messageExpr, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
+  execute: async ({ args, remainder: messageExpr, agent }: AgentCommandInputType<typeof inputSchema>): Promise<string> => {
     const context = agent.getState(ScriptingContext);
 
-    const varName = positionals.varName.replace(/^\$/, "");
+    const varName = args.varName.replace(/^\$/, "");
     if (!varName) throw new CommandFailedError('Usage: /prompt $var "message"');
 
     const unquoted = messageExpr.match(/^["'](.*)['"']$/s) as [string, string] | undefined;

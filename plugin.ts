@@ -1,5 +1,6 @@
-import { AgentCommandService, SubAgentService } from "@tokenring-ai/agent";
+import { AgentCommandService } from "@tokenring-ai/agent";
 import { SubAgentConfigSchema } from "@tokenring-ai/agent/schema";
+import { runSubAgent } from "@tokenring-ai/agent/util/runSubAgent";
 import type { TokenRingPlugin } from "@tokenring-ai/app";
 import { ChatService } from "@tokenring-ai/chat";
 import { z } from "zod";
@@ -22,19 +23,17 @@ export default {
   description: packageJSON.description,
   install(app) {
     app.waitForService(ChatService, chatService => {
-      chatService.addTools(...tools);
+      chatService.addTools(tools);
       chatService.registerContextHandlers(contextHandlers);
     });
     app.waitForService(AgentCommandService, agentCommandService => agentCommandService.addAgentCommands([...agentCommands]));
-    const scriptingService = new ScriptingService();
-    app.addServices(scriptingService);
+    const scriptingService = app.addService(new ScriptingService());
 
     scriptingService.registerFunction("runAgent", {
       type: "native",
       params: ["agentType", "message", "context"],
       async execute(this: ScriptingThis, agentType: string, message: string, context: string): Promise<string> {
-        const subAgentService = this.agent.requireServiceByType(SubAgentService);
-        const res = await subAgentService.runSubAgent({
+        const res = await runSubAgent({
           agentType: agentType,
           headless: this.agent.headless,
           from: "Scripting plugin runAgent",

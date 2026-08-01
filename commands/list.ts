@@ -33,7 +33,7 @@ export default {
     const funcMatch = remainder.match(/^@(\w+)\s*=\s*(\w+)\((.*)\)$/s);
     if (funcMatch) {
       const [, listName, funcName, argsStr] = funcMatch;
-      const scriptingService = agent.requireServiceByType(ScriptingService);
+      const scriptingService = agent.requireService(ScriptingService);
 
       const args = parseArguments(argsStr!).map(a => {
         const unquoted = a.match(/^["'](.*)['"']$/);

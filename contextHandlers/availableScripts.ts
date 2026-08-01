@@ -2,7 +2,7 @@ import type { ContextHandlerOptions, ContextItem } from "@tokenring-ai/chat/sche
 import ScriptingService from "../ScriptingService.ts";
 
 export default function* getContextItems({ agent }: ContextHandlerOptions): Generator<ContextItem> {
-  const scriptingService = agent.requireServiceByType(ScriptingService);
+  const scriptingService = agent.requireService(ScriptingService);
 
   const scriptNames = scriptingService.listScripts();
 

@@ -23,8 +23,8 @@ export default {
 
 /script info myScript`,
   inputSchema,
-  execute: ({ positionals: { scriptName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
-    const scriptingService: ScriptingService = agent.requireServiceByType(ScriptingService);
+  execute: ({ args: { scriptName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
+    const scriptingService: ScriptingService = agent.requireService(ScriptingService);
     const script = scriptingService.getScriptByName(scriptName);
     if (!script) {
       throw new CommandFailedError(`Script not found: ${scriptName}`);

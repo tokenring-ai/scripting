@@ -35,7 +35,7 @@ export default {
     }
 
     const [, funcName, argsStr] = match;
-    const scriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptingService = agent.requireService(ScriptingService);
 
     const args = parseArguments(argsStr).map(a => {
       const unquoted = a.match(/^["'](.*)['"]$/) as [string, string] | undefined;

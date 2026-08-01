@@ -22,7 +22,7 @@ export default {
 
 /var delete $name`,
   inputSchema,
-  execute: ({ positionals: { varName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ args: { varName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     if (!/^\w+$/.test(varName)) {
       throw new CommandFailedError("Invalid syntax. Use: /var delete $name");
     }

@@ -4,9 +4,9 @@ import type { TokenRingService } from "@tokenring-ai/app/types";
 import { ConfigurationError } from "@tokenring-ai/app/types";
 import { ChatService } from "@tokenring-ai/chat";
 import runChat from "@tokenring-ai/chat/runChat";
-import { deepEqual } from "@tokenring-ai/one-frontend/src/lib/utils";
 import { joinArrayable } from "@tokenring-ai/utility/array/arrayable";
 import EnhancedMap from "@tokenring-ai/utility/map/enhancedMap";
+import deepEqual from "@tokenring-ai/utility/object/deepEqual";
 import KeyedRegistry from "@tokenring-ai/utility/registry/KeyedRegistry";
 import type { ParsedScriptingServiceConfig } from "./schema.ts";
 import { ScriptingContext } from "./state/ScriptingContext.ts";
@@ -125,7 +125,7 @@ export default class ScriptingService implements TokenRingService {
         return result;
       } else if (func.type === "llm") {
         const prompt = context.interpolate(func.body.match(/^["'](.*)["']$/s)?.[1] || func.body);
-        const chatService = agent.requireServiceByType(ChatService);
+        const chatService = agent.requireService(ChatService);
         const chatConfig = chatService.getChatConfig(agent);
         const response = await runChat({ input: prompt, chatConfig, agent });
         if (!response.text) {
@@ -161,7 +161,7 @@ export default class ScriptingService implements TokenRingService {
     try {
       agent.infoMessage(`Running script: ${scriptName} with ${script.length} commands`);
 
-      const agentCommandService = agent.requireServiceByType(AgentCommandService);
+      const agentCommandService = agent.requireService(AgentCommandService);
       for (const command of script) {
         if (command.trim()) {
           agent.infoMessage(`Executing: ${command}`);

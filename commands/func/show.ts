@@ -23,9 +23,9 @@ export default {
 
 /function show greet`,
   inputSchema,
-  execute: ({ positionals: { funcName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
+  execute: ({ args: { funcName }, agent }: AgentCommandInputType<typeof inputSchema>): string => {
     const context = agent.getState(ScriptingContext);
-    const scriptingService = agent.requireServiceByType(ScriptingService);
+    const scriptingService = agent.requireService(ScriptingService);
     const func = resolveNamedFunction(funcName, context, scriptingService, agent);
     return formatFunctionDefinition(funcName, func);
   },
