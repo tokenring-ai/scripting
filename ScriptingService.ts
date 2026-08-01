@@ -94,8 +94,10 @@ export default class ScriptingService implements TokenRingService {
     }
 
     const tempVars = new EnhancedMap(context.variables);
-    func.params.forEach((param, i) => {
-      context.variables.set(param, args[i]!);
+    agent.mutateState(ScriptingContext, state => {
+      for (const [i, param] of func.params.entries()) {
+        state.variables.set(param, args[i]!);
+      }
     });
 
     try {
@@ -140,7 +142,9 @@ export default class ScriptingService implements TokenRingService {
     } catch (error: unknown) {
       throw new Error(`Function execution error: ${Error.isError(error) ? error.message : String(error)}`);
     } finally {
-      context.variables = tempVars;
+      agent.mutateState(ScriptingContext, state => {
+        state.variables = tempVars;
+      });
     }
   }
 
